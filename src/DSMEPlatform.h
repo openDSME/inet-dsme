@@ -111,6 +111,8 @@ public:
 
     void setReceiveDelegate(receive_delegate_t receiveDelegate) override;
 
+    void updateVisual() override;
+
     void startCCA() override {
         channelInactive = true;
         LOG_DEBUG("CCA start");
@@ -191,8 +193,6 @@ public:
     IEEE802154MacAddress& getAddress() {
         return this->mac_pib.macExtendedAddress;
     }
-
-    void updateCoordinator();
 
 private:
     DSMEFrame* pendingTxFrame;

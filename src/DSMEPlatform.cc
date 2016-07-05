@@ -73,16 +73,23 @@ InterfaceEntry *DSMEPlatform::createInterfaceEntry() {
     return e;
 }
 
-void DSMEPlatform::updateCoordinator() {
-    char c = ' ';
+void DSMEPlatform::updateVisual() {
+    char c = ' ', a = ' ';
 
     DSMESettings &current_settings = dsme->getDSMESettings();
     if (current_settings.isCoordinator) {
         c = 'C';
     }
+    if (this->mac_pib.macAssociatedPANCoord) {
+        a = 'A';
+    }
     char buf[10];
-    sprintf(buf, "%i %c", this->mac_pib.macShortAddress, c);
-    getModuleFromPar<cModule>(par("radioModule"), this)->getParentModule()->getParentModule()->getDisplayString().setTagArg("t", 0, buf);
+    sprintf(buf, "%i %c %c", this->mac_pib.macShortAddress, a, c);
+    cModule* displayModule = getModuleFromPar<cModule>(par("radioModule"), this)->getParentModule()->getParentModule();
+    if(displayModule->getParentModule()->getId() != 1) {
+        displayModule = displayModule->getParentModule();
+    }
+    displayModule->getDisplayString().setTagArg("t", 0, buf);
 }
 
 void DSMEPlatform::initialize(int stage) {
@@ -154,8 +161,7 @@ void DSMEPlatform::initialize(int stage) {
 
         settings->isPANCoordinator = par("isPANCoordinator");
 
-        //settings->isCoordinator =  dblrand() < par("isCoordinatorProbability").doubleValue();
-        settings->isCoordinator = false;
+        settings->isCoordinator = (par("isCoordinator") || settings->isPANCoordinator);
 
         //settings.superframeSpec.finalCAPSlot = par("finalCAPSlot").longValue(); // TODO
         settings->numMaxGTSAllocPerDevice = par("maxNumberGTSAllocPerDevice");
@@ -177,7 +183,7 @@ void DSMEPlatform::initialize(int stage) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         dsme->start(*settings, this);
 
-        updateCoordinator();
+        updateVisual();
     }
 }
 
@@ -415,7 +421,7 @@ void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long 
 }
 
 void DSMEPlatform::signalNewMsg(DSMEMessage* msg) {
-#if 1
+#if 0
     LOG_INFO_PREFIX;
     LOG_INFO_PURE(msgId << " - ");
     for(auto i : msgsActive) {

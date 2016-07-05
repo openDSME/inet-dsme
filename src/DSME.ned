@@ -17,7 +17,7 @@ simple DSME extends MACProtocolBase like IMACProtocol
         bool optimizations = default(false);
                                           
         bool isPANCoordinator = default(false);
-        //bool isCoordinator = default(false);
+        bool isCoordinator = default(false);
         double isCoordinatorProbability = default(0.5);
                 
         // aMaxPHYPacketSize = 127 Octets (802.15.4-2006, page 45)
