@@ -1,6 +1,5 @@
 sudo: false
 language: cpp
-
 addons:
   apt:
     sources:
@@ -10,17 +9,26 @@ addons:
     - g++-4.8
 
 install:
-    - source ./install-dependencies.sh
+  - source ./install-dependencies.sh
 
 script:
-    - pushd src && opp_makemake -f --deep --make-so -I$INET/src -I$INET/src/inet/common -I.. -KINET_PROJ=$INET && popd
-    - make -j2
-    - export RUN=5
-    - export REP=0
-    - opp_run -r $RUN --seed-set=$REP --repeat=1 --cmdenv-express-mode=true --vector-recording=false -u Cmdenv -c DSME -n simulations:src:$INET/examples:$INET/src -l $INET/src/INET -l src/inet-dsme --debug-on-errors=false simulations/omnetpp.ini
+  - pushd src && opp_makemake -f --deep --make-so -I$INET/src -I$INET/src/inet/common -I.. -KINET_PROJ=$INET && popd
+  - make -j2
+  - echo "test DSME" > DSME-mac.log
+  - echo "test CSMA" > CSMA-mac.log
 
 cache:
-    directories:
-    - omnetdownload
-    - omnetpp-5.0
-    - inet
+  directories:
+  - omnetdownload
+  - omnetpp-5.0
+  - inet
+
+deploy:
+  provider: releases
+  api_key:
+    secure: VVIjkrq+lT6HAbqKf7tC/RWsxfSy4cLGVgpi9fWDzbJd6iaGb7plQmJy+Ih2OZ2O479WNYvbGjDddJXWYAMUVNgch9bDDq37eKdtIYrRamGHPEuwxGtTVaJzI5AmuNhta4mzO3wSUe5Yok5CaVO8upTm70Fm8C9bdq2hwAtY32uXVLlFUItyzewLsHu8/yJO9o1KfiMBS1iLOw4DyhPeT3FKwPYzwgMWQzbYshh40VY5fPPgVZo2jgKatRV54dAh+6IaxPeVatQLvOnW+FmHWmP8n81P+OViEPeLjL1GYETT7lQtRe0NnTZQ6+LFC5tIp0dU98jqD2bJWqf0r67RBzRml70uX6B3ueuz3+yFi8Q1gQbdfb8gMsrF4czlnjUirrqNAXmuNN66iv+0vKpg4mW6UageGMwQgKWwa07vdB/Mr//z5vf8oa07Ft0VE22BNtj//Iy+CDaXmBv3g/UzRtIz0y/bhOJvnGJj5VoS/iQA7CMFJWBU4JuIZiNJC4fFU9i5alnxJrepsQR1dVxYl3HbckAcUcSVFY4AwvQn5W9iBFsvxioW+nFdz2kb3jzccxUcjozFjrDVLJne9LKdWi5DDSlNKQq9s17GRIz15SvVu39jDBkl9CWXkqfSJMyOZJp6DcYOkhtbdl+62tySwe5moYyQ2rhkOOrY8rROFjs=
+  file: 
+      - DSME-mac.log
+      - CSMA-mac.log
+  on:
+    repo: openDSME/inet-dsme
