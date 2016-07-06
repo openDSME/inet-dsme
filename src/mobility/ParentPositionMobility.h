@@ -25,7 +25,7 @@
 
 #include "inet/common/INETDefs.h"
 
-#include "inet/mobility/static/StationaryMobility.h"
+#include "DSMEStationaryMobility.h"
 
 
 namespace inet_dsme {
@@ -36,7 +36,7 @@ namespace inet_dsme {
  * @ingroup mobility
  * @author Maximilian Köstler
  */
-class ParentPositionMobility : public inet::StationaryMobility
+class ParentPositionMobility : public DSMEStationaryMobility
 {
   protected:
     /** @brief Initializes the position according to the mobility model. */

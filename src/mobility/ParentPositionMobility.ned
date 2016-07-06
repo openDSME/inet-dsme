@@ -21,12 +21,12 @@
 
 package inet_dsme.mobility;
 
-import inet.mobility.base.MobilityBase;
+import inet_dsme.mobility.base.DSMEMobilityBase;
 
 //
 // Places a host at the position of its parent module
 //
-simple ParentPositionMobility extends MobilityBase
+simple ParentPositionMobility extends DSMEMobilityBase
 {
     parameters:
         @class(::inet_dsme::ParentPositionMobility);

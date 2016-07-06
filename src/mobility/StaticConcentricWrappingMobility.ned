@@ -21,17 +21,17 @@
 
 package inet_dsme.mobility;
 
-import inet.mobility.base.MobilityBase;
+import inet_dsme.mobility.base.DSMEMobilityBase;
 
 //
 // Places all hosts on concentric circles
 //
-simple StaticConcentricWrappingMobility extends MobilityBase
+simple StaticConcentricWrappingMobility extends DSMEMobilityBase
 {
     parameters:
         int numHosts;
         double initialZ @unit(m) = default(0m);
         double distance @unit(m) = default(100m);
 
-        @class(::inet_dsme::StaticConcentricWrappingMobility);
+        @class(inet_dsme::StaticConcentricWrappingMobility);
 }

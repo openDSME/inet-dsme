@@ -40,7 +40,7 @@ void ParentPositionCircularMobility::updatePosition() {
         if (grandParent) {
             cModule *parentMobility = grandParent->getSubmodule("mobility");
             if (parentMobility) {
-                MobilityBase* parentMobilityBase = check_and_cast<MobilityBase*>(parentMobility);
+                DSMEMobilityBase* parentMobilityBase = check_and_cast<DSMEMobilityBase*>(parentMobility);
 
                 lastPosition.x = parentMobilityBase->getCurrentPosition().x;
                 lastPosition.y = parentMobilityBase->getCurrentPosition().y;

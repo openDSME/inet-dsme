@@ -26,7 +26,7 @@ module HostWrapper like INetworkNode
         @networkNode;
         @display("i=device/accesspoint;bgb=91.64,51.350002");
 
-        string mobilityType = default("StaticConcentricWrappingMobility");
+        string mobilityType;
         int numWlanInterfaces = default(1);
         string hostType = default("SimpleHost");
         

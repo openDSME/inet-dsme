@@ -19,14 +19,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef __INET_DSME_STATICCONCENTRICWRAPPINGMOBILITY_H
+#define __INET_DSME_STATICCONCENTRICWRAPPINGMOBILITY_H
 
-#ifndef __INET_STATICCONCENTRICWRAPPINGMOBILITY_H
-#define __INET_STATICCONCENTRICWRAPPINGMOBILITY_H
+#include <INETDefs.h>
 
-#include "inet/common/INETDefs.h"
-
-#include "inet/mobility/static/StationaryMobility.h"
-
+#include "DSMEStationaryMobility.h"
 
 namespace inet_dsme {
 
@@ -36,16 +34,16 @@ namespace inet_dsme {
  * @ingroup mobility
  * @author Florian Meier
  */
-class INET_API StaticConcentricWrappingMobility : public inet::StationaryMobility
-{
-  protected:
+class StaticConcentricWrappingMobility : public DSMEStationaryMobility {
+protected:
     /** @brief Initializes the position according to the mobility model. */
     virtual void setInitialPosition() override;
 
-  public:
-    StaticConcentricWrappingMobility() {};
+public:
+    StaticConcentricWrappingMobility() {
+    }
 };
 
-}
+} /* inet_dsme */
 
 #endif

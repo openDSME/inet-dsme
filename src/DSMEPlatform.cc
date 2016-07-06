@@ -340,7 +340,8 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
 
 void DSMEPlatform::handleUpperPacket(cPacket* pkt) {
     IMACProtocolControlInfo *const cInfo = check_and_cast<IMACProtocolControlInfo *>(pkt->removeControlInfo());
-    LOG_INFO("Upper layer requests to send a message to " <<  (cInfo->getDestinationAddress().getInt() & 0xFFFF) << ".");
+    LOG_INFO_PREFIX;
+    LOG_INFO_PURE("Upper layer requests to send a message to ");
 
     DSMEFrame *macPkt = new DSMEFrame();
     macPkt->setNetworkProtocol(cInfo->getNetworkProtocol());
@@ -355,7 +356,12 @@ void DSMEPlatform::handleUpperPacket(cPacket* pkt) {
     if(dest.isMulticast()) {
         // handle multicast as broadcast (TODO ok?)
         dest = MACAddress::BROADCAST_ADDRESS;
+        LOG_INFO_PURE("Broadcast");
+    } else {
+        LOG_INFO_PURE((cInfo->getDestinationAddress().getInt() & 0xFFFF));
     }
+    LOG_INFO_PURE("." << std::endl);
+
     translateMacAddress(dest, dsmemsg->getHeader().getDestAddr());
 
     delete cInfo;
