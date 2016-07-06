@@ -20,7 +20,7 @@ package inet_dsme.simulations;
 import inet.applications.generic.PRRTrafGen;
 import inet.node.inet.WirelessHost;
 import inet.linklayer.ieee802154.Ieee802154NarrowbandNic;
-import inet.routing.gpsr.GPSR;
+import inet_dsme.sp_gpsr.SP_GPSR;
 
 //
 // A wireless host containing an Ieee802154NarrowbandNic,
@@ -44,13 +44,14 @@ module IEEE802154ExampleHost extends WirelessHost
 
         *.routingTableModule = "^.generic.routingTable";
         *.networkProtocolModule = "^.generic.gnp";
+        gpsr.routingStrategy = "StraightestPath";
 
     submodules:
         trafficgen: PRRTrafGen {
             @display("p=188,287");
         }
 
-        gpsr: GPSR {
+        gpsr: SP_GPSR {
             @display("p=739,339");
         }
 
