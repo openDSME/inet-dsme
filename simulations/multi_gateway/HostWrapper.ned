@@ -29,10 +29,6 @@ module HostWrapper like INetworkNode
         string mobilityType;
         int numWlanInterfaces = default(1);
         string hostType = default("SimpleHost");
-        
-        //wrappedHost.initialX = mobility.lastPosition.x;
-        //wrappedHost.**.mobility.**.lastPosition = mobility.lastPosition;
-        
 
     gates:
         input radioIn[numWlanInterfaces] @directIn;
