@@ -74,22 +74,23 @@ InterfaceEntry *DSMEPlatform::createInterfaceEntry() {
 }
 
 void DSMEPlatform::updateVisual() {
-    char c = ' ', a = ' ';
+    std::stringstream s;
+    s << this->mac_pib.macShortAddress;
 
-    DSMESettings &current_settings = dsme->getDSMESettings();
-    if (current_settings.isCoordinator) {
-        c = 'C';
+    if (dsme->getDSMESettings().isCoordinator) {
+        s << " C";
     }
     if (this->mac_pib.macAssociatedPANCoord) {
-        a = 'A';
+        s << " A";
     }
-    char buf[10];
-    sprintf(buf, "%i %c %c", this->mac_pib.macShortAddress, a, c);
-    cModule* displayModule = getModuleFromPar<cModule>(par("radioModule"), this)->getParentModule()->getParentModule();
-    if(displayModule->getParentModule()->getId() != 1) {
-        displayModule = displayModule->getParentModule();
+
+    cModule *host = findContainingNode(this);
+    while(host->getParentModule() && host->getParentModule()->getId() != 1) {
+        host = host->getParentModule();
     }
-    displayModule->getDisplayString().setTagArg("t", 0, buf);
+    cDisplayString& displayString = host->getDisplayString();
+    displayString.setTagArg("t", 0, s.str().c_str());
+
 }
 
 void DSMEPlatform::initialize(int stage) {
