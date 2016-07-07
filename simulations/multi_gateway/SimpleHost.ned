@@ -15,23 +15,12 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package inet_dsme.simulations;
+package inet_dsme.simulations.multi_gateway;
 
-import inet.physicallayer.ieee802154.packetlevel.Ieee802154NarrowbandScalarRadioMedium;
+import inet_dsme.simulations.IEEE802154ExampleHost;
 
-network Net802154MultiGateway
+module SimpleHost extends IEEE802154ExampleHost like IWirelessNode
 {
-    parameters:
-        int numHosts;
-
-    submodules:
-        host[numHosts]: HostWrapper {
-            parameters:
-                @display("r=,,#707070;p=250,50;is=vs");
-        }
-
-        radioMedium: Ieee802154NarrowbandScalarRadioMedium {
-            parameters:
-                @display("p=60,50");
-        }
+    mobilityType = default("ParentPositionMobility"); 
 }
+

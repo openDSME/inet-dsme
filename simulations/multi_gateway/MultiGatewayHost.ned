@@ -15,7 +15,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package inet_dsme.simulations;
+package inet_dsme.simulations.multi_gateway;
 
 import inet.mobility.contract.IMobility;
 

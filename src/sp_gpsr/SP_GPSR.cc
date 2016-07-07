@@ -26,6 +26,9 @@
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/common/ModuleAccess.h"
 
+#include "inet/transportlayer/udp/UDP.h"
+#include "inet/networklayer/contract/generic/GenericNetworkProtocolControlInfo.h"
+
 #ifdef WITH_IPv4
 #include "inet/networklayer/ipv4/IPv4Datagram.h"
 #endif
@@ -49,7 +52,7 @@ static inline double determinant(double a1, double a2, double b1, double b2)
 }
 
 // KLUDGE: implement position registry protocol
-PositionTable SP_GPSR::globalPositionTable;
+SP_PositionTable SP_GPSR::globalPositionTable;
 
 SP_GPSR::SP_GPSR()
 {
@@ -80,7 +83,6 @@ void SP_GPSR::initialize(int stage)
         host = getContainingNode(this);
         nodeStatus = dynamic_cast<NodeStatus *>(host->getSubmodule("status"));
         interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
-        outputInterface = par("outputInterface");
         mobility = check_and_cast<IMobility *>(host->getSubmodule("mobility"));
         routingTable = getModuleFromPar<IRoutingTable>(par("routingTableModule"), this);
         networkProtocol = getModuleFromPar<INetfilter>(par("networkProtocolModule"), this);
@@ -164,7 +166,7 @@ void SP_GPSR::processBeaconTimer()
     if (!selfAddress.isUnspecified()) {
         sendBeacon(createBeacon(), uniform(0, maxJitter).dbl());
         // KLUDGE: implement position registry protocol
-        globalPositionTable.setPosition(selfAddress, mobility->getCurrentPosition());
+        globalPositionTable.setPosition(selfAddress, mobility->getCurrentPosition(), -1);
     }
     scheduleBeaconTimer();
     schedulePurgeNeighborsTimer();
@@ -215,9 +217,13 @@ void SP_GPSR::sendUDPPacket(UDPPacket *packet, double delay)
 
 void SP_GPSR::processUDPPacket(UDPPacket *packet)
 {
+    GenericNetworkProtocolControlInfo *ctrlInfo = check_and_cast<GenericNetworkProtocolControlInfo *>(packet->removeControlInfo());
+    int interfaceId = ctrlInfo->getInterfaceId();
+    delete ctrlInfo;
+
     cPacket *encapsulatedPacket = packet->decapsulate();
     if (dynamic_cast<GPSRBeacon *>(encapsulatedPacket))
-        processBeacon(static_cast<GPSRBeacon *>(encapsulatedPacket));
+        processBeacon(static_cast<GPSRBeacon *>(encapsulatedPacket), interfaceId);
     else
         throw cRuntimeError("Unknown UDP packet");
     delete packet;
@@ -252,10 +258,10 @@ void SP_GPSR::sendBeacon(GPSRBeacon *beacon, double delay)
     sendUDPPacket(udpPacket, delay);
 }
 
-void SP_GPSR::processBeacon(GPSRBeacon *beacon)
+void SP_GPSR::processBeacon(GPSRBeacon *beacon, int interfaceId)
 {
     EV_INFO << "Processing beacon: address = " << beacon->getAddress() << ", position = " << beacon->getPosition() << endl;
-    neighborPositionTable.setPosition(beacon->getAddress(), beacon->getPosition());
+    neighborPositionTable.setPosition(beacon->getAddress(), beacon->getPosition(), interfaceId);
     delete beacon;
 }
 
@@ -633,7 +639,14 @@ INetfilter::IHook::Result SP_GPSR::routeDatagram(INetworkDatagram *datagram, con
         EV_INFO << "Next hop found: source = " << source << ", destination = " << destination << ", nextHop: " << nextHop << endl;
         GPSROption *gpsrOption = getGpsrOptionFromNetworkDatagram(datagram);
         gpsrOption->setSenderAddress(getSelfAddress());
-        outputInterfaceEntry = interfaceTable->getInterfaceByName(outputInterface);
+        int interfaceId = neighborPositionTable.getInterfaceId(nextHop);
+        if(interfaceId < 0) {
+            /* This should only ever happen when routing back over the source that has not sent beacons yet. */
+            EV_WARN << "No interface found, dropping packet: source = " << source << ", destination = " << destination << endl;
+            return DROP;
+        }
+
+        outputInterfaceEntry = interfaceTable->getInterfaceById(interfaceId);
         ASSERT(outputInterfaceEntry);
         return ACCEPT;
     }

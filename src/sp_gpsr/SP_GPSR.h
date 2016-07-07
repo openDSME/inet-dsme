@@ -29,9 +29,10 @@
 #include "inet/networklayer/contract/INetfilter.h"
 #include "inet/networklayer/contract/IRoutingTable.h"
 #include "inet/common/lifecycle/NodeStatus.h"
-#include "inet/routing/gpsr/PositionTable.h"
 #include "inet/transportlayer/udp/UDPPacket.h"
 #include "inet/routing/gpsr/GPSR_m.h"
+
+#include "SP_PositionTable.h"
 
 namespace inet {
 
@@ -63,10 +64,9 @@ class INET_API SP_GPSR : public cSimpleModule, public ILifecycle, public cListen
     IMobility *mobility = nullptr;
     IL3AddressType *addressType = nullptr;
     IInterfaceTable *interfaceTable = nullptr;
-    const char *outputInterface = nullptr;
     IRoutingTable *routingTable = nullptr;    // TODO: delete when necessary functions are moved to interface table
     INetfilter *networkProtocol = nullptr;
-    static PositionTable globalPositionTable;    // KLUDGE: implement position registry protocol
+    static SP_PositionTable globalPositionTable;    // KLUDGE: implement position registry protocol
 
     // packet size
     int positionByteLength = -1;
@@ -76,7 +76,7 @@ class INET_API SP_GPSR : public cSimpleModule, public ILifecycle, public cListen
     // internal
     cMessage *beaconTimer = nullptr;
     cMessage *purgeNeighborsTimer = nullptr;
-    PositionTable neighborPositionTable;
+    SP_PositionTable neighborPositionTable;
 
   public:
     SP_GPSR();
@@ -108,7 +108,7 @@ class INET_API SP_GPSR : public cSimpleModule, public ILifecycle, public cListen
     // handling beacons
     GPSRBeacon *createBeacon();
     void sendBeacon(GPSRBeacon *beacon, double delay);
-    void processBeacon(GPSRBeacon *beacon);
+    void processBeacon(GPSRBeacon *beacon, int interfaceId);
 
     // handling packets
     GPSROption *createGpsrOption(L3Address destination, cPacket *content);

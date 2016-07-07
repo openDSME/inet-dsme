@@ -15,12 +15,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package inet_dsme.simulations;
+package inet_dsme.simulations.multi_gateway;
 
 import inet.applications.generic.IPvXTrafGen;
 import inet.applications.generic.PRRTrafGen;
 import inet.node.inet.StandardHost;
-import inet.routing.gpsr.GPSR;
+
+import inet_dsme.sp_gpsr.SP_GPSR;
 
 module MultiGatewayCenterHost extends StandardHost
 {
@@ -43,7 +44,7 @@ module MultiGatewayCenterHost extends StandardHost
             @display("p=188,287");
         }
 
-        gpsr: GPSR {
+        gpsr: SP_GPSR {
             @display("p=739,339");
         }
 

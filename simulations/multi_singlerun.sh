@@ -4,8 +4,8 @@ pushd ../
 make || exit 1
 popd
 
-RUN=4
-REP=4
+RUN=0
+REP=0
 VECTOR_RECORDING=true
 #VECTOR_RECORDING=false
 

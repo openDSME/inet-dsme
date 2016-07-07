@@ -15,19 +15,43 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package inet_dsme.simulations;
+package inet_dsme.simulations.multi_gateway;
 
+import inet.mobility.contract.IMobility;
 import inet.node.inet.INetworkNode;
 
-moduleinterface IWirelessNode extends INetworkNode
+module HostWrapper like INetworkNode
 {
     parameters:
-        @display("bgb=,448");
         @networkNode;
-        @labels(node,ethernet-node,wireless-node);
+        @display("i=device/accesspoint;bgb=91.64,51.350002");
+
+        string mobilityType;
+        int numWlanInterfaces = default(1);
+        string hostType = default("SimpleHost");
         
+        //wrappedHost.initialX = mobility.lastPosition.x;
+        //wrappedHost.**.mobility.**.lastPosition = mobility.lastPosition;
+        
+
     gates:
         input radioIn[numWlanInterfaces] @directIn;
         inout pppg[] @labels(PPPFrame-conn);
         inout ethg[] @labels(EtherFrame-conn);
+
+    submodules:
+        mobility: <mobilityType> like IMobility if mobilityType != "" {
+            parameters:
+                @display("p=29,27");
+        }
+        
+        wrappedHost: <hostType> like IWirelessNode {
+            parameters:
+                @display("i=device/accesspoint;p=64.385,26.465");
+        }
+
+    connections:
+        for i=0..numWlanInterfaces-1 {
+            radioIn[i] --> { @display("m=s"); } --> wrappedHost.radioIn[i];
+        }
 }
