@@ -24,8 +24,10 @@ def main(args):
 
     try:
         # Stash and checkout the jekyll branch
-        check_output(['git','stash'])
-        check_output(['git','checkout',args.jekyll])
+        call(['git','stash'])
+        call(['git','config','remote.'+args.remote+'.fetch','refs/heads/*:refs/remotes/'+args.remote+'/*']) # required since travis clones only the current branch
+        call(['git','fetch'])
+        call(['git','checkout',args.jekyll])
 
         # Create necessary directories
         for d in ['results','_posts']:
@@ -51,7 +53,7 @@ def main(args):
         # Add and commit
         call(['git','add',output_dir])
         call(['git','add',to_file])
-        call(['git','commit','-m','Results of \''+subject+'\''])
+        call(['git','commit','-m','Results of \''+subject+'\'','--author=\''+args.author+'\''])
 
         # Push if requested
         if not args.no_push:
@@ -68,8 +70,9 @@ if __name__ == '__main__':
     parser.add_argument('-i','--index', help='Markdown or Textile file inside of the results directory')
     parser.add_argument('-j','--jekyll', help='Name of the jekyll branch')
     parser.add_argument('-np','--no-push', dest='no_push', action='store_true', help="Do not push to remote")
-    parser.add_argument('-r','--remote', help='Remote to push the jekyll branch to')
-    parser.set_defaults(index='index.md',jekyll='gh-pages',no_push=False,remote='origin')
+    parser.add_argument('-r','--remote', help='Remote to pull from and push to')
+    parser.add_argument('-a','--author', help='Author of the commit')
+    parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin',author='ci <ci@localhost>')
     args = parser.parse_args()
 
     original_dir = os.getcwd()
