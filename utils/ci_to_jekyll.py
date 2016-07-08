@@ -22,9 +22,12 @@ def main(args):
     tfile.add( args.results, '.' )
     tfile.close()
 
+    call(['git','config','user.email',args.email])
+    call(['git','config','user.name',args.name])
+
     try:
         # Stash and checkout the jekyll branch
-        call(['git','stash'])
+        call(['git','stash','--include-untracked','--all'])
         call(['git','config','remote.'+args.remote+'.fetch','refs/heads/*:refs/remotes/'+args.remote+'/*']) # required since travis clones only the current branch
         call(['git','fetch'])
         call(['git','checkout',args.jekyll])
@@ -53,16 +56,23 @@ def main(args):
         # Add and commit
         call(['git','add',output_dir])
         call(['git','add',to_file])
-        call(['git','commit','-m','Results of \''+subject+'\'','--author=\''+args.author+'\''])
+        call(['git','commit','-m','Results of \''+subject+'\''])
 
         # Push if requested
         if not args.no_push:
-            call(['git','push',args.remote,args.jekyll])
+            if args.ssh: # https -> ssh
+                url = check_output(['git','config','--get','remote.'+args.remote+'.url']).strip()
+                url = url.replace("https://","")
+                url = url.replace("/",":",1)
+                url = "git@"+url
+                call(['git','remote','set-url',args.remote,url])
+
+            call(['git','push','-v',args.remote,args.jekyll])
 
     finally:
         # Revert old working tree
-        check_output(['git','checkout',branch])
-        check_output(['git','stash','apply'])
+        call(['git','checkout',branch])
+        call(['git','stash','apply'])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -71,8 +81,10 @@ if __name__ == '__main__':
     parser.add_argument('-j','--jekyll', help='Name of the jekyll branch')
     parser.add_argument('-np','--no-push', dest='no_push', action='store_true', help="Do not push to remote")
     parser.add_argument('-r','--remote', help='Remote to pull from and push to')
-    parser.add_argument('-a','--author', help='Author of the commit')
-    parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin',author='ci <ci@localhost>')
+    parser.add_argument('-u','--name', help='Name of the commiter')
+    parser.add_argument('-e','--email', help='E-mail of the commiter')
+    parser.add_argument('-s','--ssh', help='Rewrite the remote url from https to ssh')
+    parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin',name='ci',email='ci@localhost',ssh=True)
     args = parser.parse_args()
 
     original_dir = os.getcwd()
