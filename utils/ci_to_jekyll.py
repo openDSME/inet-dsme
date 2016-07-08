@@ -8,10 +8,6 @@ import tarfile
 import os
 
 def main(args):
-    if not args.force and check_output(['git','status','-s']) != "":
-        print "ERROR: Working tree not clean. Please commit, stash or force with -f"
-        return
-
     # Determine commit properties
     dtime = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct']).strip())).strftime("%Y-%m-%d-%H-%M-%S")
     sanitized_commit = check_output(['git','log','-1','--pretty=%f-%h']).strip()
@@ -68,13 +64,12 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-f','--force', action='store_true', help="Process even if working tree is not clean")
     parser.add_argument('results', help='Directory with result files')
     parser.add_argument('-i','--index', help='Markdown or Textile file inside of the results directory')
     parser.add_argument('-j','--jekyll', help='Name of the jekyll branch')
     parser.add_argument('-np','--no-push', dest='no_push', action='store_true', help="Do not push to remote")
     parser.add_argument('-r','--remote', help='Remote to push the jekyll branch to')
-    parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin')
+    parser.set_defaults(index='index.md',jekyll='gh-pages',no_push=False,remote='origin')
     args = parser.parse_args()
 
     original_dir = os.getcwd()
