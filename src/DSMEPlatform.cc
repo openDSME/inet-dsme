@@ -74,22 +74,23 @@ InterfaceEntry *DSMEPlatform::createInterfaceEntry() {
 }
 
 void DSMEPlatform::updateVisual() {
-    char c = ' ', a = ' ';
+    std::stringstream s;
+    s << this->mac_pib.macShortAddress;
 
-    DSMESettings &current_settings = dsme->getDSMESettings();
-    if (current_settings.isCoordinator) {
-        c = 'C';
+    if (dsme->getDSMESettings().isCoordinator) {
+        s << " C";
     }
     if (this->mac_pib.macAssociatedPANCoord) {
-        a = 'A';
+        s << " A";
     }
-    char buf[10];
-    sprintf(buf, "%i %c %c", this->mac_pib.macShortAddress, a, c);
-    cModule* displayModule = getModuleFromPar<cModule>(par("radioModule"), this)->getParentModule()->getParentModule();
-    if(displayModule->getParentModule()->getId() != 1) {
-        displayModule = displayModule->getParentModule();
+
+    cModule *host = findContainingNode(this);
+    while(host->getParentModule() && host->getParentModule()->getId() != 1) {
+        host = host->getParentModule();
     }
-    displayModule->getDisplayString().setTagArg("t", 0, buf);
+    cDisplayString& displayString = host->getDisplayString();
+    displayString.setTagArg("t", 0, s.str().c_str());
+
 }
 
 void DSMEPlatform::initialize(int stage) {
@@ -340,7 +341,8 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
 
 void DSMEPlatform::handleUpperPacket(cPacket* pkt) {
     IMACProtocolControlInfo *const cInfo = check_and_cast<IMACProtocolControlInfo *>(pkt->removeControlInfo());
-    LOG_INFO("Upper layer requests to send a message to " <<  (cInfo->getDestinationAddress().getInt() & 0xFFFF) << ".");
+    LOG_INFO_PREFIX;
+    LOG_INFO_PURE("Upper layer requests to send a message to ");
 
     DSMEFrame *macPkt = new DSMEFrame();
     macPkt->setNetworkProtocol(cInfo->getNetworkProtocol());
@@ -355,7 +357,12 @@ void DSMEPlatform::handleUpperPacket(cPacket* pkt) {
     if(dest.isMulticast()) {
         // handle multicast as broadcast (TODO ok?)
         dest = MACAddress::BROADCAST_ADDRESS;
+        LOG_INFO_PURE("Broadcast");
+    } else {
+        LOG_INFO_PURE((cInfo->getDestinationAddress().getInt() & 0xFFFF));
     }
+    LOG_INFO_PURE("." << std::endl);
+
     translateMacAddress(dest, dsmemsg->getHeader().getDestAddr());
 
     delete cInfo;
