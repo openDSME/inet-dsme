@@ -18,7 +18,7 @@ tar -xzf $OMNETTAR
 export OMNET_PATH=`pwd`/omnetpp-5.0
 export PATH=$PATH:$OMNET_PATH/bin
 pushd $OMNET_PATH && sed -i 's/WITH_QTENV.*/WITH_QTENV=no/' configure.user && sed -i 's/WITH_TKENV.*/WITH_TKENV=no/' configure.user && ./configure && make -j2 && popd
-cp opp_makedep_fix $OMNET_PATH/bin/opp_makedep
+cp utils/opp_makedep_fix $OMNET_PATH/bin/opp_makedep
 
 # Checkout INET
 export INET=`pwd`/inet
