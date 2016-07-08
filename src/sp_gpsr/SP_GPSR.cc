@@ -258,6 +258,7 @@ void SP_GPSR::sendBeacon(GPSRBeacon *beacon, double delay)
     sendUDPPacket(udpPacket, delay);
 }
 
+
 void SP_GPSR::processBeacon(GPSRBeacon *beacon, int interfaceId)
 {
     EV_INFO << "Processing beacon: address = " << beacon->getAddress() << ", position = " << beacon->getPosition() << endl;
@@ -639,6 +640,7 @@ INetfilter::IHook::Result SP_GPSR::routeDatagram(INetworkDatagram *datagram, con
         EV_INFO << "Next hop found: source = " << source << ", destination = " << destination << ", nextHop: " << nextHop << endl;
         GPSROption *gpsrOption = getGpsrOptionFromNetworkDatagram(datagram);
         gpsrOption->setSenderAddress(getSelfAddress());
+
         int interfaceId = neighborPositionTable.getInterfaceId(nextHop);
         if(interfaceId < 0) {
             /* This should only ever happen when routing back over the source that has not sent beacons yet. */
@@ -647,6 +649,7 @@ INetfilter::IHook::Result SP_GPSR::routeDatagram(INetworkDatagram *datagram, con
         }
 
         outputInterfaceEntry = interfaceTable->getInterfaceById(interfaceId);
+
         ASSERT(outputInterfaceEntry);
         return ACCEPT;
     }

@@ -29,6 +29,7 @@
 #include "inet/networklayer/contract/INetfilter.h"
 #include "inet/networklayer/contract/IRoutingTable.h"
 #include "inet/common/lifecycle/NodeStatus.h"
+
 #include "inet/transportlayer/udp/UDPPacket.h"
 #include "inet/routing/gpsr/GPSR_m.h"
 
@@ -64,6 +65,7 @@ class INET_API SP_GPSR : public cSimpleModule, public ILifecycle, public cListen
     IMobility *mobility = nullptr;
     IL3AddressType *addressType = nullptr;
     IInterfaceTable *interfaceTable = nullptr;
+
     IRoutingTable *routingTable = nullptr;    // TODO: delete when necessary functions are moved to interface table
     INetfilter *networkProtocol = nullptr;
     static SP_PositionTable globalPositionTable;    // KLUDGE: implement position registry protocol
