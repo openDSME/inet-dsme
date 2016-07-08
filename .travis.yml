@@ -14,7 +14,9 @@ install:
 script:
   - pushd src && opp_makemake -f --deep --make-so -I$INET/src -I$INET/src/inet/common -I.. -KINET_PROJ=$INET && popd
   - make -j2
-  - ./ci_test.sh
+  #- ./ci_test.sh
+  - mkdir -p results
+  - utils/ci_to_jekyll.py results
 
 cache:
   directories:
