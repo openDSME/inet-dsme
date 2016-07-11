@@ -46,11 +46,13 @@ void ParentPositionCircularMobility::updatePosition() {
                 lastPosition.y = parentMobilityBase->getCurrentPosition().y;
                 lastPosition.z = parentMobilityBase->getCurrentPosition().z;
 
-                double radius = distance;
-                double angularStep = 2.0 * M_PI / numAntennas;
-                double angle = angularStep * index;
-                lastPosition.x += (radius * cos(angle));
-                lastPosition.y += (radius * sin(angle));
+                if (numAntennas > 1) {
+                    double radius = distance;
+                    double angularStep = 2.0 * M_PI / numAntennas;
+                    double angle = angularStep * index;
+                    lastPosition.x += (radius * cos(angle));
+                    lastPosition.y += (radius * sin(angle));
+                }
 
                 recordScalar("x", lastPosition.x);
                 recordScalar("y", lastPosition.y);
