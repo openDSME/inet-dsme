@@ -538,6 +538,11 @@ L3Address SP_GPSR::findGreedyRoutingNextHop(INetworkDatagram *datagram, const L3
 
         std::vector<L3Address> neighborAddresses = neighborPositionTable.getAddresses();
         for (auto& neighborAddress : neighborAddresses) {
+            if(neighborAddress == destination) {
+                bestNeighbor = destination;
+                break;
+            }
+
             Coord p = neighborPositionTable.getPosition(neighborAddress);
             sqDistNext = destinationPosition.sqrdist(p);    // distance of neighbor to destination
 
