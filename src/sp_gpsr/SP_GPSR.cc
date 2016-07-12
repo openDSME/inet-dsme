@@ -95,10 +95,10 @@ void SP_GPSR::initialize(int stage)
 
         const char* _routingStrategy = par("routingStrategy");
         if (strcmp(_routingStrategy, "NearestNeighbor") == 0) {
-            EV_ERROR << "Using NearestNeighbor routing Strategy" << endl;
+            EV_INFO << "Using NearestNeighbor routing Strategy" << endl;
             routingStrategy = RoutingStrategy::NEAREST_NEIGHBOR;
         } else if (strcmp(_routingStrategy, "StraightestPath") == 0) {
-            EV_ERROR << "Using StraightestPath routing Strategy" << endl;
+            EV_INFO << "Using StraightestPath routing Strategy" << endl;
             routingStrategy = RoutingStrategy::STRAIGHTEST_PATH;
         } else {
             throw cRuntimeError("Invalid routing strategy");
@@ -519,6 +519,11 @@ L3Address SP_GPSR::findGreedyRoutingNextHop(INetworkDatagram *datagram, const L3
 
         std::vector<L3Address> neighborAddresses = neighborPositionTable.getAddresses();
         for (auto& neighborAddress: neighborAddresses) {
+            if(neighborAddress == destination) {
+                bestNeighbor = destination;
+                break;
+            }
+
             Coord neighborPosition = neighborPositionTable.getPosition(neighborAddress);
             double neighborDistance = (destinationPosition - neighborPosition).length();
             if (neighborDistance < bestDistance) {

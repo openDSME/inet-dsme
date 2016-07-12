@@ -24,7 +24,7 @@ namespace inet {
 std::vector<L3Address> SP_PositionTable::getAddresses() const
 {
     std::vector<L3Address> addresses;
-    for (const auto & elem : addressToPositionMap)
+    for (const std::pair<L3Address, AddressToPositionMapValue> & elem : addressToPositionMap)
         addresses.push_back(elem.first);
     return addresses;
 }
