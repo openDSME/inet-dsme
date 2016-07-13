@@ -24,9 +24,10 @@ def printMatrix(a):
 parser = argparse.ArgumentParser(description="Creates an animation from a log file to visualise the GTS allocation process.")
 parser.add_argument("-l", "--log", type=str, required=True, help="the log file to parse")
 parser.add_argument("-o", "--output", type=str, default="gts_allocation.mp4", help="the output file")
+parser.add_argument("-n", "--nodes", type=int, default="62", help="the number of nodes")
 args = parser.parse_args()
 
-numNodes = 62
+numNodes = args.nodes
 
 currentAllocationMatrix = numpy.zeros((numNodes, numNodes))
 positionVector = numpy.zeros((numNodes,2))
