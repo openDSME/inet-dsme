@@ -185,6 +185,10 @@ void DSMEPlatform::initialize(int stage) {
         dsme->start(*settings, this);
 
         updateVisual();
+        cModule *mobilityModule = this->getParentModule()->getParentModule()->getSubmodule("mobility");
+        IMobility *mobility = dynamic_cast<IMobility*>(mobilityModule);
+        Coord currentPosition = mobility->getCurrentPosition();
+        LOG_INFO("POSITION: x=" << currentPosition.x << ", y=" << currentPosition.y);
     }
 }
 

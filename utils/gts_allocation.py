@@ -44,17 +44,25 @@ nodesOnThisCircle = 1
 myCircle = 0
 nodesOnInnerCircles = 0
 
-for i in range(0, numNodes):
-    if i - totalNodesOnInnerCircles >= nodesOnThisCircle:
-        totalCircles += 1
-        totalNodesOnInnerCircles += nodesOnThisCircle
-        nodesOnThisCircle = int(2 * numpy.pi * totalCircles)
-    
-    radius = distance * totalCircles
-    angularStep = 2 * numpy.pi / nodesOnThisCircle
-    angle = angularStep * (i - totalNodesOnInnerCircles)
-    positionVector[i][0] = radius * numpy.sin(angle)
-    positionVector[i][1] = radius * numpy.cos(angle)
+for line in open(args.log):
+    m = re.search("^\[\w*\]\s*0\s*([0-9]*): POSITION: x=([0-9.]+), y=([0-9.]+)", line)
+    if m:
+        #print m.group(0)
+        index = int(m.group(1))-1
+        positionVector[index][0] = float(m.group(2))
+        positionVector[index][1] = float(m.group(3))
+
+#for i in range(0, numNodes):
+#    if i - totalNodesOnInnerCircles >= nodesOnThisCircle:
+#        totalCircles += 1
+#        totalNodesOnInnerCircles += nodesOnThisCircle
+#        nodesOnThisCircle = int(2 * numpy.pi * totalCircles)
+#    
+#    radius = distance * totalCircles
+#    angularStep = 2 * numpy.pi / nodesOnThisCircle
+#    angle = angularStep * (i - totalNodesOnInnerCircles)
+#    positionVector[i][0] = radius * numpy.sin(angle)
+#    positionVector[i][1] = radius * numpy.cos(angle)
 
 #printMatrix(positionVector)
 
@@ -80,7 +88,7 @@ for line in open(args.log):
             allocationMatrixHistory.append((time, currentMatrixToAdd))
 
 fig = plt.figure(figsize=(10,10))
-ax = plt.axes(xlim=(-500, 500), ylim=(-500, 500))
+ax = plt.axes(xlim=(-100, 900), ylim=(-100, 900))
 time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 last_time_text = ax.text(0.02, 0.90, '', transform=ax.transAxes)
 
