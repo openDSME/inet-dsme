@@ -11,6 +11,7 @@ addons:
     - python-numpy
     - python-tk
     - libavcodec-extra-53
+    - python-scipy
 
 before_install:
   - pip install --user `whoami` matplotlib
@@ -26,8 +27,7 @@ install:
 script:
   - ./build.sh $INET
   - ./ci_test.sh $INET
-  - echo "Test" > results/index.md
-  - ./utils/gts_allocation.py --no-show -l results/DSME-mac.log -o results/gts_allocation.mp4
+  - ./ci_analyze.py -v
   - rm results/DSME-mac.log # too large to store
   - utils/ci_to_jekyll.py results
 
