@@ -31,9 +31,7 @@ install:
   - source ./install-dependencies.sh
 
 script:
-  - pushd src && opp_makemake -f --deep --make-so -I$INET/src -I$INET/src/inet/common -I.. -KINET_PROJ=$INET && popd
-  - make -j2
-  - mkdir -p results
+  - ./build.sh $INET
   - ./ci_test.sh $INET
   - echo "Test" > results/index.md
   - ./utils/gts_allocation.py --no-show -l results/DSME-mac.log -o results/gts_allocation.mp4
