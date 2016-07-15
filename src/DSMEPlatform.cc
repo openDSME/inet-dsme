@@ -158,6 +158,8 @@ void DSMEPlatform::initialize(int stage) {
         this->mac_pib.macMaxCSMABackoffs = par("macMaxCSMABackoffs");
         this->mac_pib.macMaxFrameRetries = par("macMaxFrameRetries");
 
+        this->mac_pib.macDSMEGTSExpirationTime = 42;
+
         this->mac_pib.recalculateDependentProperties();
 
         settings->isPANCoordinator = par("isPANCoordinator");
