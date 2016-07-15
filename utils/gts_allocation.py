@@ -5,6 +5,11 @@ import numpy
 import re
 from collections import deque
 
+import os
+if not os.environ.has_key('DISPLAY'):
+    import matplotlib
+    matplotlib.use("Agg")
+
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib.patches import Circle
@@ -24,6 +29,7 @@ def printMatrix(a):
 parser = argparse.ArgumentParser(description="Creates an animation from a log file to visualise the GTS allocation process.")
 parser.add_argument("-l", "--log", type=str, required=True, help="the log file to parse")
 parser.add_argument("-o", "--output", type=str, default="gts_allocation.mp4", help="the output file")
+parser.add_argument("-s", "--no-show", action='store_true', help="do not show the result")
 parser.add_argument("-n", "--nodes", type=int, default="62", help="the number of nodes")
 args = parser.parse_args()
 
@@ -162,11 +168,15 @@ def animate(i):
     return line, time_text, last_time_text
 
 final_time, unused =  allocationMatrixHistory[keys - 1]
+
+print "Data collection finished"
+
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=int(final_time) + 10, interval=1, blit=True)
 
 anim.save(args.output, writer='avconv', fps=2, extra_args=['-vcodec', 'libx264'])
 
-plt.show()
+if not args.no_show: 
+    plt.show()
 
 print "Dealloc %i  Alloc %i\n"%(totalDealloc,totalAlloc)
 

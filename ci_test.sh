@@ -11,4 +11,6 @@ run DSME &
 run CSMA &
 wait
 
+echo "Test" > results/index.md
+utils/gts_allocation.py --no-show -l results/DSME-mac.log -o results/gts_allocation.mp4
 

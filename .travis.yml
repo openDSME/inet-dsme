@@ -7,8 +7,13 @@ addons:
     packages:
     - gcc-4.8
     - g++-4.8
+    - libav-tools
+    - python-numpy
+    - python-tk
+    - libavcodec-extra-53
 
 before_install:
+  - pip install --user `whoami` matplotlib
   - openssl aes-256-cbc -K $encrypted_ea54299d5f4f_key -iv $encrypted_ea54299d5f4f_iv -in utils/publish_key.enc -out ~/.ssh/publish_key -d
   - chmod u=rw,og= ~/.ssh/publish_key
   - echo "Host github.com" >> ~/.ssh/config
@@ -31,6 +36,7 @@ script:
   - mkdir -p results
   - ./ci_test.sh $INET
   - echo "Test" > results/index.md
+  - ./utils/gts_allocation.py --no-show -l results/DSME-mac.log -o results/gts_allocation.mp4
   - utils/ci_to_jekyll.py -x 'git lfs install && git lfs track results/*/DSME-mac.log && git add results/*/DSME-mac.log && git add .gitattributes' results
 
 cache:
