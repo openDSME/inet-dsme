@@ -2,38 +2,17 @@
 layout: default
 ---
 
-<div class="blog-index">
-      {% assign post = site.posts.first %}
-      {% assign page = post %}
-      {% assign content = post.content %}
+<main class="cd-main-content">
+    <div class="blog-index">
+          {% assign post = site.posts.first %}
+          {% assign page = post %}
+          {% assign content = post.content %}
 
-      <h1 class="entry-title">
-          {% if page.title %}
-              <a href="{{ root_url }}{{ page.url }}">{{ page.title }}</a>
-          {% endif %}
-          {% if post.title %}
-              <a href="{{ root_url }}{{ post.url }}">{{ post.title }}</a>
-          {% endif %}
-      </h1>
-      <div class="entry-content">{{ content }}</div>
-</div>
-
-<div class="home">
-
-  <h1 class="page-heading">Posts</h1>
-
-  <ul class="post-list">
-    {% for opost in site.posts %}
-      <li>
-        <span class="post-meta">{{ opost.date | date: "%b %-d, %Y" }}</span>
-
-        <h2>
-          <a class="post-link" href="{{ opost.url | prepend: site.baseurl }}">{{ opost.title }}</a>
-        </h2>
-      </li>
-    {% endfor %}
-  </ul>
-
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
-
-</div>
+          <h1 class="entry-title">
+              {% if post.title %}
+                  <a href="{{ root_url }}{{ post.url }}">{{ post.title }}</a>
+              {% endif %}
+          </h1>
+          <div class="entry-content">{{ content }}</div>
+    </div>
+</main>
