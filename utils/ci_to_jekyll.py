@@ -1,20 +1,36 @@
 #!/usr/bin/env python
 
-from subprocess import *
+import subprocess
 import argparse
 import datetime
 import tempfile
 import tarfile
 import os
+import sys
+
+def printcmd(args,shell):
+    print "$",
+    if shell:
+        print args
+    else:
+        print " ".join(args)
+
+def call(args,shell=False):
+    printcmd(args,shell)
+    return subprocess.call(args,shell=shell)
+
+def check_output(args,shell=False):
+    printcmd(args,shell)
+    return subprocess.check_output(args,shell=shell)
 
 def main(args):
     # Determine commit properties
-    dtime = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct']).strip())).strftime("%Y-%m-%d-%H-%M-%S")
+    date = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct']).strip())).strftime("%Y-%m-%d")
     sanitized_commit = check_output(['git','log','-1','--pretty=%f-%h']).strip()
     subject = check_output(['git','log','-1','--pretty=%s']).strip()
     branch = check_output(['git','rev-parse','--abbrev-ref','HEAD']).strip()
     post_file = check_output(['git','log','-1','--date=short','--pretty=%cd-%f-%h']).strip()
-    output_dir = 'results/'+dtime+'_'+sanitized_commit
+    output_dir = 'results/'+date+'-'+sanitized_commit
 
     # Pack up the results temporarily
     results_tar = tempfile.TemporaryFile()
@@ -22,12 +38,19 @@ def main(args):
     tfile.add( args.results, '.' )
     tfile.close()
 
-    call(['git','config','user.email',args.email])
-    call(['git','config','user.name',args.name])
+    if call(['git','config','--get','user.email']) != 0:
+        call(['git','config','user.email',args.email])
+
+    if call(['git','config','--get','user.name']) != 0:
+        call(['git','config','user.name',args.name])
+
+    if call(['git','stash','--include-untracked','--all']) != 0:
+        exit(1)
+
+    call(['git','clean','-df']) # save, since we just stashed
 
     try:
         # Stash and checkout the jekyll branch
-        call(['git','stash','--include-untracked','--all'])
         call(['git','config','remote.'+args.remote+'.fetch','refs/heads/*:refs/remotes/'+args.remote+'/*']) # required since travis clones only the current branch
         call(['git','fetch'])
         call(['git','checkout',args.jekyll])
@@ -70,10 +93,14 @@ def main(args):
                 call(['git','remote','set-url',args.remote,url])
 
             call(['git','push','-v',args.remote,args.jekyll])
+    except:
+        print "Unexpected error:", sys.exc_info()[0]
+        raise
 
     finally:
         # Revert old working tree
-        call(['git','checkout',branch])
+        call(['git','clean','-dfx'])
+        call(['git','checkout','-f',branch])
         call(['git','stash','apply'])
 
 if __name__ == '__main__':
@@ -83,8 +110,8 @@ if __name__ == '__main__':
     parser.add_argument('-j','--jekyll', help='Name of the jekyll branch')
     parser.add_argument('-np','--no-push', dest='no_push', action='store_true', help="Do not push to remote")
     parser.add_argument('-r','--remote', help='Remote to pull from and push to')
-    parser.add_argument('-u','--name', help='Name of the commiter')
-    parser.add_argument('-e','--email', help='E-mail of the commiter')
+    parser.add_argument('-u','--name', help='Name of the commiter if not set by git config')
+    parser.add_argument('-e','--email', help='E-mail of the commiter if not set by git config')
     parser.add_argument('-s','--ssh', help='Rewrite the remote url from https to ssh')
     parser.add_argument('-x','--execute', help='Additional command to execute before a commit to the jekyll branch. Can be used e.g. for git lfs.')
     parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin',name='ci',email='ci@localhost',ssh=True,execute='')
@@ -100,5 +127,7 @@ if __name__ == '__main__':
         main(args)
     finally:
         # Switch back to original directory
+        print original_dir
         os.chdir(original_dir)
+        print "foo"
         
