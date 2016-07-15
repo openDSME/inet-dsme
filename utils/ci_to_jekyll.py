@@ -56,6 +56,8 @@ def main(args):
         # Add and commit
         call(['git','add',output_dir])
         call(['git','add',to_file])
+        print "Executing %s"%args.execute
+        call(args.execute,shell=True)
         call(['git','commit','-m','Results of \''+subject+'\''])
 
         # Push if requested
@@ -84,7 +86,8 @@ if __name__ == '__main__':
     parser.add_argument('-u','--name', help='Name of the commiter')
     parser.add_argument('-e','--email', help='E-mail of the commiter')
     parser.add_argument('-s','--ssh', help='Rewrite the remote url from https to ssh')
-    parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin',name='ci',email='ci@localhost',ssh=True)
+    parser.add_argument('-x','--execute', help='Additional command to execute before a commit to the jekyll branch. Can be used e.g. for git lfs.')
+    parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin',name='ci',email='ci@localhost',ssh=True,execute='')
     args = parser.parse_args()
 
     original_dir = os.getcwd()
