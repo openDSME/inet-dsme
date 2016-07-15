@@ -87,7 +87,7 @@ tab.write("""
 
 tab.close()
 
-subprocess.call(['pdflatex','table.tex'])
+subprocess.call(['pdflatex', '-interaction=batchmode', 'table.tex'])
 
 print pernode
 
