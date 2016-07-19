@@ -35,7 +35,10 @@ totalLoss = 0
 
 lossMatrixHistory = []
 
-for line in open(args.log):
+f = open(args.log)
+for i in range(1000):
+    line = f.next()
+#for line in open(args.log):
     m = re.search("^\[\w*\]\s*0\s*([0-9]*): POSITION: x=([0-9.]+), y=([0-9.]+)", line)
     if m:
         #print m.group(0)
@@ -58,10 +61,12 @@ for line in open(args.log):
         currentMatrixToAdd = currentLossMatrix.copy()
         lossMatrixHistory.append((time, currentMatrixToAdd))
 
+
 fig = plt.figure(figsize=(10,10))
 ax = plt.axes(xlim=(-100, 900), ylim=(-100, 900))
 time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
 last_time_text = ax.text(0.02, 0.90, '', transform=ax.transAxes)
+ax.set_ylim(ax.get_ylim()[::-1])
 
 for i in range(0, numNodes):
     x = positionVector[i][0]
