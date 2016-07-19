@@ -340,7 +340,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
                             + 2*4 // Preamble
                             + 2*1; // SFD
 
-    LOG_INFO("handleLowerPacket " << (uint16_t)dsmemsg->getHeader().getSequenceNumber());
+    //LOG_INFO("handleLowerPacket " << (uint16_t)dsmemsg->getHeader().getSequenceNumber());
 
     dsme->getAckLayer().receive(dsmemsg);
 }
@@ -428,7 +428,7 @@ void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long 
         }
     }
     else if(signalID == IRadio::receptionStateChangedSignal) {
-        LOG_INFO("receptionStateChanged to " << (uint16_t)value);
+        //LOG_INFO("receptionStateChanged to " << (uint16_t)value);
         channelInactive = false;
     }
 }
