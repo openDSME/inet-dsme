@@ -101,6 +101,7 @@ public:
 
     bool receivedViaMCPS; // TODO better handling?
     bool firstTry;
+    bool currentlySending;
 
 private:
     // TODO
@@ -109,16 +110,18 @@ private:
 
     DSMEFrame* frame;
 
-    DSMEMessage()
-    : frame(new DSMEFrame()) {
+    DSMEMessage() :
+            currentlySending(false),
+            frame(new DSMEFrame()) {
     }
 
-    DSMEMessage(DSMEFrame* frame)
-    : frame(frame) {
+    DSMEMessage(DSMEFrame* frame) :
+            currentlySending(false),
+            frame(frame) {
     }
 
     ~DSMEMessage() {
-        if(frame != nullptr) {
+        if (frame != nullptr) {
             delete frame;
         }
     }
