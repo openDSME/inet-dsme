@@ -29,7 +29,8 @@ constexpr uint8_t MAX_SAB_UNITS = 1;
 
 constexpr uint16_t CAP_QUEUE_SIZE = 8;
 constexpr uint16_t TOTAL_GTS_QUEUE_SIZE = 30-CAP_QUEUE_SIZE;
-constexpr uint16_t MSG_POOL_SIZE = CAP_QUEUE_SIZE+TOTAL_GTS_QUEUE_SIZE+5;
+constexpr uint16_t UPPER_LAYER_QUEUE_SIZE = 12;
+constexpr uint16_t MSG_POOL_SIZE = CAP_QUEUE_SIZE + TOTAL_GTS_QUEUE_SIZE + 2 * UPPER_LAYER_QUEUE_SIZE + 10;
 
 }
 

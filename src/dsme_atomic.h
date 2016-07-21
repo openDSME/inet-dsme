@@ -38,47 +38,16 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLATFORM_OMNETPP_H
-#define PLATFORM_OMNETPP_H
+#ifndef PLATFORM_ATOMIC_OMNETPP_H
+#define PLATFORM_ATOMIC_OMNETPP_H
 
-#include "omnetpp.h"
-
-#if 1
-inline static const char* LOG_SIMTIME_FIXED(simtime_t x) {
-    char buf[64];
-    char *endp;
-    static char target[11];
-    strncpy(target, omnetpp::SimTime::ttoa(buf, x.raw(), omnetpp::SimTime::getScaleExp(), endp), 9);
-    target[9] = '\0';
-    return target;
+// recursive locks necessary!
+inline void dsme_atomicBegin() {
+    // not needed for INET
 }
 
-#define palId_id() (((DSMEPlatform*)(cSimulation::getActiveSimulation()->getContextModule()))->getAddress().getShortAddress())
-#define cometos std
-#define LOG_INFO(x) do{ EV_INFO << (LOG_SIMTIME_FIXED(simTime())) << " \t " << palId_id() << ": " << x << std::endl; } while(0)
-#define LOG_INFO_PURE(x) do{ EV_INFO << x;} while(0)
-#define LOG_INFO_PREFIX do{ EV_INFO << (LOG_SIMTIME_FIXED(simTime())) << " \t " << palId_id() << ": ";} while(0)
-#define HEXOUT std::hex
-#define DECOUT std::dec
-#else
-#define LOG_INFO(x)
-#define LOG_INFO_PURE(x)
-#define LOG_INFO_PREFIX
-#define HEXOUT
-#endif
+inline void dsme_atomicEnd() {
+    // not needed for INET
+}
 
-#define LOG_WARN(x) LOG_INFO(x)
-#define LOG_DEBUG(x) LOG_INFO(x)
-#define LOG_DEBUG_PURE(x) LOG_INFO_PURE(x)
-#define LOG_DEBUG_PREFIX LOG_INFO_PREFIX
-
-#define DSME_ASSERT(x) if(!(x)) LOG_WARN("ASSERT"); ASSERT(x)
-
-#include "DSMEMessage.h"
-#include "dsme_settings.h"
-#include "dsme_atomic.h"
-#include "DSMEPlatform.h"
-#include "phy_constants.h"
-
-
-#endif
+#endif /* PLATFORM_ATOMIC_OMNETPP_H */
