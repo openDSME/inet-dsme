@@ -41,23 +41,12 @@
 #ifndef PLATFORM_OMNETPP_H
 #define PLATFORM_OMNETPP_H
 
-#include "omnetpp.h"
-
 #if 1
-inline static const char* LOG_SIMTIME_FIXED(simtime_t x) {
-    char buf[64];
-    char *endp;
-    static char target[11];
-    strncpy(target, omnetpp::SimTime::ttoa(buf, x.raw(), omnetpp::SimTime::getScaleExp(), endp), 9);
-    target[9] = '\0';
-    return target;
-}
-
 #define palId_id() (((DSMEPlatform*)(cSimulation::getActiveSimulation()->getContextModule()))->getAddress().getShortAddress())
 #define cometos std
-#define LOG_INFO(x) do{ EV_INFO << (LOG_SIMTIME_FIXED(simTime())) << " \t " << palId_id() << ": " << x << std::endl; } while(0)
+#define LOG_INFO(x) do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": " << x << std::endl; } while(0)
 #define LOG_INFO_PURE(x) do{ EV_INFO << x;} while(0)
-#define LOG_INFO_PREFIX do{ EV_INFO << (LOG_SIMTIME_FIXED(simTime())) << " \t " << palId_id() << ": ";} while(0)
+#define LOG_INFO_PREFIX do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": ";} while(0)
 #define HEXOUT std::hex
 #define DECOUT std::dec
 #else
