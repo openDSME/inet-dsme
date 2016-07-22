@@ -158,7 +158,7 @@ void DSMEPlatform::initialize(int stage) {
         this->mac_pib.macMaxCSMABackoffs = par("macMaxCSMABackoffs");
         this->mac_pib.macMaxFrameRetries = par("macMaxFrameRetries");
 
-        this->mac_pib.macDSMEGTSExpirationTime = 128;
+        this->mac_pib.macDSMEGTSExpirationTime = 32;
 
         this->mac_pib.recalculateDependentProperties();
 
