@@ -159,6 +159,7 @@ void DSMEPlatform::initialize(int stage) {
         this->mac_pib.macMaxFrameRetries = par("macMaxFrameRetries");
 
         this->mac_pib.macDSMEGTSExpirationTime = 64;
+        this->mac_pib.macResponseWaitTime = 16;
 
         this->mac_pib.recalculateDependentProperties();
 
