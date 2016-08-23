@@ -19,18 +19,30 @@ def call(args,shell=False):
     printcmd(args,shell)
     return subprocess.call(args,shell=shell)
 
-def check_output(args,shell=False):
+def check_output(args,shell=False,cwd=None):
     printcmd(args,shell)
-    return subprocess.check_output(args,shell=shell)
+    return subprocess.check_output(args,shell=shell,cwd=cwd)
 
 def main(args):
     # Determine commit properties
-    date = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct']).strip())).strftime("%Y-%m-%d")
-    sanitized_commit = check_output(['git','log','-1','--pretty=%f-%h']).strip()
-    subject = check_output(['git','log','-1','--pretty=%s']).strip()
-    branch = check_output(['git','rev-parse','--abbrev-ref','HEAD']).strip()
-    post_file = check_output(['git','log','-1','--date=short','--pretty=%cd-%f-%h']).strip()
-    output_dir = 'results/'+date+'-'+sanitized_commit
+    paths = ['.']
+    if args.submodule:
+        paths.append(args.submodule)
+
+    vals = {}
+    for d in paths:
+        vals[d] = {}
+        vals[d]['datetime'] = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct'],cwd=d).strip()))
+        vals[d]['date'] = vals[d]['datetime'].strftime("%Y-%m-%d")
+        vals[d]['sanitized_commit'] = check_output(['git','log','-1','--pretty=%f-%h'],cwd=d).strip()
+        vals[d]['subject'] = check_output(['git','log','-1','--pretty=%s'],cwd=d).strip()
+        vals[d]['post_file'] = check_output(['git','log','-1','--date=short','--pretty=%cd-%f-%h'],cwd=d).strip()
+
+    maxtimepath = max(vals, key = lambda v: vals[v]['datetime'])
+    vals = vals[maxtimepath]
+
+    output_dir = 'results/'+vals['date']+'-'+vals['sanitized_commit']
+    branch = check_output(['git','rev-parse','--abbrev-ref','HEAD']).strip() # for checkout, so no cwd
 
     # Pack up the results temporarily
     results_tar = tempfile.TemporaryFile()
@@ -69,7 +81,7 @@ def main(args):
 
         # Move index file
         from_file = os.path.join(output_dir,args.index)
-        to_file = os.path.join('_posts',post_file+os.path.splitext(from_file)[1])
+        to_file = os.path.join('_posts',vals['post_file']+os.path.splitext(from_file)[1])
         try:
             os.rename(from_file,to_file)
         except OSError as e:
@@ -81,7 +93,7 @@ def main(args):
         call(['git','add',to_file])
         print "Executing %s"%args.execute
         call(args.execute,shell=True)
-        call(['git','commit','-m','Results of \''+subject+'\''])
+        call(['git','commit','-m','Results of \''+vals['subject']+'\''])
 
         # Push if requested
         if not args.no_push:
@@ -113,6 +125,7 @@ if __name__ == '__main__':
     parser.add_argument('-u','--name', help='Name of the commiter if not set by git config')
     parser.add_argument('-e','--email', help='E-mail of the commiter if not set by git config')
     parser.add_argument('-s','--ssh', help='Rewrite the remote url from https to ssh')
+    parser.add_argument('-m','--submodule', help='Also consider this submodules when determining the commit string')
     parser.add_argument('-x','--execute', help='Additional command to execute before a commit to the jekyll branch. Can be used e.g. for git lfs.')
     parser.set_defaults(force=False,index='index.md',jekyll='gh-pages',no_push=False,remote='origin',name='ci',email='ci@localhost',ssh=True,execute='')
     args = parser.parse_args()
@@ -129,5 +142,4 @@ if __name__ == '__main__':
         # Switch back to original directory
         print original_dir
         os.chdir(original_dir)
-        print "foo"
         

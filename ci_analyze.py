@@ -16,17 +16,27 @@ def call(args,shell=False):
     printcmd(args,shell)
     return subprocess.call(args,shell=shell)
 
-def check_output(args,shell=False):
+def check_output(args,shell=False,cwd=None):
     printcmd(args,shell)
-    return subprocess.check_output(args,shell=shell)
+    return subprocess.check_output(args,shell=shell,cwd=cwd)
 
 def main(args):
-    datetime = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct']).strip()))
-    date = datetime.strftime("%Y-%m-%d")
-    datetime = datetime.strftime("%F %T %z")
-    sanitized_commit = check_output(['git','log','-1','--pretty=%f-%h']).strip()
-    subject = check_output(['git','log','-1','--pretty=%s']).strip()
-    resultdir = '/inet-dsme/results/'+date+'-'+sanitized_commit
+    vals = {}
+    dsme_path = 'src/openDSME'
+    for d in ['.',dsme_path]:
+        vals[d] = {}
+        vals[d]['datetime'] = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct'],cwd=d).strip()))
+        vals[d]['date'] = vals[d]['datetime'].strftime("%Y-%m-%d")
+        vals[d]['datetime_str'] = vals[d]['datetime'].strftime("%F %T %z")
+        vals[d]['sanitized_commit'] = check_output(['git','log','-1','--pretty=%f-%h'],cwd=d).strip()
+        vals[d]['subject'] = check_output(['git','log','-1','--pretty=%s'],cwd=d).strip()
+
+    if vals['.']['datetime'] > vals[dsme_path]['datetime']:
+        vals = vals['.']
+    else:
+        vals = vals[dsme_path]
+
+    resultdir = '/inet-dsme/results/'+vals['date']+'-'+vals['sanitized_commit']
 
     call(['utils/analyze.py','results'])
 
@@ -40,7 +50,7 @@ def main(args):
             - https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js
         resultdir: %s
         title: %s
-        ---\n"""%(datetime,resultdir,subject))
+        ---\n"""%(vals['datetime_str'],resultdir,vals['subject']))
     index += textwrap.dedent("""\
         <canvas id="chartDSME" width="800" height="200"></canvas>
         <canvas id="chartCSMA" width="800" height="200"></canvas>
@@ -74,7 +84,7 @@ def main(args):
 
                     for (var i = 0, len = data.length; i < len; i++) {
                         labels.push(data[i]['address']);
-                prr = parseFloat(data[i][key+'received'])/(parseFloat(data[i][key+'lost'])+parseFloat(data[i][key+'received']));
+                        prr = parseFloat(data[i][key+'received'])/(parseFloat(data[i][key+'lost'])+parseFloat(data[i][key+'received']));
                         prrs.push(prr);
                     }
 
