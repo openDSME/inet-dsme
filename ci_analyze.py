@@ -21,7 +21,9 @@ def check_output(args,shell=False):
     return subprocess.check_output(args,shell=shell)
 
 def main(args):
-    date = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct']).strip())).strftime("%Y-%m-%d")
+    datetime = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct']).strip()))
+    date = datetime.strftime("%Y-%m-%d")
+    datetime = datetime.strftime("%F %T %z")
     sanitized_commit = check_output(['git','log','-1','--pretty=%f-%h']).strip()
     subject = check_output(['git','log','-1','--pretty=%s']).strip()
     resultdir = '/inet-dsme/results/'+date+'-'+sanitized_commit
@@ -31,13 +33,14 @@ def main(args):
     index = textwrap.dedent("""\
         ---
         layout: post
+        date: %s
         extra_js: 
             - http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js
             - https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.min.js
             - https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js
         resultdir: %s
         title: %s
-        ---\n"""%(resultdir,subject))
+        ---\n"""%(datetime,resultdir,subject))
     index += textwrap.dedent("""\
         <canvas id="chartDSME" width="800" height="200"></canvas>
         <canvas id="chartCSMA" width="800" height="200"></canvas>
