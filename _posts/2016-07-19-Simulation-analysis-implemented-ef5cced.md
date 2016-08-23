@@ -1,5 +1,6 @@
 ---
 layout: post
+date: 2016-07-19 17:00:30 +0000
 extra_js: 
     - http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js
     - https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.min.js
