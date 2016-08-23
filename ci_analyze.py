@@ -60,9 +60,18 @@ def main(args):
                 ['DSME','CSMA'].forEach(function(type) {
                     labels = [];
                     prrs = [];
+                    key = 0;
+                    for(var k in data[0]) {
+                        expr = new RegExp(type+'-.*-.*-');
+                        res = expr.exec(k);
+                        if(res) {
+                            key = res;
+                        }
+                    }
+
                     for (var i = 0, len = data.length; i < len; i++) {
                         labels.push(data[i]['address']);
-                        prr = parseFloat(data[i][type+'-2.25-0.0-received'])/(parseFloat(data[i][type+'-2.25-0.0-lost'])+parseFloat(data[i][type+'-2.25-0.0-received']));
+                prr = parseFloat(data[i][key+'received'])/(parseFloat(data[i][key+'lost'])+parseFloat(data[i][key+'received']));
                         prrs.push(prr);
                     }
 
