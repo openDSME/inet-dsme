@@ -4,7 +4,7 @@ pushd ../
 make || exit 1
 popd
 
-CONFIG=DSME
+CONFIG=DSME-Multi
 RUN=0
 REP=0
 #VECTOR_RECORDING=true
