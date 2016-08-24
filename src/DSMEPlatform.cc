@@ -158,7 +158,7 @@ void DSMEPlatform::initialize(int stage) {
         this->mac_pib.macMaxCSMABackoffs = par("macMaxCSMABackoffs");
         this->mac_pib.macMaxFrameRetries = par("macMaxFrameRetries");
 
-        this->mac_pib.macDSMEGTSExpirationTime = 64;
+        this->mac_pib.macDSMEGTSExpirationTime = par("macDSMEGTSExpirationTime");
         this->mac_pib.macResponseWaitTime = 16;
 
         this->mac_pib.recalculateDependentProperties();
@@ -170,7 +170,6 @@ void DSMEPlatform::initialize(int stage) {
         //settings.superframeSpec.finalCAPSlot = par("finalCAPSlot").longValue(); // TODO
         settings->numMaxGTSAllocPerDevice = par("maxNumberGTSAllocPerDevice");
         settings->numMaxGTSAllocPerRequest = par("maxNumberGTSAllocPerRequest");
-        settings->maxGTSIdleCount = par("maxGTSIdleCount");
         settings->contentionWindow = par("contentionWindow");
         settings->commonChannel = par("commonChannel");
         settings->optimizations = par("optimizations");

@@ -38,6 +38,8 @@ simple DSME extends MACProtocolBase like IMACProtocol
         int maxNumberGTSAllocPerDevice = default(7);
         int maxNumberGTSAllocPerRequest = default(1); // also per superframe TODO ??
         int maxGTSIdleCount = default(0);	// 0 => never deallocate idle GTS
+        
+        int macDSMEGTSExpirationTime = default(7);
 
         string allocationScheme = default("next");	// ("random", "next")
 
