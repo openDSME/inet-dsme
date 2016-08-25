@@ -22,11 +22,13 @@ parser.add_argument("-o", "--output", type=str, default="gts_allocation.csv", he
 parser.add_argument("-s", "--step", type=str, default="1", help="unit of time")
 args = parser.parse_args()
 
-allocationVector = numpy.zeros((500,3))
+length = 500 / int(args.step)
+
+allocationVector = numpy.zeros((length,3))
 totalAlloc = 0
 totalDealloc = 0
 
-for i in range(0,500):
+for i in range(0,length):
     allocationVector[i][0] = i * int(args.step)
 
 for line in open(args.log):
