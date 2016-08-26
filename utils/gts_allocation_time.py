@@ -5,24 +5,19 @@ import numpy
 import matplotlib.pyplot as plt
 import re
 import math
-from collections import deque
 
-def printMatrix(a):
-   rows = a.shape[0]
-   cols = a.shape[1]
-   for i in range(0,rows):
-      for j in range(0,cols):
-         print("%2.0f" %a[i,j]),
-      print
-   print
-
+import os
+if not os.environ.has_key('DISPLAY'):
+    import matplotlib
+    matplotlib.use("Agg")
 
 parser = argparse.ArgumentParser(description="Extracts the number of allocated and deallocated slots per second.")
 parser.add_argument("-l", "--log", type=str, required=True, help="the log file to parse")
 parser.add_argument("-o", "--output", type=str, default="gts_allocation.csv", help="the output file")
 parser.add_argument("-s", "--step", type=str, default="1", help="unit of time")
-parser.add_argument("-v", "--visual", help="plot the data", action='store_true')
+parser.add_argument("-v", "--visual", help="plot the data on screen", action='store_true')
 parser.add_argument("-f", "--filter", type=str, default="[0-9]*", help="unit of time")
+parser.add_argument("-i", "--image", help="output an image", action='store_true')
 args = parser.parse_args()
 
 length = 500 / int(args.step)
@@ -56,9 +51,11 @@ for line in open(args.log):
 print "Data collection finished"
 
 print "Dealloc %i  Alloc %i"%(totalDealloc,totalAlloc)
-numpy.savetxt(args.output, allocationVector, delimiter=";")
 
-if args.visual:
+if not args.image:
+    numpy.savetxt(args.output, allocationVector, delimiter=";")
+
+if args.visual or args.image:
     times = allocationVector[:,0]
     allocations = allocationVector[:,2]
     deallocations = numpy.negative(allocationVector[:,1])
@@ -70,5 +67,10 @@ if args.visual:
     plt.bar(times, deallocations, width, color="red")
 
     plt.tight_layout()
-    plt.show()
+
+    if args.visual:
+        plt.show()
+    if args.image:
+        fig.savefig(args.output)
+        
 
