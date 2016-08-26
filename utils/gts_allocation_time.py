@@ -2,6 +2,7 @@
 
 import argparse
 import numpy
+import matplotlib.pyplot as plt
 import re
 import math
 from collections import deque
@@ -20,6 +21,8 @@ parser = argparse.ArgumentParser(description="Extracts the number of allocated a
 parser.add_argument("-l", "--log", type=str, required=True, help="the log file to parse")
 parser.add_argument("-o", "--output", type=str, default="gts_allocation.csv", help="the output file")
 parser.add_argument("-s", "--step", type=str, default="1", help="unit of time")
+parser.add_argument("-v", "--visual", help="plot the data", action='store_true')
+parser.add_argument("-f", "--filter", type=str, default="[0-9]*", help="unit of time")
 args = parser.parse_args()
 
 length = 500 / int(args.step)
@@ -31,8 +34,9 @@ totalDealloc = 0
 for i in range(0,length):
     allocationVector[i][0] = i * int(args.step)
 
+pattern = re.compile("^\[\w*\]\s*([0-9.]*)\s*" + args.filter + ": ((de)?)alloc ([0-9]+)(.)([0-9]+) ([0-9]+),([0-9]+),([0-9]+)")
 for line in open(args.log):
-    m = re.search("^\[\w*\]\s*([0-9.]*)\s*[0-9]*: ((de)?)alloc ([0-9]+)(.)([0-9]+) ([0-9]+),([0-9]+),([0-9]+)", line)
+    m = pattern.match(line)
     if m:
         #print m.group(0)
         direction = ''
@@ -51,8 +55,20 @@ for line in open(args.log):
 
 print "Data collection finished"
 
-#printMatrix(allocationVector)
+print "Dealloc %i  Alloc %i"%(totalDealloc,totalAlloc)
 numpy.savetxt(args.output, allocationVector, delimiter=";")
 
-print "Dealloc %i  Alloc %i\n"%(totalDealloc,totalAlloc)
+if args.visual:
+    times = allocationVector[:,0]
+    allocations = allocationVector[:,2]
+    deallocations = numpy.negative(allocationVector[:,1])
+
+    fig = plt.figure(figsize=(20,10))
+
+    width = int(args.step)
+    plt.bar(times, allocations, width, color="blue")
+    plt.bar(times, deallocations, width, color="red")
+
+    plt.tight_layout()
+    plt.show()
 
