@@ -2,7 +2,6 @@
 
 import argparse
 import numpy
-import matplotlib.pyplot as plt
 import re
 import math
 
@@ -10,6 +9,8 @@ import os
 if not os.environ.has_key('DISPLAY'):
     import matplotlib
     matplotlib.use("Agg")
+
+from matplotlib import pyplot as plt
 
 parser = argparse.ArgumentParser(description="Extracts the number of allocated and deallocated slots per second.")
 parser.add_argument("-l", "--log", type=str, required=True, help="the log file to parse")
