@@ -119,6 +119,9 @@ def main(args):
         <video width="400" controls>
         <source src="{{page.resultdir}}/gts_allocation.mp4" type="video/mp4" />
         </video>
+        </div>
+        <div style="text-align:center">
+        <img width="400" src="{{page.resultdir}}/gts_allocation.png" width="400" alt="GTS allocation over time">
         </div>""")
 
     with open('results/index.md','w') as indexfile:
@@ -126,6 +129,7 @@ def main(args):
 
     if args.video:
         call(['utils/gts_allocation.py','--no-show','-l','results/DSME-mac.log','-o','results/gts_allocation.mp4'])
+    call(['utils/gts_allocation_time.py','-l','results/DSME-mac.log','-o','results/gts_allocation.png', '-i'])
 
 
 if __name__ == '__main__':
