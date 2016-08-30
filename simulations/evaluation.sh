@@ -5,8 +5,8 @@ make || exit 1
 popd
 
 CONFIG=Eval-DSME-Multi-6
-RUN=4
-REP=2
+RUN=0
+REP=1
 #VECTOR_RECORDING=true
 VECTOR_RECORDING=false
 
