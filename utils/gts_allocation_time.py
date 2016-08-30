@@ -61,7 +61,7 @@ if args.visual or args.image:
     allocations = allocationVector[:,2]
     deallocations = numpy.negative(allocationVector[:,1])
 
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=(10,5))
 
     width = int(args.step)
     plt.bar(times, allocations, width, color="blue")

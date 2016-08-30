@@ -121,7 +121,8 @@ def main(args):
         </video>
         </div>
         <div style="text-align:center">
-        <img width="400" src="{{page.resultdir}}/gts_allocation.png" width="400" alt="GTS allocation over time">
+        <h2>GTS Allocation and Deallocation Over Time</h2>
+        <img style="width:100%; max-width:800px" src="{{page.resultdir}}/gts_allocation.png" width="400" alt="GTS allocation over time">
         </div>""")
 
     with open('results/index.md','w') as indexfile:
