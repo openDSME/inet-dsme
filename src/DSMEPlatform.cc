@@ -6,6 +6,9 @@
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 
+#include "wamp_cpp/WAMPServer.h"
+#include "DemoServer.h"
+
 using namespace inet;
 using namespace inet::physicallayer;
 
@@ -30,6 +33,9 @@ void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
     }
 }
 
+DemoServer* demo = nullptr;
+WAMPServer* server = nullptr;
+
 DSMEPlatform::DSMEPlatform() :
                 phy_pib(10),
                 mac_pib(phy_pib),
@@ -47,9 +53,22 @@ DSMEPlatform::DSMEPlatform() :
                 settings(new DSMESettings()),
                 transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED)
 {
+    if(demo == nullptr) {
+        demo = new DemoServer();
+        server = new WAMPServer();
+        server->start();
+    }
 }
 
 DSMEPlatform::~DSMEPlatform() {
+    if(demo != nullptr) {
+        delete demo;
+        demo = nullptr;
+        server->stop();
+        delete server;
+        server = nullptr;
+    }
+
     delete dsme;
     delete settings;
 
