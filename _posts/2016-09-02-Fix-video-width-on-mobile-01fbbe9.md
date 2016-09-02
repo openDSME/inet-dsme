@@ -57,7 +57,7 @@ $(document).ready(function () {
                 },
                 options: {
                     responsive: false,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
                     scales: {
                         yAxes: [{
                             ticks: {
