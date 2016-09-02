@@ -116,7 +116,7 @@ def main(args):
         </script>
 
         <div style="text-align:center">
-        <video width="400" controls>
+        <video style="width:100%; max-width:400px" controls>
         <source src="{{page.resultdir}}/gts_allocation.mp4" type="video/mp4" />
         </video>
         </div>
