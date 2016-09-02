@@ -56,7 +56,7 @@ $(document).ready(function () {
                     }]
                 },
                 options: {
-                    responsive: true,
+                    responsive: false,
                     maintainAspectRatio: false,
                     scales: {
                         yAxes: [{
