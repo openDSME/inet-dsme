@@ -20,13 +20,17 @@
 
 #include <string>
 #include "inet/common/INETDefs.h"
+#include "wamp_cpp/WAMPServer.h"
+#include "wamp_cpp/RPCallable.h"
+#include <thread>
+#include "wamp_cpp/Topic.h"
 
 namespace inet {
 
 /**
  * Listener for sending events via websocket
  */
-class INET_API LiveRecorder : public cResultRecorder
+class INET_API LiveRecorder : public cResultRecorder,  public RPCallable<LiveRecorder>
 {
     protected:
         //std::map<std::string,long> groupcounts;
@@ -42,14 +46,21 @@ class INET_API LiveRecorder : public cResultRecorder
         virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, const char *s, cObject *details) override;
         virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *obj, cObject *details) override;
 
-    public:
-        LiveRecorder() {
-            //groupcounts.clear();
+        static WAMPServer* server;
 
-        }
+        void eventLoop();
+        std::thread eventThread;
+        bool running;
+
+        Topic<int> topic;
+
+    public:
+        LiveRecorder();
+        ~LiveRecorder();
         virtual void finish(cResultFilter *prev) override;
 
-
+        int adding(int a, int b);
+        void handleEvent1(int a);
 };
 
 } // namespace inet

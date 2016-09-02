@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js">
+      </script>
+      <script>
+	// WAMP session object
+	var sess;
+	var wsuri = "ws://localhost:9002";
+	 
+	window.onload = function() {
+	 
+	   // connect to WAMP server
+	   ab.connect(wsuri,
+	 
+	      // WAMP session was established
+	      function (session) {
+	 
+		 sess = session;
+		 console.log("Connected to " + wsuri);
+	 
+		 // subscribe to topic, providing an event handler
+		 sess.subscribe("http://example.com/simple/ev2", onEvent);
+
+		 // subscribe to topic, providing an event handler
+		 sess.subscribe("http://example.com/simple/ev3", onEvent);
+	      },
+	 
+	      // WAMP session is gone
+	      function (code, reason) {
+	 
+		 sess = null;
+		 console.log("Connection lost (" + reason + ")");
+	      }
+	   );
+	};
+	 
+	function onEvent(topic, event) {
+	   console.log(topic);
+	   console.log(event);
+	}
+	 
+	function publishEvent()
+	{
+	   sess.publish("http://example.com/simple/ev1", 42);
+	}
+	 
+	function callProcedure() {
+	   // issue an RPC, returns promise object
+	   sess.call("http://example.com/simple/calc#add", 23, 7).then(
+	 
+	      // RPC success callback
+	      function (res) {
+		 alert("got result: " + res);
+	      },
+	 
+	      // RPC error callback
+	      function (error, desc) {
+		 alert("error: " + desc);
+	      }
+	   );
+	}
+      </script>
+   </head>
+   <body>
+      <h1>AutobahnJS WAMP Client demonstrating the use of wamp_cpp</h1>
+      <button onclick="callProcedure();">Call Procedure</button>
+      <button onclick="publishEvent();">Publish Event</button>
+   </body>
+ </html>
