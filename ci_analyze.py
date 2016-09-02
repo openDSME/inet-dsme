@@ -52,8 +52,8 @@ def main(args):
         title: %s
         ---\n"""%(vals['datetime_str'],resultdir,vals['subject']))
     index += textwrap.dedent("""\
-        <canvas id="chartDSME" width="800" height="200"></canvas>
-        <canvas id="chartCSMA" width="800" height="200"></canvas>
+        <div style="max-height:250px"><canvas id="chartDSME" width="800" height="200"></canvas></div>
+        <div style="max-height:250px"><canvas id="chartCSMA" width="800" height="200"></canvas></div>
         <script>
         $(document).ready(function () {
             $.ajax({
@@ -100,6 +100,8 @@ def main(args):
                             }]
                         },
                         options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
                             scales: {
                                 yAxes: [{
                                     ticks: {
