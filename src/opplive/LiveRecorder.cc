@@ -26,11 +26,8 @@ Register_ResultRecorder("live", LiveRecorder);
 WAMPServer* LiveRecorder::server = nullptr;
 
 LiveRecorder::LiveRecorder()
-: topic("http://example.com/simple/ev3")
+: topic("http://example.com/simple/ev4")
 {
-    addRemoteProcedure("http://example.com/simple/calc#add",&LiveRecorder::adding);
-    addRemoteProcedure("http://example.com/simple/ev1",&LiveRecorder::handleEvent1);
-
     if(server == nullptr) {
         server = new WAMPServer();
         server->start();
@@ -45,26 +42,8 @@ LiveRecorder::~LiveRecorder() {
     }
 }
 
-int LiveRecorder::adding(int a, int b)
-{
-  return a+b;
-}
-
-void LiveRecorder::handleEvent1(int a)
-{
-  std::cout << "Event 1 received " << a << std::endl;
-}
-
-
 void LiveRecorder::collect(std::string value) {
-    EventManager::getInstance().publish("http://example.com/simple/ev4", value);
-
-    //ASSERT(1 == 4);
-    //int* a = 0;
-    //*a = 17;
-    if(value == "1") {
-        value = "@";
-    }
+    topic.update(value);
 }
 
 void LiveRecorder::receiveSignal(cResultFilter *prev, simtime_t_cref t, bool b DETAILS_ARG) {
@@ -102,14 +81,6 @@ void LiveRecorder::receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject 
 }
 
 void LiveRecorder::finish(cResultFilter *prev) {
-/*    opp_string_map attributes = getStatisticAttributes();
-
-    for(auto & elem : groupcounts) {
-        std::stringstream name;
-        name << getResultName().c_str() << ":" << elem.first;
-        getEnvir()->recordScalar(getComponent(), name.str().c_str(), elem.second, &attributes); // note: this is NaN if count==0
-    }
-    */
 }
 
 } // namespace inet

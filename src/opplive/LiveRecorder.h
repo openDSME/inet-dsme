@@ -33,10 +33,6 @@ namespace inet {
 class INET_API LiveRecorder : public cResultRecorder,  public RPCallable<LiveRecorder>
 {
     protected:
-        //std::map<std::string,long> groupcounts;
-    int a;
-
-    protected:
         virtual void collect(std::string val);
         virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, bool b, cObject *details) override;
         virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, long l, cObject *details) override;
@@ -48,15 +44,12 @@ class INET_API LiveRecorder : public cResultRecorder,  public RPCallable<LiveRec
 
         static WAMPServer* server;
 
-        Topic<int> topic;
+        Topic<std::string> topic;
 
     public:
         LiveRecorder();
         ~LiveRecorder();
         virtual void finish(cResultFilter *prev) override;
-
-        int adding(int a, int b);
-        void handleEvent1(int a);
 };
 
 } // namespace inet

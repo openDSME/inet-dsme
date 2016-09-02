@@ -1,144 +1,85 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
-      <script src="http://www.chartjs.org/assets/Chart.min.js"></script>
- 
-      <script>
-      </script>
-   </head>
-   <body>
-      <h1>AutobahnJS WAMP Client demonstrating the use of wamp_cpp</h1>
-      <button onclick="callProcedure();">Call Procedure</button>
-      <button onclick="publishEvent();">Publish Event</button>
-      <canvas id="updating-chart" width="500" height="300"></canvas>
+<head>
+<script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
+<script src="http://www.chartjs.org/assets/Chart.min.js"></script>
+
+<script>
+</script>
+</head>
+<body>
+<h1>Live Interaction with OMNET++ simulation</h1>
+<br />
+<canvas id="updating-chart" width="500" height="300"></canvas>
 
 <script id="jsbin-javascript">
-	// WAMP session object
-	var sess;
-	var wsuri = "ws://127.0.0.1:9002";
+// WAMP session object
+var sess;
+var wsuri = "ws://127.0.0.1:9002";
 
-    var connected = false;
+function connect() {
+    // connect to WAMP server
+    ab.connect(wsuri,
 
-    function connect() {
-        if(connected) {
-        return;
-        }
+        // WAMP session was established
+        function (session) {
+            sess = session;
+            console.log("Connected to " + wsuri);
 
-       console.log("Try");
-	 
-	   // connect to WAMP server
-	   ab.connect(wsuri,
-	 
-	      // WAMP session was established
-	      function (session) {
-	 
-        connected = true;
-		 sess = session;
-		 console.log("Connected to " + wsuri);
-	 
-		 // subscribe to topic, providing an event handler
-		 sess.subscribe("http://example.com/simple/ev2", onEvent);
+            sess.subscribe("http://example.com/simple/ev4", onEvent);
+        },
 
-		 // subscribe to topic, providing an event handler
-		 sess.subscribe("http://example.com/simple/ev3", onEvent);
-
-		 sess.subscribe("http://example.com/simple/ev4", onEvent);
-	      },
-	 
-	      // WAMP session is gone
-	      function (code, reason) {
-	 
-		 sess = null;
-		 console.log("Connection lost (" + reason + ")");
+        // WAMP session is gone
+        function (code, reason) {
+            sess = null;
+            console.log("Connection lost (" + reason + ")");
             connected = false;
-	      },
-        
-   // The session options
-   {
-      'maxRetries': 600,
-      'retryDelay': 10
-   }
-	   );
-        
-    }
-	 
-	window.onload = connect;
-	 
-	function publishEvent()
-	{
-	   sess.publish("http://example.com/simple/ev1", 42);
-	}
-	 
-	function callProcedure() {
-	   // issue an RPC, returns promise object
-	   sess.call("http://example.com/simple/calc#add", 23, 7).then(
-	 
-	      // RPC success callback
-	      function (res) {
-		 alert("got result: " + res);
-	      },
-	 
-	      // RPC error callback
-	      function (error, desc) {
-		 alert("error: " + desc);
-	      }
-	   );
-	}
+        },
+        {
+            'maxRetries': 600,
+            'retryDelay': 10
+        }
+    );
 
-var canvas = document.getElementById('updating-chart'),
-    ctx = canvas.getContext('2d'),
-    startingData = {
-      labels: [],
-      datasets: [
-          {
-              fillColor: "rgba(220,220,220,0.2)",
-              strokeColor: "rgba(220,220,220,1)",
-              pointColor: "rgba(220,220,220,1)",
-              pointStrokeColor: "#fff",
-              data: []
-          }
-      ]
-    },
-    latestLabel = 1;
+}
 
-// Reduce the animation steps for demo clarity.
+window.onload = connect;
+
+var canvas = document.getElementById('updating-chart');
+var ctx = canvas.getContext('2d');
+var startingData = {
+        labels: [],
+        datasets: [
+        {
+           fillColor: "rgba(220,220,220,0.2)",
+           strokeColor: "rgba(220,220,220,1)",
+           pointColor: "rgba(220,220,220,1)",
+           pointStrokeColor: "#fff",
+           data: []
+        }
+        ]
+    };
+var latestLabel = 1;
+
 var myLiveChart = new Chart(ctx).Line(startingData, {animationSteps: 4});
-
-
-//setInterval(function(){
-  // Add two random numbers for each dataset
- // myLiveChart.addData([Math.random() * 100, Math.random() * 100], ++latestLabel);
-  // Remove the first point so we dont just add values forever
-  //myLiveChart.removeData();
-   //connect();
-//}, 2000);
-
 
 var cnt = 0;
 var sum = 0;
 var maxcnt = 20;
-	 
-	function onEvent(topic, event) {
-	   //console.log(topic);
-       var val = parseFloat(event);
-	   //console.log(val);
 
-       sum = sum + val;
-	   //console.log(val);
-       cnt++;
-       if(cnt == maxcnt) {
-            myLiveChart.addData([sum/maxcnt], ++latestLabel);
-            cnt = 0;
-            sum = 0;
-       }
-       
-      // Add two random numbers for each dataset
-      // Remove the first point so we dont just add values forever
- //     myLiveChart.removeData();
-	}
+function onEvent(topic, event) {
+    sum = sum + parseFloat(event);
+    cnt++;
+    if(cnt == maxcnt) {
+        myLiveChart.addData([sum/maxcnt], ++latestLabel);
+        cnt = 0;
+        sum = 0;
+    }
+
+    // myLiveChart.removeData();
+}
 
 
 </script>
-   </body>
- </html>
+</body>
+</html>
