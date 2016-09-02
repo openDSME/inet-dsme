@@ -48,10 +48,6 @@ class INET_API LiveRecorder : public cResultRecorder,  public RPCallable<LiveRec
 
         static WAMPServer* server;
 
-        void eventLoop();
-        std::thread eventThread;
-        bool running;
-
         Topic<int> topic;
 
     public:

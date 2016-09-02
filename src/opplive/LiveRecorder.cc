@@ -31,9 +31,6 @@ LiveRecorder::LiveRecorder()
     addRemoteProcedure("http://example.com/simple/calc#add",&LiveRecorder::adding);
     addRemoteProcedure("http://example.com/simple/ev1",&LiveRecorder::handleEvent1);
 
-    running = true;
-    eventThread = std::thread(&LiveRecorder::eventLoop,this);
-
     if(server == nullptr) {
         server = new WAMPServer();
         server->start();
@@ -41,11 +38,6 @@ LiveRecorder::LiveRecorder()
 }
 
 LiveRecorder::~LiveRecorder() {
-    running = false;
-    std::cout << "DemoServer shutting down" << std::endl;
-    eventThread.join();
-    std::cout << "DemoServer shut down" << std::endl;
-
     if(server != nullptr) {
         server->stop();
         delete server;
@@ -63,22 +55,10 @@ void LiveRecorder::handleEvent1(int a)
   std::cout << "Event 1 received " << a << std::endl;
 }
 
-void LiveRecorder::eventLoop()
-{
-    while(running)
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-
-        /* Use EventManager directly */
-        EventManager::getInstance().publish("http://example.com/simple/ev2", 55);
-
-        /* Publish to predefined topic */
-        topic.update(12);
-    }
-}
-
 
 void LiveRecorder::collect(std::string value) {
+    EventManager::getInstance().publish("http://example.com/simple/ev4", value);
+
     //ASSERT(1 == 4);
     //int* a = 0;
     //*a = 17;
