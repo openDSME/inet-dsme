@@ -168,6 +168,8 @@ public:
     static simsignal_t ackSentDown;
     static simsignal_t beaconSentDown;
     static simsignal_t commandSentDown;
+    static simsignal_t uncorruptedFrameReceived;
+    static simsignal_t corruptedFrameReceived;
 
 private:
     void signalNewMsg(DSMEMessage* msg);

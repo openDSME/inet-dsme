@@ -18,6 +18,8 @@ simsignal_t DSMEPlatform::unicastDataSentDown = registerSignal("unicastDataSentD
 simsignal_t DSMEPlatform::commandSentDown = registerSignal("commandSentDown");
 simsignal_t DSMEPlatform::beaconSentDown = registerSignal("beaconSentDown");
 simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
+simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
+simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
 
 void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
     // TODO correct translation
@@ -167,10 +169,8 @@ void DSMEPlatform::initialize(int stage) {
 
         settings->isCoordinator = (par("isCoordinator") || settings->isPANCoordinator);
 
-        //settings.superframeSpec.finalCAPSlot = par("finalCAPSlot").longValue(); // TODO
         settings->numMaxGTSAllocPerDevice = par("maxNumberGTSAllocPerDevice");
         settings->numMaxGTSAllocPerRequest = par("maxNumberGTSAllocPerRequest");
-        settings->contentionWindow = par("contentionWindow");
         settings->commonChannel = par("commonChannel");
         settings->optimizations = par("optimizations");
 
@@ -261,6 +261,7 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg,
     acktimer->getParList().setTakeOwnership(false); // ackMsg is still owned by the AckLayer
     acktimer->getParList().addAt(0,ackMsg);
 
+    // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     uint32_t endOfReception = receivedMsg->getStartOfFrameDelimiterSymbolCounter()+receivedMsg->getTotalSymbols()
                                     - 2*4 // Preamble
                                     - 2*1; // SFD
@@ -331,9 +332,18 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
         return;
     }
 
+    if(macPkt->hasBitError()) {
+        emit(corruptedFrameReceived,macPkt);
+        delete macPkt;
+        return;
+    }
+
+    emit(uncorruptedFrameReceived,macPkt);
+
     DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
     dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
+    // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     dsmemsg->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - dsmemsg->getTotalSymbols()
                             + 2*4 // Preamble
                             + 2*1; // SFD

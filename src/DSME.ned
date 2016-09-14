@@ -43,9 +43,6 @@ simple DSME extends MACProtocolBase like IMACProtocol
 
         string allocationScheme = default("next");	// ("random", "next")
 
-        // Slotted CSMA-CA
-        int contentionWindow = default(2);
-
         int numChannels = default(16);
         int commonChannel = default(11);
         
@@ -77,9 +74,13 @@ simple DSME extends MACProtocolBase like IMACProtocol
         @signal[commandSentDown](type=cPacket);
         @signal[beaconSentDown](type=cPacket);
         @signal[ackSentDown](type=cPacket);
+        @signal[corruptedFrameReceived](type=cPacket);
+        @signal[uncorruptedFrameReceived](type=cPacket);
         
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count,vector(packetBytes); interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count,vector(packetBytes); interpolationmode=none);
+        @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count,vector(packetBytes); interpolationmode=none);
+        @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count,vector(packetBytes); interpolationmode=none);
         
         @class(::dsme::DSMEPlatform);
 }
