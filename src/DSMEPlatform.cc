@@ -136,15 +136,15 @@ void DSMEPlatform::initialize(int stage) {
         ccaTimer = new cMessage();
 
         //check parameters for consistency
-        //aTurnaroundTime should match (be equal or bigger) the RX to TX
+        //aTurnaroundTimeSymbols should match (be equal or bigger) the RX to TX
         //switching time of the radio
         if (radioModule->hasPar("timeRXToTX")) {
             simtime_t rxToTx = radioModule->par("timeRXToTX").doubleValue();
-            if (rxToTx > aTurnaroundTime) {
-                throw cRuntimeError("Parameter \"aTurnaroundTime\" (%f) does not match"
+            if (rxToTx > aTurnaroundTimeSymbols) {
+                throw cRuntimeError("Parameter \"aTurnaroundTimeSymbols\" (%f) does not match"
                         " the radios RX to TX switching time (%f)! It"
                         " should be equal or bigger",
-                        SIMTIME_DBL(aTurnaroundTime*symbolDuration), SIMTIME_DBL(rxToTx));
+                        SIMTIME_DBL(aTurnaroundTimeSymbols*symbolDuration), SIMTIME_DBL(rxToTx));
             }
         }
 
@@ -265,7 +265,7 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg,
     uint32_t endOfReception = receivedMsg->getStartOfFrameDelimiterSymbolCounter()+receivedMsg->getTotalSymbols()
                                     - 2*4 // Preamble
                                     - 2*1; // SFD
-    uint32_t ackTime = endOfReception + aTurnaroundTime;
+    uint32_t ackTime = endOfReception + aTurnaroundTimeSymbols;
     uint32_t now = getSymbolCounter();
     uint32_t diff = ackTime-now;
 
