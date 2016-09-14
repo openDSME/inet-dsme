@@ -288,8 +288,6 @@ bool DSMEPlatform::sendDirectButKeep(DSMEMessage* msg, Delegate<void(bool)> txEn
     this->txEndCallback = txEndCallback;
     DSMEFrame* frame = msg->getSendableCopy();
 
-    //   attachSignal(mac, simTime() + aTurnaroundTime); TODO ??
-
     switch(msg->getHeader().getFrameType()) {
     case IEEE802154eMACHeader::BEACON:
         emit(beaconSentDown,frame);
