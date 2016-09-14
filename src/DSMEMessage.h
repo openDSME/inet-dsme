@@ -72,10 +72,10 @@ public:
     uint16_t getTotalSymbols() {
         uint16_t bytes = macHdr.getSerializationLength()
                                    + frame->getData().size()
-                                   + 2 // FCS
-                                   + 4 // Preamble
-                                   + 1 // SFD
-                                   + 1; // PHY Header
+                                   + 4  // Preamble
+                                   + 1  // SFD
+                                   + 1  // PHY Header
+                                   + 2; // FCS
 
         if(frame->hasEncapsulatedPacket()) {
             bytes += frame->getEncapsulatedPacket()->getByteLength();

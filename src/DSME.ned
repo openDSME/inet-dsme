@@ -43,9 +43,6 @@ simple DSME extends MACProtocolBase like IMACProtocol
 
         string allocationScheme = default("next");	// ("random", "next")
 
-        // Slotted CSMA-CA
-        int contentionWindow = default(2);
-
         int numChannels = default(16);
         int commonChannel = default(11);
         

@@ -69,10 +69,13 @@ void DSMEMessage::copyTo(DSMEMessageElement* me) {
 DSMEFrame* DSMEMessage::getSendableCopy() {
     DSMEMessage msg(frame->dup());
 
-    // preamble, sfd and phy header will be added by the lower layer
+    // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
+    // Preamble, sfd and phy header will be added by the lower layer (not actually, but for calculating the duration!)
+    // However, the FCS will not be added by the lower layer since it is the task of the MAC layer, so do not subtract it!
+    // By this it will be virtually added, though it is not part of the DSMEFrame itself.
     auto symbolsPayload = getTotalSymbols()
-            - 2*4 // Preamble
-            - 2*1 // SFD
+            - 2*4  // Preamble
+            - 2*1  // SFD
             - 2*1; // PHY Header
     msg.frame->setBitLength(symbolsPayload*4); // 4 bit per symbol
     macHdr.prependTo(&msg);
