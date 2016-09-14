@@ -100,7 +100,7 @@ public:
      * but keep the message (the caller has to ensure that the message is eventually released)
      * This might lead to an additional memory copy in the platform
      */
-    bool sendDirectButKeep(DSMEMessage *msg, Delegate<void(bool)> txEndCallback);
+    bool sendCopyNow(DSMEMessage *msg, Delegate<void(bool)> txEndCallback);
 
     /**
      * Send an ACK message, delay until aTurnaRoundTime after reception_time has expired

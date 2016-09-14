@@ -274,14 +274,14 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg,
     return true;
 }
 
-bool DSMEPlatform::sendDirectButKeep(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
+bool DSMEPlatform::sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
     printSequenceChartInfo(msg);
 
     if (msg == nullptr) {
         return false;
     }
 
-    LOG_INFO("sendDirectButKeep " << (uint64_t)msg);
+    LOG_INFO("sendCopyNow " << (uint64_t)msg);
 
     this->txEndCallback = txEndCallback;
     DSMEFrame* frame = msg->getSendableCopy();
@@ -386,7 +386,7 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     }
     else if(strcmp(msg->getName(),"acktimer") == 0) {
         //LOG_INFO("send ACK")
-        sendDirectButKeep((DSMEMessage*)msg->getParList().get(0), txEndCallback);
+        sendCopyNow((DSMEMessage*)msg->getParList().get(0), txEndCallback);
         // the ACK Message itself will be deleted inside the AckLayer
         delete msg;
     }
