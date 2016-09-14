@@ -44,7 +44,7 @@
 namespace dsme {
 
 void DSMEMessage::prependFrom(DSMEMessageElement* me) {
-    // TODO better fill buffer from the end (but this is not how it works in CometOS)
+    // TODO better fill buffer from the end
     uint8_t oldSize = this->frame->getData().size();
     this->frame->getData().resize(oldSize + me->getSerializationLength());
     memmove(this->frame->getData().data() + me->getSerializationLength(), this->frame->getData().data(), oldSize);
