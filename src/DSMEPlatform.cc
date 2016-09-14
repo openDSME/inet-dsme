@@ -18,6 +18,8 @@ simsignal_t DSMEPlatform::unicastDataSentDown = registerSignal("unicastDataSentD
 simsignal_t DSMEPlatform::commandSentDown = registerSignal("commandSentDown");
 simsignal_t DSMEPlatform::beaconSentDown = registerSignal("beaconSentDown");
 simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
+simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
+simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
 
 void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
     // TODO correct translation
@@ -332,6 +334,14 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
         DSME_ASSERT(false);
         return;
     }
+
+    if(macPkt->hasBitError()) {
+        emit(corruptedFrameReceived,macPkt);
+        delete macPkt;
+        return;
+    }
+
+    emit(uncorruptedFrameReceived,macPkt);
 
     DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
     dsmemsg->getHeader().decapsulateFrom(dsmemsg);
