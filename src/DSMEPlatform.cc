@@ -54,6 +54,7 @@ DSMEPlatform::~DSMEPlatform() {
     delete settings;
 
     cancelAndDelete(ccaTimer);
+    cancelAndDelete(cfpTimer);
     cancelAndDelete(timer);
 }
 
@@ -133,6 +134,7 @@ void DSMEPlatform::initialize(int stage) {
 
         symbolDuration = SimTime(16, SIMTIME_US);
         timer = new cMessage();
+        cfpTimer = new cMessage();
         ccaTimer = new cMessage();
 
         //check parameters for consistency
@@ -169,8 +171,6 @@ void DSMEPlatform::initialize(int stage) {
 
         settings->isCoordinator = (par("isCoordinator") || settings->isPANCoordinator);
 
-        settings->numMaxGTSAllocPerDevice = par("maxNumberGTSAllocPerDevice");
-        settings->numMaxGTSAllocPerRequest = par("maxNumberGTSAllocPerRequest");
         settings->commonChannel = par("commonChannel");
         settings->optimizations = par("optimizations");
 
@@ -385,6 +385,10 @@ void DSMEPlatform::handleUpperPacket(cPacket* pkt) {
     this->dsmeAdaptionLayer.sendMessage(dsmemsg);
 }
 
+void DSMEPlatform::scheduleStartOfCFP() {
+    scheduleAt(simTime(), cfpTimer);
+}
+
 void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     if(msg == timer) {
         dsme->getEventDispatcher().timerInterrupt();
@@ -393,6 +397,9 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
         bool isIdle = (radio->getReceptionState() == IRadio::RECEPTION_STATE_IDLE) && channelInactive;
         LOG_DEBUG("CCA isIdle " << isIdle);
         dsme->dispatchCCAResult(isIdle);
+    }
+    else if(msg == cfpTimer) {
+        dsme->handleStartOfCFP();
     }
     else if(strcmp(msg->getName(),"acktimer") == 0) {
         //LOG_INFO("send ACK")

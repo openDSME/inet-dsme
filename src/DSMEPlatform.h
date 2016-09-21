@@ -115,7 +115,6 @@ public:
 
     void startCCA() override {
         channelInactive = true;
-        LOG_DEBUG("CCA start");
         scheduleAt(simTime() + 8*symbolDuration, ccaTimer);
     }
 
@@ -137,6 +136,8 @@ public:
     DSMEMessage* getEmptyMessage() override;
 
     void releaseMessage(DSMEMessage* msg) override;
+
+    virtual void scheduleStartOfCFP();
 
 private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
@@ -180,6 +181,7 @@ private:
 
     cMessage* timer;
     cMessage* ccaTimer;
+    cMessage* cfpTimer;
     Delegate<void(bool)> txEndCallback;
 
 public:
