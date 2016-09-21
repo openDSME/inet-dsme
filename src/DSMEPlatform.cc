@@ -185,6 +185,7 @@ void DSMEPlatform::initialize(int stage) {
     else if (stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         dsme->start(*settings, this);
+        dsmeAdaptionLayer.startAssociation();
 
         updateVisual();
         cModule *mobilityModule = this->getParentModule()->getParentModule()->getSubmodule("mobility");
