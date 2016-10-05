@@ -67,7 +67,6 @@
 #include "dsme_settings.h"
 #include "dsme_atomic.h"
 #include "DSMEPlatform.h"
-#include "phy_constants.h"
 
 
 #endif
