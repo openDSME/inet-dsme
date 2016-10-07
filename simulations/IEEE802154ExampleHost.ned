@@ -45,6 +45,8 @@ module IEEE802154ExampleHost extends WirelessHost
         *.routingTableModule = "^.generic.routingTable";
         *.networkProtocolModule = "^.generic.gnp";
         gpsr.routingStrategy = "StraightestPath";
+        
+        @statistic[intermediatePRR](title="intermediate PRR"; source=intermediatePRR; record=live; interpolationmode=none);
 
     submodules:
         trafficgen: PRRTrafGen {

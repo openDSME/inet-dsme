@@ -63,20 +63,27 @@ var latestLabel = 1;
 
 var myLiveChart = new Chart(ctx).Line(startingData, {animationSteps: 4});
 
-var cnt = 0;
-var sum = 0;
-var maxcnt = 20;
+//var cnt = 0;
+//var sum = 0;
+//var maxcnt = 20;
 
 function onEvent(topic, event) {
-    sum = sum + parseFloat(event);
-    cnt++;
-    if(cnt == maxcnt) {
-        myLiveChart.addData([sum/maxcnt], ++latestLabel);
-        cnt = 0;
-        sum = 0;
-    }
+//    sum = sum + parseFloat(event);
+//    cnt++;
+//    if(cnt == maxcnt) {
+//        myLiveChart.addData([sum/maxcnt], ++latestLabel);
+//        cnt = 0;
+//        sum = 0;
+//    }
 
     // myLiveChart.removeData();
+    
+    var val = parseFloat(event);
+    if(!(val >= 0 && val <= 1)) {
+    	val = 0;
+    }
+    
+   	myLiveChart.addData([val], ++latestLabel);
 }
 
 
