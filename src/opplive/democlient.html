@@ -51,9 +51,16 @@ var startingData = {
         labels: [],
         datasets: [
         {
-           fillColor: "rgba(220,220,220,0.2)",
-           strokeColor: "rgba(220,220,220,1)",
-           pointColor: "rgba(220,220,220,1)",
+           fillColor: "rgba(0,220,0,0.2)",
+           strokeColor: "rgba(0,220,0,1)",
+           pointColor: "rgba(0,220,0,1)",
+           pointStrokeColor: "#fff",
+           data: []
+        },
+        {
+           fillColor: "rgba(220,0,0,0.2)",
+           strokeColor: "rgba(220,0,0,1)",
+           pointColor: "rgba(220,0,0,1)",
            pointStrokeColor: "#fff",
            data: []
         }
@@ -61,7 +68,11 @@ var startingData = {
     };
 var latestLabel = 1;
 
-var myLiveChart = new Chart(ctx).Line(startingData, {animationSteps: 4});
+
+var myLiveChart = new Chart(ctx).Bar(startingData, {animationSteps: 4});
+
+
+
 
 //var cnt = 0;
 //var sum = 0;
@@ -83,7 +94,7 @@ function onEvent(topic, event) {
     	val = 0;
     }
     
-   	myLiveChart.addData([val], ++latestLabel);
+   	myLiveChart.addData([val,val], ++latestLabel);
 }
 
 

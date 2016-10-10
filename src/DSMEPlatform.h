@@ -145,7 +145,8 @@ public:
 private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
 
-    void handleDataMessageFromMCPS(DSMEMessage* msg);
+    void handleIndicationFromMCPS(DSMEMessage* msg);
+    void handleConfirmFromMCPS(DSMEMessage* msg, bool success);
 
     bool send(DSMEFrame* frame);
 
@@ -174,6 +175,7 @@ public:
     static simsignal_t commandSentDown;
     static simsignal_t uncorruptedFrameReceived;
     static simsignal_t corruptedFrameReceived;
+    static simsignal_t frameDropped;
 
 private:
     void signalNewMsg(DSMEMessage* msg);

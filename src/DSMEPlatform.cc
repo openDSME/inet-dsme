@@ -23,6 +23,7 @@ simsignal_t DSMEPlatform::beaconSentDown = registerSignal("beaconSentDown");
 simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
 simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
 simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
+simsignal_t DSMEPlatform::frameDropped = registerSignal("frameDropped");
 
 void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
     // TODO correct translation
@@ -183,7 +184,8 @@ void DSMEPlatform::initialize(int stage) {
             this->dsmeAdaptionLayer.settings.allocationScheme = DSMEAdaptionLayerSettings::ALLOC_CONTIGUOUS_SLOT;
         }
 
-        this->dsmeAdaptionLayer.setReceiveMessage(DELEGATE(&DSMEPlatform::handleDataMessageFromMCPS, *this));
+        this->dsmeAdaptionLayer.setIndicationCallback(DELEGATE(&DSMEPlatform::handleIndicationFromMCPS, *this));
+        this->dsmeAdaptionLayer.setConfirmCallback(DELEGATE(&DSMEPlatform::handleConfirmFromMCPS, *this));
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
@@ -204,7 +206,7 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
 }
 
-void DSMEPlatform::handleDataMessageFromMCPS(DSMEMessage* msg) {
+void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
     DSMEFrame* macPkt = msg->decapsulateFrame();
     releaseMessage(msg);
     cPacket *packet = macPkt->decapsulate();
@@ -217,6 +219,11 @@ void DSMEPlatform::handleDataMessageFromMCPS(DSMEMessage* msg) {
 
     delete macPkt;
     sendUp(packet);
+}
+
+void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, bool success) {
+    releaseMessage(msg);
+    emit(frameDropped, true);
 }
 
 DSMEMessage* DSMEPlatform::getEmptyMessage()
