@@ -51,6 +51,10 @@ LiveTrafGen::~LiveTrafGen()
     }
 }
 
+void LiveTrafGen::setInterval(double interval) {
+    meanInterval = interval;
+}
+
 void LiveTrafGen::initialize(int stage)
 {
     PRRTrafGen::initialize(stage);
@@ -58,6 +62,10 @@ void LiveTrafGen::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {
         intermediatePRRInterval = par("intermediatePRRInterval");
         intermediatePRRAlpha = par("intermediatePRRAlpha");
+        meanInterval = 1;
+        k = 10;
+
+        addRemoteProcedure("http://example.com/simple/setInterval",&LiveTrafGen::setInterval);
     }
     else if (stage == INITSTAGE_APPLICATION_LAYER) {
         if(intermediatePRRTimer == nullptr) { // only one node shall handle these events
@@ -65,6 +73,21 @@ void LiveTrafGen::initialize(int stage)
             scheduleAt(simTime()+intermediatePRRInterval, intermediatePRRTimer);
         }
     }
+}
+
+void LiveTrafGen::scheduleNextPacket(simtime_t previous)
+{
+    simtime_t next;
+    if (previous == -1) {
+        next = simTime() <= startTime ? startTime : simTime();
+        timer->setKind(START);
+    }
+    else {
+        next = previous + gamma_d(k, meanInterval/k);
+        timer->setKind(NEXT);
+    }
+    if (stopTime < SIMTIME_ZERO || next < stopTime)
+        scheduleAt(next, timer);
 }
 
 void LiveTrafGen::messageDeliveredOrDropped(cPacket* pkt, bool dropped) {

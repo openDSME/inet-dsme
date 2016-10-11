@@ -94,7 +94,25 @@ function onEvent(topic, event) {
    	myLiveChart.addData([val1,val2], ++latestLabel);
 }
 
+function setInterval() {
+        sess.call("http://example.com/simple/setInterval", 7).then(
+	 
+	      // RPC success callback
+	      function (res) {
+		// alert("got result: " + res);
+	      },
+	 
+	      // RPC error callback
+	      function (error, desc) {
+		// alert("error: " + desc);
+	      }
+	   );
+}
+
 
 </script>
+
+<button onclick="setInterval()">Hallo</button>
+
 </body>
 </html>

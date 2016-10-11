@@ -24,13 +24,14 @@
 
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/applications/generic/PRRTrafGen.h"
+#include "wamp_cpp/RPCallable.h"
 
 namespace inet {
 
 /**
  * IP traffic generator application for live results
  */
-class INET_API LiveTrafGen : public PRRTrafGen
+class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
 {
   protected:
     simtime_t intermediatePRRInterval;
@@ -43,8 +44,12 @@ class INET_API LiveTrafGen : public PRRTrafGen
     static double sentPerIntervalSmooth;
     static double receivedPerIntervalSmooth;
 
+    double meanInterval;
+    double k;
+
   protected:
     virtual void initialize(int stage) override;
+    virtual void scheduleNextPacket(simtime_t previous);
     virtual void handleMessage(cMessage *msg) override;
     virtual void sendPacket() override;
 
@@ -57,6 +62,7 @@ class INET_API LiveTrafGen : public PRRTrafGen
     virtual ~LiveTrafGen();
 
     void handleDroppedPacket(cPacket *msg);
+    void setInterval(double interval);
 };
 
 } // namespace inet
