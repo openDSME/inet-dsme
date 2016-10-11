@@ -17,7 +17,7 @@
 
 package inet_dsme.simulations;
 
-import inet.applications.generic.PRRTrafGen;
+import inet_dsme.opplive.LiveTrafGen;
 import inet.node.inet.WirelessHost;
 import inet.linklayer.ieee802154.Ieee802154NarrowbandNic;
 import inet_dsme.sp_gpsr.SP_GPSR;
@@ -49,7 +49,7 @@ module IEEE802154ExampleHost extends WirelessHost
         @statistic[intermediatePRR](title="intermediate PRR"; source=intermediatePRR; record=live; interpolationmode=none);
 
     submodules:
-        trafficgen: PRRTrafGen {
+        trafficgen: LiveTrafGen {
             @display("p=188,287");
         }
 

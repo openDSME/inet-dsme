@@ -5,7 +5,7 @@
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
-#include "PRRTrafGen.h"
+#include "LiveTrafGen.h"
 
 #include "wamp_cpp/WAMPServer.h"
 #include "DemoServer.h"
@@ -230,7 +230,7 @@ void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, bool success) {
 
         if(netPkt->hasEncapsulatedPacket()) {
             cPacket *appPkt = netPkt->decapsulate();
-            PRRTrafGen* trafGen = dynamic_cast<PRRTrafGen*>(appPkt->getSenderModule());
+            LiveTrafGen* trafGen = dynamic_cast<LiveTrafGen*>(appPkt->getSenderModule());
             if(trafGen != nullptr) {
                 if(!success) {
                     trafGen->handleDroppedPacket(appPkt);
