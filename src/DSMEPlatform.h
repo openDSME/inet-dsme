@@ -175,7 +175,6 @@ public:
     static simsignal_t commandSentDown;
     static simsignal_t uncorruptedFrameReceived;
     static simsignal_t corruptedFrameReceived;
-    static simsignal_t frameDropped;
 
 private:
     void signalNewMsg(DSMEMessage* msg);

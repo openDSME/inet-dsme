@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
-<script src="http://www.chartjs.org/assets/Chart.min.js"></script>
+<script src="autobahn.min.js"></script>
+<script src="Chart.min.js"></script>
 
 <script>
 </script>
@@ -72,8 +72,6 @@ var latestLabel = 1;
 var myLiveChart = new Chart(ctx).Bar(startingData, {animationSteps: 4});
 
 
-
-
 //var cnt = 0;
 //var sum = 0;
 //var maxcnt = 20;
@@ -88,13 +86,12 @@ function onEvent(topic, event) {
 //    }
 
     // myLiveChart.removeData();
+    var p = event.split(",");
     
-    var val = parseFloat(event);
-    if(!(val >= 0 && val <= 1)) {
-    	val = 0;
-    }
+    var val1 = parseFloat(p[0]);
+    var val2 = parseFloat(p[1]);
     
-   	myLiveChart.addData([val,val], ++latestLabel);
+   	myLiveChart.addData([val1,val2], ++latestLabel);
 }
 
 

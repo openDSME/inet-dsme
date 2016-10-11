@@ -5,6 +5,7 @@
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
+#include "PRRTrafGen.h"
 
 #include "wamp_cpp/WAMPServer.h"
 #include "DemoServer.h"
@@ -23,7 +24,6 @@ simsignal_t DSMEPlatform::beaconSentDown = registerSignal("beaconSentDown");
 simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
 simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
 simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
-simsignal_t DSMEPlatform::frameDropped = registerSignal("frameDropped");
 
 void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
     // TODO correct translation
@@ -222,8 +222,29 @@ void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
 }
 
 void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, bool success) {
+    DSMEFrame* macPkt = msg->decapsulateFrame();
     releaseMessage(msg);
-    emit(frameDropped, true);
+
+    if(macPkt->hasEncapsulatedPacket()) {
+        cPacket *netPkt = macPkt->decapsulate();
+
+        if(netPkt->hasEncapsulatedPacket()) {
+            cPacket *appPkt = netPkt->decapsulate();
+            PRRTrafGen* trafGen = dynamic_cast<PRRTrafGen*>(appPkt->getSenderModule());
+            if(trafGen != nullptr) {
+                if(!success) {
+                    trafGen->handleDroppedPacket(appPkt);
+                }
+                else {
+                    delete appPkt;
+                }
+            }
+        }
+
+        delete netPkt;
+    }
+
+    delete macPkt;
 }
 
 DSMEMessage* DSMEPlatform::getEmptyMessage()
