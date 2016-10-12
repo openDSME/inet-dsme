@@ -1,21 +1,19 @@
 name: webplot
 version: 1.0.0
 author: Maximilian Köstler 
-description: X
-homepage: X
 environment:
     sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
+    browser: ^0.10.0
     wamp: ^0.4.3
     chartjs: ^0.2.0+1
-    polymer: ^1.0.0-rc.2
-    polymer_elements: ^1.0.0-rc.3
-    reflectable: ^0.3.3
-    web_components: '>=0.11.3 <0.13.0'
-    polymer_interop: ^1.0.0-rc.4
-dev_dependencies:
-    browser: '>=0.10.0+2 <0.11.0'
+    angular2: 2.0.0-beta.21
+    dart_to_js_script_rewriter: ^1.0.1
 transformers:
-- polymer:
-    entry_points:
-        - web/index.html
+- angular2:
+    platform_directives:
+    - 'package:angular2/common.dart#COMMON_DIRECTIVES'
+    platform_pipes:
+    - 'package:angular2/common.dart#COMMON_PIPES'
+    entry_points: web/main.dart
+- dart_to_js_script_rewriter
