@@ -145,7 +145,8 @@ public:
 private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
 
-    void handleDataMessageFromMCPS(DSMEMessage* msg);
+    void handleIndicationFromMCPS(DSMEMessage* msg);
+    void handleConfirmFromMCPS(DSMEMessage* msg, bool success);
 
     bool send(DSMEFrame* frame);
 
