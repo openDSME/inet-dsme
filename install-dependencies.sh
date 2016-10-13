@@ -30,7 +30,7 @@ then
     rm -rf $INET;
     git clone --depth=2 --branch=ieee802154_example https://github.com/openDSME/inet.git $INET;
 else
-    pushd $INET && git pull && popd;
+    pushd $INET && git fetch -f && git reset --hard origin/ieee802154_example && popd;
 fi
 
 # Compile INET
