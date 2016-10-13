@@ -46,6 +46,8 @@ module IEEE802154ExampleHost extends WirelessHost
         *.networkProtocolModule = "^.generic.gnp";
         gpsr.routingStrategy = "StraightestPath";
 
+        *.gnp.procDelay = default(2ms);
+
     submodules:
         trafficgen: PRRTrafGen {
             @display("p=188,287");
