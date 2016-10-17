@@ -28,7 +28,7 @@ class InputClient extends WampClient {
 @Component(
         selector: 'slider-input',
         template: '''
-            <input #input (change)="onChange()" type="range" min="5" max="40">
+            <input #input (change)="onChange()" (input)="onInput()" type="range" min="1" max="40">
             <span #value >0.0</span>
         ''')
 
@@ -45,6 +45,11 @@ class SliderInput {
         double value = double.parse(inputElement.nativeElement.value) / 10;
         valueElement.nativeElement.text = value.toString();
         client.send(value);
+    }
+
+    onInput() {
+        double value = double.parse(inputElement.nativeElement.value) / 10;
+        valueElement.nativeElement.text = value.toString();
     }
 
     InputClient client;
