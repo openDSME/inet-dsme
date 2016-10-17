@@ -65,7 +65,7 @@ void LiveTrafGen::initialize(int stage)
         meanInterval = 1;
         k = 10;
 
-        addRemoteProcedure("http://example.com/simple/setInterval",&LiveTrafGen::setInterval);
+        addRemoteProcedure("http://opendsme.org/rpc/setInterval",&LiveTrafGen::setInterval);
     }
     else if (stage == INITSTAGE_APPLICATION_LAYER) {
         if(intermediatePRRTimer == nullptr) { // only one node shall handle these events

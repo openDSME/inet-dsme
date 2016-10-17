@@ -21,12 +21,19 @@
 
 namespace inet {
 
-Register_ResultRecorder("live", LiveRecorder);
+class NamedLifeRecorder : public LiveRecorder {
+public:
+    NamedLifeRecorder() : LiveRecorder("http://opendsme.org/events/1"){
+
+    }
+};
+
+Register_ResultRecorder("live", NamedLifeRecorder);
 
 WAMPServer* LiveRecorder::server = nullptr;
 
-LiveRecorder::LiveRecorder()
-: topic("http://example.com/simple/ev4")
+LiveRecorder::LiveRecorder(std::string event)
+: topic(event)
 {
     if(server == nullptr) {
         server = new WAMPServer();

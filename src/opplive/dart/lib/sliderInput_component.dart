@@ -15,7 +15,7 @@ class InputClient extends WampClient {
 
     void send(double value) {
         var callId = generateSessionId();
-        var uri = "http://example.com/simple/setInterval";
+        var uri = "http://opendsme.org/rpc/setInterval";
         var arg = value;
         const int CALL = 2;
         var msg = [CALL, callId, uri, arg];

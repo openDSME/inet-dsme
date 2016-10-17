@@ -47,7 +47,9 @@ class INET_API LiveRecorder : public cResultRecorder,  public RPCallable<LiveRec
         Topic<std::string> topic;
 
     public:
-        LiveRecorder();
+        LiveRecorder() = delete;
+
+        LiveRecorder(std::string event);
         ~LiveRecorder();
         virtual void finish(cResultFilter *prev) override;
 };

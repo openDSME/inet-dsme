@@ -16,7 +16,7 @@ class ChartClient extends WampClient {
     }
 
     onWelcome() {
-        subscribe('http://example.com/simple/ev4');
+        subscribe('http://opendsme.org/events/1');
     }
 
     onEvent(topicUri, event) {
