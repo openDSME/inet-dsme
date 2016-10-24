@@ -36,7 +36,10 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
   protected:
     simtime_t intermediatePRRInterval;
     double intermediatePRRAlpha;
+
     static simsignal_t intermediatePRRSignal;
+    static simsignal_t nodeDroppedPk;
+
     static cMessage *intermediatePRRTimer;
     static int sentCurrentInterval;
     static int receivedCurrentInterval;
@@ -61,7 +64,7 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
     LiveTrafGen();
     virtual ~LiveTrafGen();
 
-    void handleDroppedPacket(cPacket *msg);
+    void handleDroppedPacket(cPacket *msg, uint16_t srcAddr);
     void setInterval(double interval);
 };
 

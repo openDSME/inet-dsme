@@ -28,6 +28,7 @@ simple LiveTrafGen extends PRRTrafGen
         double intermediatePRRAlpha = default(0.2);
         
         @signal[intermediatePRR](type=string);
+        @signal[nodeDroppedPk](type=string);
         @class(inet::LiveTrafGen);
 }
 

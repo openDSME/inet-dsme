@@ -23,11 +23,15 @@
 #include "inet/networklayer/contract/IL3AddressType.h"
 #include "inet/networklayer/contract/INetworkProtocolControlInfo.h"
 
+#include "inet/linklayer/base/MACFrameBase_m.h"
+
 namespace inet {
 
 Define_Module(LiveTrafGen);
 
 simsignal_t LiveTrafGen::intermediatePRRSignal = registerSignal("intermediatePRR");
+simsignal_t LiveTrafGen::nodeDroppedPk = registerSignal("nodeDroppedPk");
+
 int LiveTrafGen::receivedCurrentInterval = 0;
 int LiveTrafGen::sentCurrentInterval = 0;
 int LiveTrafGen::droppedCurrentInterval = 0;
@@ -115,8 +119,11 @@ void LiveTrafGen::receiveSignal(cComponent *prev, simsignal_t t, cObject *obj DE
     messageDeliveredOrDropped((cPacket*)obj,false);
 }
 
-void LiveTrafGen::handleDroppedPacket(cPacket *msg) {
+void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr) {
     messageDeliveredOrDropped(msg,true);
+    std::stringstream stream;
+    stream << srcAddr;
+    emit(nodeDroppedPk, stream.str().c_str());
     delete msg;
 }
 
@@ -134,7 +141,7 @@ void LiveTrafGen::handleMessage(cMessage *msg)
         std::cout << std::fixed << var << " " << mean << " " << val << std::endl;
         //droppedCurrentInterval << " " << receivedCurrentInterval << " " << sentCurrentInterval << " " << receivedCurrentInterval/(double)sentCurrentInterval << " " <<  receivedPerIntervalSmooth << " " << sentPerIntervalSmooth << " " << receivedPerIntervalSmooth / sentPerIntervalSmooth << std::endl;
         std::stringstream stream;
-        stream << receivedCurrentInterval << "," << droppedCurrentInterval;
+        stream << simTime().dbl() << "," << receivedCurrentInterval << "," << droppedCurrentInterval;
         emit(intermediatePRRSignal, stream.str().c_str());
         lastMean = mean;
         lastV = v;

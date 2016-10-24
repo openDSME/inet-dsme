@@ -21,14 +21,22 @@
 
 namespace inet {
 
-class NamedLifeRecorder : public LiveRecorder {
+class TrafficLifeRecorder : public LiveRecorder {
 public:
-    NamedLifeRecorder() : LiveRecorder("http://opendsme.org/events/1"){
+    TrafficLifeRecorder() : LiveRecorder("http://opendsme.org/events/1"){
 
     }
 };
 
-Register_ResultRecorder("live", NamedLifeRecorder);
+class DroppedLifeRecorder : public LiveRecorder {
+public:
+    DroppedLifeRecorder() : LiveRecorder("http://opendsme.org/events/2"){
+
+    }
+};
+
+Register_ResultRecorder("traffic_live", TrafficLifeRecorder);
+Register_ResultRecorder("dropped_live", DroppedLifeRecorder);
 
 WAMPServer* LiveRecorder::server = nullptr;
 
@@ -36,7 +44,7 @@ LiveRecorder::LiveRecorder(std::string event)
 : topic(event)
 {
     if(server == nullptr) {
-        server = new WAMPServer();
+        server = new WAMPServer(9002);
         server->start();
     }
 }

@@ -12,7 +12,11 @@ using namespace std;
 using namespace boost::filesystem;
 
 WAMPServer::WAMPServer()
-: basedir(""), debug(false) {
+: basedir(""), debug(false), port(9002) {
+}
+
+WAMPServer::WAMPServer(unsigned int port)
+: basedir(""), debug(false), port(port) {
 }
 
 void WAMPServer::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
@@ -211,7 +215,7 @@ void WAMPServer::thread()
 		wserver.set_http_handler(bind(&WAMPServer::on_http,this,::_1));
 
 		// Listen on port
-		wserver.listen(boost::asio::ip::tcp::v4(), 9002);
+		wserver.listen(boost::asio::ip::tcp::v4(), port);
 
 		// Start the server accept loop
 		wserver.start_accept();

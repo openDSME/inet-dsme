@@ -146,7 +146,7 @@ void DSMEMobilityBase::handleMessage(cMessage *message)
 
 void DSMEMobilityBase::updateVisualRepresentation()
 {
-    EV_DEBUG << "current position = " << lastPosition << endl;
+    //EV_DEBUG << "current position = " << lastPosition << endl;
     if (hasGUI()) {
         char buf[80];
         sprintf(buf, "%.3g, %.3g, %.3g", lastPosition.x, lastPosition.y, lastPosition.z);

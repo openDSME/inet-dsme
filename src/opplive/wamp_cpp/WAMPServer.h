@@ -31,6 +31,7 @@ public:
 	typedef std::set<connection_hdl> con_list;
 
 	WAMPServer();
+	WAMPServer(unsigned int port);
 
 	// Define a callback to handle incoming messages
 	void on_message(websocketpp::connection_hdl hdl, message_ptr msg);
@@ -56,6 +57,8 @@ private:
 	WAMPMessageHandler handler;
 	boost::bimap<std::string, connection_hdl> clients;
 	bool debug;
+
+	unsigned int port;
 };
 
 #endif

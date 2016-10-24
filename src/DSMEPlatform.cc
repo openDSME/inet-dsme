@@ -97,7 +97,6 @@ void DSMEPlatform::updateVisual() {
     }
     cDisplayString& displayString = host->getDisplayString();
     displayString.setTagArg("t", 0, s.str().c_str());
-
 }
 
 void DSMEPlatform::initialize(int stage) {
@@ -233,7 +232,7 @@ void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, bool success) {
             LiveTrafGen* trafGen = dynamic_cast<LiveTrafGen*>(appPkt->getSenderModule());
             if(trafGen != nullptr) {
                 if(!success) {
-                    trafGen->handleDroppedPacket(appPkt);
+                    trafGen->handleDroppedPacket(appPkt, this->mac_pib.macShortAddress);
                 }
                 else {
                     delete appPkt;
