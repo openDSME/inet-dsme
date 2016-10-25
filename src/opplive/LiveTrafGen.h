@@ -50,6 +50,10 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
     double meanInterval;
     double k;
 
+    static std::vector<std::vector<unsigned int>> droppedHistory;
+    static unsigned int history_index;
+    static constexpr unsigned int history_length = 5;
+
   protected:
     virtual void initialize(int stage) override;
     virtual void scheduleNextPacket(simtime_t previous);
@@ -66,6 +70,9 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
 
     void handleDroppedPacket(cPacket *msg, uint16_t srcAddr);
     void setInterval(double interval);
+
+  private:
+    void setDroppedZero();
 };
 
 } // namespace inet

@@ -39,12 +39,16 @@ double LiveTrafGen::receivedPerIntervalSmooth = 0;
 double LiveTrafGen::sentPerIntervalSmooth = 0;
 cMessage *LiveTrafGen::intermediatePRRTimer = 0;
 
+std::vector<std::vector<unsigned int>> LiveTrafGen::droppedHistory;
+unsigned int LiveTrafGen::history_index = 0;
+
 double lastV = 0;
 double lastMean = 0;
 int cnt = 0;
 
 LiveTrafGen::LiveTrafGen()
 {
+    droppedHistory.resize(history_length);
 }
 
 LiveTrafGen::~LiveTrafGen()
@@ -121,10 +125,13 @@ void LiveTrafGen::receiveSignal(cComponent *prev, simsignal_t t, cObject *obj DE
 
 void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr) {
     messageDeliveredOrDropped(msg,true);
-    std::stringstream stream;
-    stream << srcAddr;
-    emit(nodeDroppedPk, stream.str().c_str());
-    delete msg;
+
+    unsigned int index = srcAddr - 1;
+
+    if(droppedHistory[history_index].size() <= index) {
+        droppedHistory[history_index].resize(index + 1);
+    }
+    droppedHistory[history_index][index]++;
 }
 
 void LiveTrafGen::handleMessage(cMessage *msg)
@@ -149,6 +156,36 @@ void LiveTrafGen::handleMessage(cMessage *msg)
         sentCurrentInterval = 0;
         droppedCurrentInterval = 0;
         scheduleAt(simTime()+intermediatePRRInterval, intermediatePRRTimer);
+
+
+        unsigned int maxSize = 0;
+        for(std::vector<unsigned int>& vec : droppedHistory) {
+            if(vec.size() > maxSize) {
+                maxSize = vec.size();
+            }
+        }
+        std::vector<unsigned int> droppedLastInterval;
+        droppedLastInterval.resize(maxSize);
+
+        for(std::vector<unsigned int>& vec : droppedHistory) {
+            for(unsigned int i = 0; i < vec.size(); i++) {
+                droppedLastInterval[i] += vec[i];
+            }
+        }
+
+        std::stringstream droppedStream;
+        Json::FastWriter writer;
+        Json::Value results(Json::arrayValue);
+        for(unsigned int &value : droppedLastInterval) {
+            double mean = static_cast<double>(value) / history_length;
+            results.append(Json::Value(mean));
+        }
+
+        droppedStream << writer.write(results);
+        emit(nodeDroppedPk, droppedStream.str().c_str());
+
+        history_index = (history_index + 1) % history_length;
+        setDroppedZero();
     }
     else {
         PRRTrafGen::handleMessage(msg);
@@ -158,6 +195,12 @@ void LiveTrafGen::handleMessage(cMessage *msg)
 void LiveTrafGen::sendPacket() {
     sentCurrentInterval++;
     PRRTrafGen::sendPacket();
+}
+
+void LiveTrafGen::setDroppedZero() {
+    for(unsigned int& val : droppedHistory[history_index]) {
+        val = 0;
+    }
 }
 
 } // namespace inet
