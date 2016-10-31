@@ -61,7 +61,7 @@ void WAMPServer::on_http(websocketpp::connection_hdl hdl) {
 
 		cout << request << endl;
 		
-		ifstream t(request.string());
+		std::ifstream t(request.string());
 		if(!t.is_open())
 		{
 			throw 0;
