@@ -144,8 +144,8 @@ void LiveTrafGen::handleMessage(cMessage *msg)
         double var = v / (cnt-1);
         sentPerIntervalSmooth = intermediatePRRAlpha * sentCurrentInterval + (1-intermediatePRRAlpha) * sentPerIntervalSmooth;
         receivedPerIntervalSmooth = intermediatePRRAlpha * receivedCurrentInterval + (1-intermediatePRRAlpha) * receivedPerIntervalSmooth;
-        std::cout.precision(3);
-        std::cout << std::fixed << var << " " << mean << " " << val << std::endl;
+        //std::cout.precision(3);
+        //std::cout << std::fixed << var << " " << mean << " " << val << std::endl;
         //droppedCurrentInterval << " " << receivedCurrentInterval << " " << sentCurrentInterval << " " << receivedCurrentInterval/(double)sentCurrentInterval << " " <<  receivedPerIntervalSmooth << " " << sentPerIntervalSmooth << " " << receivedPerIntervalSmooth / sentPerIntervalSmooth << std::endl;
         std::stringstream stream;
         stream << simTime().dbl() << "," << receivedCurrentInterval << "," << droppedCurrentInterval;
