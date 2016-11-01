@@ -25,6 +25,8 @@
 
 #include "inet/linklayer/base/MACFrameBase_m.h"
 
+#include "LiveRecorder.h"
+
 namespace inet {
 
 Define_Module(LiveTrafGen);
@@ -68,6 +70,9 @@ void LiveTrafGen::initialize(int stage)
     PRRTrafGen::initialize(stage);
 
     if (stage == INITSTAGE_LOCAL) {
+        unsigned int portNumber = par("portNumber");
+        LiveRecorder::openConnection(portNumber);
+
         intermediatePRRInterval = par("intermediatePRRInterval");
         intermediatePRRAlpha = par("intermediatePRRAlpha");
         meanInterval = 1;

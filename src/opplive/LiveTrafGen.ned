@@ -27,6 +27,8 @@ simple LiveTrafGen extends PRRTrafGen
         double intermediatePRRInterval @unit("s") = default(1s);
         double intermediatePRRAlpha = default(0.2);
         
+        int portNumber = default(9002);
+        
         @signal[intermediatePRR](type=string);
         @signal[nodeDroppedPk](type=string);
         @class(inet::LiveTrafGen);

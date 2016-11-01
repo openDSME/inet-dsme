@@ -52,6 +52,8 @@ class INET_API LiveRecorder : public cResultRecorder,  public RPCallable<LiveRec
         LiveRecorder(std::string event);
         ~LiveRecorder();
         virtual void finish(cResultFilter *prev) override;
+
+        static void openConnection(unsigned int port);
 };
 
 } // namespace inet

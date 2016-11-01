@@ -40,13 +40,21 @@ Register_ResultRecorder("dropped_live", DroppedLifeRecorder);
 
 WAMPServer* LiveRecorder::server = nullptr;
 
+void LiveRecorder::openConnection(unsigned int port) {
+    if(server == nullptr) {
+        std::cout << "Websocket listening to port " << port << std::endl;
+        server = new WAMPServer(port);
+        server->start();
+    }
+}
+
 LiveRecorder::LiveRecorder(std::string event)
 : topic(event)
 {
-    if(server == nullptr) {
-        server = new WAMPServer(9002);
-        server->start();
-    }
+//    if(server == nullptr) {
+//        server = new WAMPServer(9002);
+//        server->start();
+//    }
 }
 
 LiveRecorder::~LiveRecorder() {
