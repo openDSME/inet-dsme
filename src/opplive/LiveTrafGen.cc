@@ -24,6 +24,7 @@
 #include "inet/networklayer/contract/INetworkProtocolControlInfo.h"
 
 #include "inet/linklayer/base/MACFrameBase_m.h"
+#include "wamp_cpp/EventManager.h"
 
 #include "LiveRecorder.h"
 
@@ -36,19 +37,11 @@ simsignal_t LiveTrafGen::nodeDroppedPk = registerSignal("nodeDroppedPk");
 
 unsigned int LiveTrafGen::handledPackets[PACKET_RESULT_LENGTH];
 
-//int LiveTrafGen::receivedCurrentInterval = 0;
 int LiveTrafGen::sentCurrentInterval = 0;
-//int LiveTrafGen::droppedCurrentInterval = 0;
-//double LiveTrafGen::receivedPerIntervalSmooth = 0;
-//double LiveTrafGen::sentPerIntervalSmooth = 0;
 cMessage *LiveTrafGen::intermediatePRRTimer = 0;
 
-std::vector<std::vector<unsigned int>> LiveTrafGen::droppedHistory;
+std::vector<std::vector<std::array<unsigned int,PACKET_RESULT_LENGTH>>> LiveTrafGen::droppedHistory;
 unsigned int LiveTrafGen::history_index = 0;
-
-//double lastV = 0;
-//double lastMean = 0;
-//int cnt = 0;
 
 LiveTrafGen::LiveTrafGen()
 {
@@ -67,11 +60,16 @@ void LiveTrafGen::setInterval(double interval) {
     meanInterval = interval;
 }
 
+void LiveTrafGen::scheduleStop() {
+    waitForStop = true;
+}
+
 void LiveTrafGen::initialize(int stage)
 {
     PRRTrafGen::initialize(stage);
 
     if (stage == INITSTAGE_LOCAL) {
+        waitForStop = false;
         unsigned int portNumber = par("portNumber");
         LiveRecorder::openConnection(portNumber);
 
@@ -81,11 +79,13 @@ void LiveTrafGen::initialize(int stage)
         k = 10;
 
         addRemoteProcedure("http://opendsme.org/rpc/setInterval",&LiveTrafGen::setInterval);
+        addRemoteProcedure("http://opendsme.org/rpc/restart",&LiveTrafGen::scheduleStop);
     }
     else if (stage == INITSTAGE_APPLICATION_LAYER) {
         if(intermediatePRRTimer == nullptr) { // only one node shall handle these events
             intermediatePRRTimer = new cMessage("intermediatePRRTimer");
             scheduleAt(simTime()+intermediatePRRInterval, intermediatePRRTimer);
+            startingCountdown = 2;
         }
     }
 }
@@ -137,12 +137,21 @@ void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr, PacketResu
     if(droppedHistory[history_index].size() <= index) {
         droppedHistory[history_index].resize(index + 1);
     }
-    droppedHistory[history_index][index]++;
+    droppedHistory[history_index][index][result]++;
 }
 
 void LiveTrafGen::handleMessage(cMessage *msg)
 {
     if(msg == intermediatePRRTimer) {
+        if(waitForStop) {
+            endSimulation();
+        }
+
+        if(startingCountdown > 0) {
+            EventManager::getInstance().publish("http://opendsme.org/events/initialized",1);
+        }
+        startingCountdown--;
+
         //cnt++;
         //double val = sentCurrentInterval;
         //double mean = lastMean + (val - lastMean) / cnt;
@@ -168,27 +177,33 @@ void LiveTrafGen::handleMessage(cMessage *msg)
 
 
         unsigned int maxSize = 0;
-        for(std::vector<unsigned int>& vec : droppedHistory) {
+        for(auto& vec : droppedHistory) {
             if(vec.size() > maxSize) {
                 maxSize = vec.size();
             }
         }
 
-        std::vector<unsigned int> droppedLastInterval;
+        std::vector<std::array<unsigned int,PACKET_RESULT_LENGTH>> droppedLastInterval;
         droppedLastInterval.resize(maxSize);
 
-        for(std::vector<unsigned int>& vec : droppedHistory) {
+        for(auto& vec : droppedHistory) {
             for(unsigned int i = 0; i < vec.size(); i++) {
-                droppedLastInterval[i] += vec[i];
+                for(unsigned int j = 0; j < PACKET_RESULT_LENGTH; j++) {
+                    droppedLastInterval[i][j] += vec[i][j];
+                }
             }
         }
 
         std::stringstream droppedStream;
         Json::FastWriter writer;
         Json::Value results(Json::arrayValue);
-        for(unsigned int &value : droppedLastInterval) {
-            double mean = static_cast<double>(value) / history_length;
-            results.append(Json::Value(mean));
+        for(auto& node : droppedLastInterval) {
+            Json::Value noderesults(Json::arrayValue);
+            for(auto& value : node) {
+                double mean = static_cast<double>(value) / history_length;
+                noderesults.append(Json::Value(mean));
+            }
+            results.append(noderesults);
         }
 
         droppedStream << writer.write(results);
@@ -208,8 +223,8 @@ void LiveTrafGen::sendPacket() {
 }
 
 void LiveTrafGen::setDroppedZero() {
-    for(unsigned int& val : droppedHistory[history_index]) {
-        val = 0;
+    for(auto& val : droppedHistory[history_index]) {
+        val.fill(0);
     }
 }
 
