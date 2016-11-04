@@ -171,6 +171,8 @@ class INET_API SP_GPSR : public cSimpleModule, public ILifecycle, public cListen
 
     // notification
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj DETAILS_ARG) override;
+
+    void packetDropped(INetworkDatagram* datagram);
 };
 
 } // namespace inet

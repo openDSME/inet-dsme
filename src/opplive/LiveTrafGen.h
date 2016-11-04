@@ -28,6 +28,16 @@
 
 namespace inet {
 
+enum PacketResult {
+    DELIVERED = 0,
+    NO_ACK = 1,
+    CHANNEL_BUSY = 2,
+    NO_ROUTE = 3,
+    QUEUE_FULL = 4,
+    NO_GTS = 5,
+    PACKET_RESULT_LENGTH = 6
+};
+
 /**
  * IP traffic generator application for live results
  */
@@ -42,10 +52,10 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
 
     static cMessage *intermediatePRRTimer;
     static int sentCurrentInterval;
-    static int receivedCurrentInterval;
-    static int droppedCurrentInterval;
-    static double sentPerIntervalSmooth;
-    static double receivedPerIntervalSmooth;
+    //static int receivedCurrentInterval;
+    //static int droppedCurrentInterval;
+    //static double sentPerIntervalSmooth;
+    //static double receivedPerIntervalSmooth;
 
     double meanInterval;
     double k;
@@ -62,17 +72,19 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
 
     virtual void receiveSignal(cComponent *prev, simsignal_t t, cObject *obj DETAILS_ARG) override;
 
-    void messageDeliveredOrDropped(cPacket* pkt, bool dropped);
+    void messageDeliveredOrDropped(cPacket* pkt, PacketResult result);
 
   public:
     LiveTrafGen();
     virtual ~LiveTrafGen();
 
-    void handleDroppedPacket(cPacket *msg, uint16_t srcAddr);
+    void handleDroppedPacket(cPacket *msg, uint16_t srcAddr, PacketResult result);
     void setInterval(double interval);
 
   private:
     void setDroppedZero();
+
+    static unsigned int handledPackets[PACKET_RESULT_LENGTH];
 };
 
 } // namespace inet

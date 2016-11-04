@@ -34,19 +34,21 @@ Define_Module(LiveTrafGen);
 simsignal_t LiveTrafGen::intermediatePRRSignal = registerSignal("intermediatePRR");
 simsignal_t LiveTrafGen::nodeDroppedPk = registerSignal("nodeDroppedPk");
 
-int LiveTrafGen::receivedCurrentInterval = 0;
+unsigned int LiveTrafGen::handledPackets[PACKET_RESULT_LENGTH];
+
+//int LiveTrafGen::receivedCurrentInterval = 0;
 int LiveTrafGen::sentCurrentInterval = 0;
-int LiveTrafGen::droppedCurrentInterval = 0;
-double LiveTrafGen::receivedPerIntervalSmooth = 0;
-double LiveTrafGen::sentPerIntervalSmooth = 0;
+//int LiveTrafGen::droppedCurrentInterval = 0;
+//double LiveTrafGen::receivedPerIntervalSmooth = 0;
+//double LiveTrafGen::sentPerIntervalSmooth = 0;
 cMessage *LiveTrafGen::intermediatePRRTimer = 0;
 
 std::vector<std::vector<unsigned int>> LiveTrafGen::droppedHistory;
 unsigned int LiveTrafGen::history_index = 0;
 
-double lastV = 0;
-double lastMean = 0;
-int cnt = 0;
+//double lastV = 0;
+//double lastMean = 0;
+//int cnt = 0;
 
 LiveTrafGen::LiveTrafGen()
 {
@@ -103,7 +105,7 @@ void LiveTrafGen::scheduleNextPacket(simtime_t previous)
         scheduleAt(next, timer);
 }
 
-void LiveTrafGen::messageDeliveredOrDropped(cPacket* pkt, bool dropped) {
+void LiveTrafGen::messageDeliveredOrDropped(cPacket* pkt, PacketResult result) {
     unsigned int num = atoi(pkt->getName()+strlen("appData-"));
 
     // packetReceived from the base class is also used to track dropped packet
@@ -114,22 +116,21 @@ void LiveTrafGen::messageDeliveredOrDropped(cPacket* pkt, bool dropped) {
 
     if(!packetReceived[num]) { // handle duplicates
         packetReceived[num] = true;
-        if(!dropped) {
-            receivedCurrentInterval++;
+        if(result == PacketResult::DELIVERED) {
             emit(sinkRcvdPkSignal, pkt);
         }
-        else {
-            droppedCurrentInterval++;
-        }
+
+        handledPackets[result]++;
     }
 }
 
 void LiveTrafGen::receiveSignal(cComponent *prev, simsignal_t t, cObject *obj DETAILS_ARG) {
-    messageDeliveredOrDropped((cPacket*)obj,false);
+    messageDeliveredOrDropped((cPacket*)obj,PacketResult::DELIVERED);
 }
 
-void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr) {
-    messageDeliveredOrDropped(msg,true);
+void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr, PacketResult result) {
+    messageDeliveredOrDropped(msg,result);
+    ASSERT(srcAddr > 0);
 
     unsigned int index = srcAddr - 1;
 
@@ -142,24 +143,27 @@ void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr) {
 void LiveTrafGen::handleMessage(cMessage *msg)
 {
     if(msg == intermediatePRRTimer) {
-        cnt++;
-        double val = sentCurrentInterval;
-        double mean = lastMean + (val - lastMean) / cnt;
-        double v = lastV + (val - lastMean)*(val - mean);
-        double var = v / (cnt-1);
-        sentPerIntervalSmooth = intermediatePRRAlpha * sentCurrentInterval + (1-intermediatePRRAlpha) * sentPerIntervalSmooth;
-        receivedPerIntervalSmooth = intermediatePRRAlpha * receivedCurrentInterval + (1-intermediatePRRAlpha) * receivedPerIntervalSmooth;
+        //cnt++;
+        //double val = sentCurrentInterval;
+        //double mean = lastMean + (val - lastMean) / cnt;
+        //double v = lastV + (val - lastMean)*(val - mean);
+        //double var = v / (cnt-1);
+        //sentPerIntervalSmooth = intermediatePRRAlpha * sentCurrentInterval + (1-intermediatePRRAlpha) * sentPerIntervalSmooth;
+        //receivedPerIntervalSmooth = intermediatePRRAlpha * receivedCurrentInterval + (1-intermediatePRRAlpha) * receivedPerIntervalSmooth;
         //std::cout.precision(3);
         //std::cout << std::fixed << var << " " << mean << " " << val << std::endl;
         //droppedCurrentInterval << " " << receivedCurrentInterval << " " << sentCurrentInterval << " " << receivedCurrentInterval/(double)sentCurrentInterval << " " <<  receivedPerIntervalSmooth << " " << sentPerIntervalSmooth << " " << receivedPerIntervalSmooth / sentPerIntervalSmooth << std::endl;
         std::stringstream stream;
-        stream << simTime().dbl() << "," << receivedCurrentInterval << "," << droppedCurrentInterval;
+        stream << simTime().dbl();
+        for(int i = 0; i < PACKET_RESULT_LENGTH; i++) {
+            stream << "," << handledPackets[i];
+            handledPackets[i] = 0;
+        }
+
         emit(intermediatePRRSignal, stream.str().c_str());
-        lastMean = mean;
-        lastV = v;
-        receivedCurrentInterval = 0;
+        //lastMean = mean;
+        //lastV = v;
         sentCurrentInterval = 0;
-        droppedCurrentInterval = 0;
         scheduleAt(simTime()+intermediatePRRInterval, intermediatePRRTimer);
 
 
@@ -169,6 +173,7 @@ void LiveTrafGen::handleMessage(cMessage *msg)
                 maxSize = vec.size();
             }
         }
+
         std::vector<unsigned int> droppedLastInterval;
         droppedLastInterval.resize(maxSize);
 

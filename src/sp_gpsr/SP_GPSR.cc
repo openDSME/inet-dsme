@@ -42,6 +42,8 @@
 #include "inet/networklayer/generic/GenericDatagram.h"
 #endif
 
+#include "../LiveTrafGen.h"
+
 namespace inet {
 
 Define_Module(SP_GPSR);
@@ -632,6 +634,21 @@ L3Address SP_GPSR::findPerimeterRoutingNextHop(INetworkDatagram *datagram, const
     }
 }
 
+void SP_GPSR::packetDropped(INetworkDatagram* datagram) {
+    cPacket* netPkt = dynamic_cast<cPacket*>(datagram);
+    ASSERT(netPkt != nullptr);
+
+    uint16_t short_address = 1; // TODO
+
+    if(netPkt->hasEncapsulatedPacket()) {
+        cPacket *appPkt = netPkt->getEncapsulatedPacket();
+        LiveTrafGen* trafGen = dynamic_cast<LiveTrafGen*>(appPkt->getSenderModule());
+        if(trafGen != nullptr) {
+            trafGen->handleDroppedPacket(appPkt, short_address, PacketResult::NO_ROUTE);
+        }
+    }
+}
+
 //
 // routing
 //
@@ -644,6 +661,7 @@ INetfilter::IHook::Result SP_GPSR::routeDatagram(INetworkDatagram *datagram, con
     nextHop = findNextHop(datagram, destination);
     if (nextHop.isUnspecified()) {
         EV_WARN << "No next hop found, dropping packet: source = " << source << ", destination = " << destination << endl;
+        packetDropped(datagram);
         return DROP;
     }
     else {
@@ -655,6 +673,7 @@ INetfilter::IHook::Result SP_GPSR::routeDatagram(INetworkDatagram *datagram, con
         if(interfaceId < 0) {
             /* This should only ever happen when routing back over the source that has not sent beacons yet. */
             EV_WARN << "No interface found, dropping packet: source = " << source << ", destination = " << destination << endl;
+            packetDropped(datagram);
             return DROP;
         }
 

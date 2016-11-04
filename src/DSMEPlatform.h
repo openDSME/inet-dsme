@@ -146,7 +146,7 @@ private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
 
     void handleIndicationFromMCPS(DSMEMessage* msg);
-    void handleConfirmFromMCPS(DSMEMessage* msg, bool success);
+    void handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status dataStatus);
 
     bool send(DSMEFrame* frame);
 
