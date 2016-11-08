@@ -57,21 +57,21 @@ class DSMEPlatform;
 
 class DSMEMessage : public omnetpp::cOwnedObject, public IDSMEMessage {
 public:
-    void prependFrom(DSMEMessageElement* msg);
+    void prependFrom(DSMEMessageElement* msg) override;
 
-    void decapsulateTo(DSMEMessageElement* msg);
+    void decapsulateTo(DSMEMessageElement* msg) override;
 
-    void copyTo(DSMEMessageElement* msg);
+    void copyTo(DSMEMessageElement* msg) override;
 
-    uint8_t getByte(uint8_t pos) {
+    uint8_t getByte(uint8_t pos) override {
         return frame->getData().at(pos);
     }
 
-    bool hasPayload() {
+    bool hasPayload() override {
         return (frame->getData().size() > 0 ) || (frame->hasEncapsulatedPacket() && frame->getEncapsulatedPacket()->getByteLength() > 0);
     }
 
-    uint16_t getTotalSymbols() {
+    uint16_t getTotalSymbols() override {
         uint16_t bytes = macHdr.getSerializationLength()
                                    + frame->getData().size()
                                    + 4  // Preamble
@@ -97,7 +97,7 @@ public:
     }
 
 
-    IEEE802154eMACHeader& getHeader() {
+    IEEE802154eMACHeader& getHeader() override {
         return macHdr;
     }
 

@@ -217,7 +217,7 @@ void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
     sendUp(packet);
 }
 
-void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, bool success) {
+void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status status) {
     releaseMessage(msg);
 }
 
