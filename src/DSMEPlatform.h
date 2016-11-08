@@ -70,6 +70,9 @@ class DSMELayer;
 class DSMEAdaptionLayer;
 
 class DSMEPlatform : public inet::MACProtocolBase, public inet::IMACProtocol, public IDSMEPlatform {
+    using omnetpp::cIListener::finish;
+    using omnetpp::cSimpleModule::send;
+
 public:
     typedef Delegate<void(DSMEMessage* msg)> receive_delegate_t;
 
@@ -103,12 +106,12 @@ public:
      * but keep the message (the caller has to ensure that the message is eventually released)
      * This might lead to an additional memory copy in the platform
      */
-    bool sendCopyNow(DSMEMessage *msg, Delegate<void(bool)> txEndCallback);
+    bool sendCopyNow(DSMEMessage *msg, Delegate<void(bool)> txEndCallback) override;
 
     /**
      * Send an ACK message, delay until aTurnaRoundTime after reception_time has expired
      */
-    bool sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg, Delegate<void(bool)> txEndCallback);
+    bool sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg, Delegate<void(bool)> txEndCallback) override;
 
     void handleReceivedMessageFromAckLayer(DSMEMessage* message) override;
 
@@ -140,13 +143,14 @@ public:
 
     void releaseMessage(DSMEMessage* msg) override;
 
-    virtual void scheduleStartOfCFP();
+    virtual void scheduleStartOfCFP() override;
 
 private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
 
     void handleIndicationFromMCPS(DSMEMessage* msg);
-    void handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status dataStatus);
+
+    void handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status status);
 
     bool send(DSMEFrame* frame);
 

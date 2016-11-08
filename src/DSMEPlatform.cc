@@ -220,7 +220,7 @@ void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
     sendUp(packet);
 }
 
-void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status dataStatus) {
+void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status status) {
     DSMEFrame* macPkt = msg->decapsulateFrame();
     releaseMessage(msg);
 
@@ -233,7 +233,7 @@ void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Stat
             if(trafGen != nullptr) {
 
                 PacketResult result;
-                switch(dataStatus) {
+                switch(status) {
                 case DataStatus::Data_Status::SUCCESS:
                     result = PacketResult::DELIVERED;
                     break;
@@ -261,7 +261,7 @@ void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Stat
                     ASSERT(false);
                 }
 
-                if(dataStatus != DataStatus::Data_Status::SUCCESS) {
+                if(status != DataStatus::Data_Status::SUCCESS) {
                     trafGen->handleDroppedPacket(appPkt, this->mac_pib.macShortAddress, result);
                 }
             }
