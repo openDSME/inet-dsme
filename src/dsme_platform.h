@@ -51,6 +51,7 @@
 #define LOG_INFO_PREFIX do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": ";} while(0)
 #define HEXOUT std::hex
 #define DECOUT std::dec
+#define LOG_ENDL std::endl
 #else
 #define LOG_INFO(x)
 #define LOG_INFO_PURE(x)
