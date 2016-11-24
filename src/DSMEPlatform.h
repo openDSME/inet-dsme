@@ -65,7 +65,7 @@
 
 namespace dsme {
 
-class DSMESettings;
+struct DSMESettings;
 class DSMELayer;
 class DSMEAdaptionLayer;
 

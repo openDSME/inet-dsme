@@ -171,7 +171,7 @@ void DSMEPlatform::initialize(int stage) {
 
         settings->isCoordinator = (par("isCoordinator") || settings->isPANCoordinator);
 
-        settings->commonChannel = par("commonChannel");
+        this->phy_pib.phyCurrentChannel = par("commonChannel");
         settings->optimizations = par("optimizations");
 
         if (strcmp(par("allocationScheme").stringValue(), "random") == 0) {
