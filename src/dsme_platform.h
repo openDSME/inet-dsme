@@ -58,6 +58,7 @@
 #define HEXOUT
 #endif
 
+#define LOG_ERROR(x) LOG_INFO(x)
 #define LOG_WARN(x) LOG_INFO(x)
 #define LOG_DEBUG(x) LOG_INFO(x)
 #define LOG_DEBUG_PURE(x) LOG_INFO_PURE(x)
