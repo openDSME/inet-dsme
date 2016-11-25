@@ -262,6 +262,10 @@ void DSMEPlatform::handleReceivedMessageFromAckLayer(DSMEMessage* message) {
     receiveFromAckLayerDelegate(message);
 }
 
+bool DSMEPlatform::isReceptionFromAckLayerPossible() {
+    return true;
+}
+
 void DSMEPlatform::setReceiveDelegate(receive_delegate_t receiveDelegate) {
     this->receiveFromAckLayerDelegate = receiveDelegate;
 }

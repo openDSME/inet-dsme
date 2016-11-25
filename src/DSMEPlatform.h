@@ -115,6 +115,8 @@ public:
 
     void handleReceivedMessageFromAckLayer(DSMEMessage* message) override;
 
+    bool isReceptionFromAckLayerPossible() override;
+
     void setReceiveDelegate(receive_delegate_t receiveDelegate) override;
 
     void updateVisual() override;
