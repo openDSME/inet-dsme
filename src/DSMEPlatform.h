@@ -121,9 +121,10 @@ public:
 
     void updateVisual() override;
 
-    void startCCA() override {
+    bool startCCA() override {
         channelInactive = true;
         scheduleAt(simTime() + 8*symbolDuration, ccaTimer);
+        return true;
     }
 
     void startTimer(uint32_t symbolCounterValue) override {

@@ -44,7 +44,7 @@
 #define PLATFORM_OMNETPP_H
 
 #if 1
-#define palId_id() (((DSMEPlatform*)(cSimulation::getActiveSimulation()->getContextModule()))->getAddress().getShortAddress())
+#define palId_id() ((static_cast<DSMEPlatform*>(cSimulation::getActiveSimulation()->getContextModule()))->getAddress().getShortAddress())
 #define cometos std
 #define LOG_INFO(x) do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": " << x << std::endl; } while(0)
 #define LOG_INFO_PURE(x) do{ EV_INFO << x;} while(0)

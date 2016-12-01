@@ -21,10 +21,10 @@ simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
 simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
 simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
 
-void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
+void translateMacAddress(MACAddress &from, IEEE802154MacAddress &to) {
     // TODO correct translation
     if(from.isBroadcast()) {
-        to = IEEE802154MacAddress::SHORT_BROADCAST_ADDRESS;
+        to = IEEE802154MacAddress(IEEE802154MacAddress::SHORT_BROADCAST_ADDRESS);
     } else {
         to.setShortAddress((from.getAddressByte(4) << 8) | from.getAddressByte(5));
     }
