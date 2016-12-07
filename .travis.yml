@@ -8,20 +8,16 @@ addons:
     - gcc-4.8
     - g++-4.8
     - libav-tools
-    - python-tk
     - libavcodec-extra-53
+    - python-tk
+    - python-numpy
     - python-scipy
+    - python-matplotlib
 
 before_install:
   - git config --global user.email travis@example.com
   - git config --global user.name travis
   - PATH=~/.local/bin:$PATH
-  - PYTHONPATH=~/.local/lib/python2.7/site-packages:$PYTHONPATH
-  - wget https://bootstrap.pypa.io/get-pip.py
-  - python get-pip.py --user
-  - pip --version
-  - easy_install --prefix=$HOME/.local numpy
-  - easy_install --prefix=$HOME/.local matplotlib==2.0.0b4
   - openssl aes-256-cbc -K $encrypted_ea54299d5f4f_key -iv $encrypted_ea54299d5f4f_iv -in utils/publish_key.enc -out ~/.ssh/publish_key -d
   - chmod u=rw,og= ~/.ssh/publish_key
   - echo "Host github.com" >> ~/.ssh/config
