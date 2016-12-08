@@ -65,7 +65,7 @@
 
 namespace dsme {
 
-class DSMESettings;
+struct DSMESettings;
 class DSMELayer;
 class DSMEAdaptionLayer;
 
@@ -115,13 +115,16 @@ public:
 
     void handleReceivedMessageFromAckLayer(DSMEMessage* message) override;
 
+    bool isReceptionFromAckLayerPossible() override;
+
     void setReceiveDelegate(receive_delegate_t receiveDelegate) override;
 
     void updateVisual() override;
 
-    void startCCA() override {
+    bool startCCA() override {
         channelInactive = true;
         scheduleAt(simTime() + 8*symbolDuration, ccaTimer);
+        return true;
     }
 
     void startTimer(uint32_t symbolCounterValue) override {

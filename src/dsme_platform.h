@@ -44,13 +44,14 @@
 #define PLATFORM_OMNETPP_H
 
 #if 1
-#define palId_id() (((DSMEPlatform*)(cSimulation::getActiveSimulation()->getContextModule()))->getAddress().getShortAddress())
+#define palId_id() ((static_cast<DSMEPlatform*>(cSimulation::getActiveSimulation()->getContextModule()))->getAddress().getShortAddress())
 #define cometos std
 #define LOG_INFO(x) do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": " << x << std::endl; } while(0)
 #define LOG_INFO_PURE(x) do{ EV_INFO << x;} while(0)
 #define LOG_INFO_PREFIX do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": ";} while(0)
 #define HEXOUT std::hex
 #define DECOUT std::dec
+#define LOG_ENDL std::endl
 #else
 #define LOG_INFO(x)
 #define LOG_INFO_PURE(x)
@@ -58,6 +59,7 @@
 #define HEXOUT
 #endif
 
+#define LOG_ERROR(x) LOG_INFO(x)
 #define LOG_WARN(x) LOG_INFO(x)
 #define LOG_DEBUG(x) LOG_INFO(x)
 #define LOG_DEBUG_PURE(x) LOG_INFO_PURE(x)

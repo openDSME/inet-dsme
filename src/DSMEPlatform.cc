@@ -25,10 +25,10 @@ simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
 simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
 simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
 
-void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
+void translateMacAddress(MACAddress &from, IEEE802154MacAddress &to) {
     // TODO correct translation
     if(from.isBroadcast()) {
-        to = IEEE802154MacAddress::SHORT_BROADCAST_ADDRESS;
+        to = IEEE802154MacAddress(IEEE802154MacAddress::SHORT_BROADCAST_ADDRESS);
     } else {
         to.setShortAddress((from.getAddressByte(4) << 8) | from.getAddressByte(5));
     }
@@ -155,6 +155,10 @@ void DSMEPlatform::initialize(int stage) {
 
         this->mac_pib.macShortAddress = this->mac_pib.macExtendedAddress.getShortAddress();
 
+        if(par("isPANCoordinator")) {
+            this->mac_pib.macPANId = par("macPANId");
+        }
+
         this->mac_pib.macAssociatedPANCoord = par("isPANCoordinator");
         this->mac_pib.macBeaconOrder = par("beaconOrder");
         this->mac_pib.macSuperframeOrder = par("superframeOrder");
@@ -174,7 +178,7 @@ void DSMEPlatform::initialize(int stage) {
 
         settings->isCoordinator = (par("isCoordinator") || settings->isPANCoordinator);
 
-        settings->commonChannel = par("commonChannel");
+        this->phy_pib.phyCurrentChannel = par("commonChannel");
         settings->optimizations = par("optimizations");
 
         if (strcmp(par("allocationScheme").stringValue(), "random") == 0) {
@@ -310,6 +314,10 @@ void DSMEPlatform::releaseMessage(DSMEMessage* msg) {
 void DSMEPlatform::handleReceivedMessageFromAckLayer(DSMEMessage* message) {
     DSME_ASSERT(receiveFromAckLayerDelegate);
     receiveFromAckLayerDelegate(message);
+}
+
+bool DSMEPlatform::isReceptionFromAckLayerPossible() {
+    return true;
 }
 
 void DSMEPlatform::setReceiveDelegate(receive_delegate_t receiveDelegate) {
