@@ -65,7 +65,6 @@
 
 namespace dsme {
 
-struct DSMESettings;
 class DSMELayer;
 class DSMEAdaptionLayer;
 
@@ -210,8 +209,6 @@ public:
 
 private:
     DSMEFrame* pendingTxFrame;
-
-    DSMESettings* settings;
 
     /** @brief The radio. */
     inet::physicallayer::IRadio *radio;

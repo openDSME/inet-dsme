@@ -66,6 +66,7 @@
 #define LOG_DEBUG_PREFIX LOG_INFO_PREFIX
 
 #define DSME_ASSERT(x) if(!(x)) LOG_WARN("ASSERT"); ASSERT(x)
+#define DSME_SIM_ASSERT(x) DSME_ASSERT(x)
 
 #include "DSMEMessage.h"
 #include "dsme_settings.h"

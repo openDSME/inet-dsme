@@ -44,14 +44,12 @@ DSMEPlatform::DSMEPlatform() :
 
                 pendingTxFrame(nullptr),
 
-                settings(new DSMESettings()),
                 transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED)
 {
 }
 
 DSMEPlatform::~DSMEPlatform() {
     delete dsme;
-    delete settings;
 
     cancelAndDelete(ccaTimer);
     cancelAndDelete(cfpTimer);
@@ -80,7 +78,7 @@ void DSMEPlatform::updateVisual() {
     std::stringstream s;
     s << this->mac_pib.macShortAddress;
 
-    if (dsme->getDSMESettings().isCoordinator) {
+    if (this->mac_pib.macIsCoord) {
         s << " C";
     }
     if (this->mac_pib.macAssociatedPANCoord) {
@@ -171,12 +169,11 @@ void DSMEPlatform::initialize(int stage) {
 
         this->mac_pib.recalculateDependentProperties();
 
-        settings->isPANCoordinator = par("isPANCoordinator");
+        this->mac_pib.macIsPANCoord = par("isPANCoordinator");
 
-        settings->isCoordinator = (par("isCoordinator") || settings->isPANCoordinator);
+        this->mac_pib.macIsCoord = (par("isCoordinator") || this->mac_pib.macIsPANCoord);
 
         this->phy_pib.phyCurrentChannel = par("commonChannel");
-        settings->optimizations = par("optimizations");
 
         if (strcmp(par("allocationScheme").stringValue(), "random") == 0) {
             this->dsmeAdaptionLayer.settings.allocationScheme = DSMEAdaptionLayerSettings::ALLOC_RANDOM;
@@ -186,10 +183,12 @@ void DSMEPlatform::initialize(int stage) {
 
         this->dsmeAdaptionLayer.setIndicationCallback(DELEGATE(&DSMEPlatform::handleIndicationFromMCPS, *this));
         this->dsmeAdaptionLayer.setConfirmCallback(DELEGATE(&DSMEPlatform::handleConfirmFromMCPS, *this));
+
+        this->dsme->initialize(this);
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
-        dsme->start(*settings, this);
+        dsme->start();
         dsmeAdaptionLayer.startAssociation();
 
         updateVisual();
