@@ -44,7 +44,8 @@ DSMEPlatform::DSMEPlatform() :
 
                 pendingTxFrame(nullptr),
 
-                transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED)
+                transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED),
+                channelInactive(true)
 {
 }
 
@@ -196,8 +197,10 @@ void DSMEPlatform::initialize(int stage) {
         updateVisual();
         cModule *mobilityModule = this->getParentModule()->getParentModule()->getSubmodule("mobility");
         IMobility *mobility = dynamic_cast<IMobility*>(mobilityModule);
-        Coord currentPosition = mobility->getCurrentPosition();
-        LOG_INFO("POSITION: x=" << currentPosition.x << ", y=" << currentPosition.y);
+        if(mobility) {
+            Coord currentPosition = mobility->getCurrentPosition();
+            LOG_INFO("POSITION: x=" << currentPosition.x << ", y=" << currentPosition.y);
+        }
     }
 }
 
@@ -291,11 +294,11 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg,
 }
 
 bool DSMEPlatform::sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
-    printSequenceChartInfo(msg);
-
     if (msg == nullptr) {
         return false;
     }
+
+    printSequenceChartInfo(msg);
 
     LOG_INFO("sendCopyNow " << (uint64_t)msg);
 
@@ -435,7 +438,7 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
 void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long value DETAILS_ARG) {
     Enter_Method_Silent();
     if (signalID == IRadio::transmissionStateChangedSignal) {
-        IRadio::TransmissionState newRadioTransmissionState = (IRadio::TransmissionState)value;
+        IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(value);
         if (transmissionState == IRadio::TRANSMISSION_STATE_TRANSMITTING && newRadioTransmissionState == IRadio::TRANSMISSION_STATE_IDLE) {
             //LOG_INFO("Transmission ready")
             txEndCallback(true); // TODO could it be false?
@@ -444,6 +447,7 @@ void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long 
         transmissionState = newRadioTransmissionState;
     }
     else if(signalID == IRadio::radioModeChangedSignal) {
+        IRadio::RadioMode newRadioMode = static_cast<IRadio::RadioMode>(value);
         if(value == IRadio::RADIO_MODE_TRANSMITTER) {
             //LOG_INFO("switched to transmit")
             if(pendingTxFrame) {
