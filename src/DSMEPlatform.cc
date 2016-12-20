@@ -103,7 +103,9 @@ void DSMEPlatform::initialize(int stage) {
         this->dsme->setMCPS(&(this->mcps_sap));
         this->dsme->setMLME(&(this->mlme_sap));
 
-        this->dsmeAdaptionLayer.initialize();
+        channelList_t scanChannels;
+        scanChannels.add(par("commonChannel"));
+        this->dsmeAdaptionLayer.initialize(scanChannels);
 
         /* Initialize Address */
         IEEE802154MacAddress address;
