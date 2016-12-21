@@ -58,7 +58,7 @@ void DSMEMessage::prependFrom(DSMEMessageElement* me) {
 void DSMEMessage::decapsulateTo(DSMEMessageElement* me) {
     this->copyTo(me);
     uint8_t newSize = this->frame->getData().size() - me->getSerializationLength();
-    memmove(this->frame->getData().data(), this->frame->getData().data()+me->getSerializationLength(), newSize);
+    memmove(this->frame->getData().data(), this->frame->getData().data() + me->getSerializationLength(), newSize);
     this->frame->getData().resize(newSize);
 }
 
@@ -76,10 +76,10 @@ DSMEFrame* DSMEMessage::getSendableCopy() {
     // However, the FCS will not be added by the lower layer since it is the task of the MAC layer, so do not subtract it!
     // By this it will be virtually added, though it is not part of the DSMEFrame itself.
     auto symbolsPayload = getTotalSymbols()
-            - 2*4  // Preamble
-            - 2*1  // SFD
-            - 2*1; // PHY Header
-    msg.frame->setBitLength(symbolsPayload*4); // 4 bit per symbol
+                          - 2 * 4 // Preamble
+                          - 2 * 1 // SFD
+                          - 2 * 1; // PHY Header
+    msg.frame->setBitLength(symbolsPayload * 4); // 4 bit per symbol
     macHdr.prependTo(&msg);
     DSMEFrame* f = msg.frame;
     msg.frame = nullptr;

@@ -6,6 +6,11 @@
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 
+void _simulation_will_terminate(void) {
+    /* This is only used during static code analysis to signal that the simulation will terminate. */
+    return;
+}
+
 using namespace inet;
 using namespace inet::physicallayer;
 
@@ -21,7 +26,7 @@ simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
 simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
 simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
 
-void translateMacAddress(MACAddress &from, IEEE802154MacAddress &to) {
+void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
     // TODO correct translation
     if(from.isBroadcast()) {
         to = IEEE802154MacAddress(IEEE802154MacAddress::SHORT_BROADCAST_ADDRESS);
@@ -31,22 +36,21 @@ void translateMacAddress(MACAddress &from, IEEE802154MacAddress &to) {
 }
 
 DSMEPlatform::DSMEPlatform() :
-                phy_pib(10),
-                mac_pib(phy_pib),
+    phy_pib(10),
+    mac_pib(phy_pib),
 
-                dsme(new DSMELayer()),
-                mcps_sap(*dsme),
-                mlme_sap(*dsme),
-                dsmeAdaptionLayer(*dsme),
+    dsme(new DSMELayer()),
+    mcps_sap(*dsme),
+    mlme_sap(*dsme),
+    dsmeAdaptionLayer(*dsme),
 
-                messagesInUse(0),
-                msgId(0),
+    messagesInUse(0),
+    msgId(0),
 
-                pendingTxFrame(nullptr),
+    pendingTxFrame(nullptr),
 
-                transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED),
-                channelInactive(true)
-{
+    transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED),
+    channelInactive(true) {
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -57,8 +61,8 @@ DSMEPlatform::~DSMEPlatform() {
     cancelAndDelete(timer);
 }
 
-InterfaceEntry *DSMEPlatform::createInterfaceEntry() {
-    InterfaceEntry *e = new InterfaceEntry(this);
+InterfaceEntry* DSMEPlatform::createInterfaceEntry() {
+    InterfaceEntry* e = new InterfaceEntry(this);
 
     // data rate
     e->setDatarate(bitrate);
@@ -79,14 +83,14 @@ void DSMEPlatform::updateVisual() {
     std::stringstream s;
     s << this->mac_pib.macShortAddress;
 
-    if (this->mac_pib.macIsCoord) {
+    if(this->mac_pib.macIsCoord) {
         s << " C";
     }
-    if (this->mac_pib.macAssociatedPANCoord) {
+    if(this->mac_pib.macAssociatedPANCoord) {
         s << " A";
     }
 
-    cModule *host = findContainingNode(this);
+    cModule* host = findContainingNode(this);
     while(host->getParentModule() && host->getParentModule()->getId() != 1) {
         host = host->getParentModule();
     }
@@ -98,7 +102,7 @@ void DSMEPlatform::updateVisual() {
 void DSMEPlatform::initialize(int stage) {
     MACProtocolBase::initialize(stage);
 
-    if (stage == INITSTAGE_LOCAL) {
+    if(stage == INITSTAGE_LOCAL) {
         this->dsme->setPHY_PIB(&(this->phy_pib));
         this->dsme->setMAC_PIB(&(this->mac_pib));
         this->dsme->setMCPS(&(this->mcps_sap));
@@ -110,16 +114,15 @@ void DSMEPlatform::initialize(int stage) {
 
         /* Initialize Address */
         IEEE802154MacAddress address;
-        const char *addrstr = par("address");
+        const char* addrstr = par("address");
 
-        if (!strcmp(addrstr, "auto")) {
+        if(!strcmp(addrstr, "auto")) {
             // assign automatic address
             addr = MACAddress::generateAutoAddress();
 
             // change module parameter from "auto" to concrete address
             par("address").setStringValue(addr.str().c_str());
-        }
-        else {
+        } else {
             addr.setAddress(addrstr);
         }
 
@@ -127,11 +130,11 @@ void DSMEPlatform::initialize(int stage) {
         registerInterface();
 
         /* Find Radio Module */
-        cModule *radioModule = getModuleFromPar<cModule>(par("radioModule"), this);
+        cModule* radioModule = getModuleFromPar<cModule>(par("radioModule"), this);
         radioModule->subscribe(IRadio::radioModeChangedSignal, this);
         radioModule->subscribe(IRadio::transmissionStateChangedSignal, this);
         radioModule->subscribe(IRadio::receptionStateChangedSignal, this);
-        radio = check_and_cast<IRadio *>(radioModule);
+        radio = check_and_cast<IRadio*>(radioModule);
 
         symbolDuration = SimTime(16, SIMTIME_US);
         timer = new cMessage();
@@ -141,13 +144,13 @@ void DSMEPlatform::initialize(int stage) {
         //check parameters for consistency
         //aTurnaroundTimeSymbols should match (be equal or bigger) the RX to TX
         //switching time of the radio
-        if (radioModule->hasPar("timeRXToTX")) {
+        if(radioModule->hasPar("timeRXToTX")) {
             simtime_t rxToTx = radioModule->par("timeRXToTX").doubleValue();
-            if (rxToTx > aTurnaroundTimeSymbols) {
+            if(rxToTx > aTurnaroundTimeSymbols) {
                 throw cRuntimeError("Parameter \"aTurnaroundTimeSymbols\" (%f) does not match"
-                        " the radios RX to TX switching time (%f)! It"
-                        " should be equal or bigger",
-                        SIMTIME_DBL(aTurnaroundTimeSymbols*symbolDuration), SIMTIME_DBL(rxToTx));
+                                    " the radios RX to TX switching time (%f)! It"
+                                    " should be equal or bigger",
+                                    SIMTIME_DBL(aTurnaroundTimeSymbols * symbolDuration), SIMTIME_DBL(rxToTx));
             }
         }
 
@@ -178,7 +181,7 @@ void DSMEPlatform::initialize(int stage) {
 
         this->phy_pib.phyCurrentChannel = par("commonChannel");
 
-        if (strcmp(par("allocationScheme").stringValue(), "random") == 0) {
+        if(strcmp(par("allocationScheme").stringValue(), "random") == 0) {
             this->dsmeAdaptionLayer.settings.allocationScheme = DSMEAdaptionLayerSettings::ALLOC_RANDOM;
         } else {
             this->dsmeAdaptionLayer.settings.allocationScheme = DSMEAdaptionLayerSettings::ALLOC_CONTIGUOUS_SLOT;
@@ -188,15 +191,14 @@ void DSMEPlatform::initialize(int stage) {
         this->dsmeAdaptionLayer.setConfirmCallback(DELEGATE(&DSMEPlatform::handleConfirmFromMCPS, *this));
 
         this->dsme->initialize(this);
-    }
-    else if (stage == INITSTAGE_LINK_LAYER) {
+    } else if(stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         dsme->start();
         dsmeAdaptionLayer.startAssociation();
 
         updateVisual();
-        cModule *mobilityModule = this->getParentModule()->getParentModule()->getSubmodule("mobility");
-        IMobility *mobility = dynamic_cast<IMobility*>(mobilityModule);
+        cModule* mobilityModule = this->getParentModule()->getParentModule()->getSubmodule("mobility");
+        IMobility* mobility = dynamic_cast<IMobility*>(mobilityModule);
         if(mobility) {
             Coord currentPosition = mobility->getCurrentPosition();
             LOG_INFO("POSITION: x=" << currentPosition.x << ", y=" << currentPosition.y);
@@ -213,9 +215,9 @@ void DSMEPlatform::finish() {
 void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
     DSMEFrame* macPkt = msg->decapsulateFrame();
     releaseMessage(msg);
-    cPacket *packet = macPkt->decapsulate();
+    cPacket* packet = macPkt->decapsulate();
 
-    SimpleLinkLayerControlInfo *const controlInfo = new SimpleLinkLayerControlInfo();
+    SimpleLinkLayerControlInfo* const controlInfo = new SimpleLinkLayerControlInfo();
     controlInfo->setSrc(macPkt->getSrcAddr());
     controlInfo->setInterfaceId(interfaceEntry->getInterfaceId());
     controlInfo->setNetworkProtocol(macPkt->getNetworkProtocol());
@@ -229,8 +231,7 @@ void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Stat
     releaseMessage(msg);
 }
 
-DSMEMessage* DSMEPlatform::getEmptyMessage()
-{
+DSMEMessage* DSMEPlatform::getEmptyMessage() {
     messagesInUse++;
     DSME_ASSERT(messagesInUse <= MSG_POOL_SIZE); // TODO should return nullptr (and check everywhere!!)
     DSMEMessage* msg = new DSMEMessage();
@@ -239,8 +240,7 @@ DSMEMessage* DSMEPlatform::getEmptyMessage()
     return msg;
 }
 
-DSMEMessage* DSMEPlatform::getLoadedMessage(DSMEFrame* frame)
-{
+DSMEMessage* DSMEPlatform::getLoadedMessage(DSMEFrame* frame) {
     messagesInUse++;
     DSME_ASSERT(messagesInUse <= MSG_POOL_SIZE); // TODO
     DSMEMessage* msg = new DSMEMessage(frame);
@@ -274,27 +274,27 @@ void DSMEPlatform::setReceiveDelegate(receive_delegate_t receiveDelegate) {
     this->receiveFromAckLayerDelegate = receiveDelegate;
 }
 
-bool DSMEPlatform::sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg, Delegate<void(bool)> txEndCallback) {
+bool DSMEPlatform::sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) {
     cMessage* acktimer = new cMessage("acktimer");
     acktimer->getParList().setTakeOwnership(false); // ackMsg is still owned by the AckLayer
-    acktimer->getParList().addAt(0,ackMsg);
+    acktimer->getParList().addAt(0, ackMsg);
 
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
-    uint32_t endOfReception = receivedMsg->getStartOfFrameDelimiterSymbolCounter()+receivedMsg->getTotalSymbols()
-                                    - 2*4 // Preamble
-                                    - 2*1; // SFD
+    uint32_t endOfReception = receivedMsg->getStartOfFrameDelimiterSymbolCounter() + receivedMsg->getTotalSymbols()
+                              - 2 * 4 // Preamble
+                              - 2 * 1; // SFD
     uint32_t ackTime = endOfReception + aTurnaroundTimeSymbols;
     uint32_t now = getSymbolCounter();
-    uint32_t diff = ackTime-now;
+    uint32_t diff = ackTime - now;
 
     radio->setRadioMode(IRadio::RADIO_MODE_TRANSMITTER);
 
-    scheduleAt(simTime() + diff*symbolDuration, acktimer);
+    scheduleAt(simTime() + diff * symbolDuration, acktimer);
     return true;
 }
 
 bool DSMEPlatform::sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
-    if (msg == nullptr) {
+    if(msg == nullptr) {
         return false;
     }
 
@@ -306,32 +306,30 @@ bool DSMEPlatform::sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallb
     DSMEFrame* frame = msg->getSendableCopy();
 
     switch(msg->getHeader().getFrameType()) {
-    case IEEE802154eMACHeader::BEACON:
-        emit(beaconSentDown,frame);
-        break;
-    case IEEE802154eMACHeader::DATA:
-        if(msg->getHeader().getDestAddr().isBroadcast()) {
-            emit(broadcastDataSentDown,frame);
-        }
-        else {
-            emit(unicastDataSentDown,frame);
-        }
-        break;
-    case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
-        emit(ackSentDown,frame);
-        break;
-    case IEEE802154eMACHeader::COMMAND:
-        emit(commandSentDown,frame);
-        break;
-    default:
-        DSME_ASSERT(false);
+        case IEEE802154eMACHeader::BEACON:
+            emit(beaconSentDown, frame);
+            break;
+        case IEEE802154eMACHeader::DATA:
+            if(msg->getHeader().getDestAddr().isBroadcast()) {
+                emit(broadcastDataSentDown, frame);
+            } else {
+                emit(unicastDataSentDown, frame);
+            }
+            break;
+        case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
+            emit(ackSentDown, frame);
+            break;
+        case IEEE802154eMACHeader::COMMAND:
+            emit(commandSentDown, frame);
+            break;
+        default:
+            DSME_ASSERT(false);
     }
 
     if(radio->getRadioMode() == IRadio::RADIO_MODE_TRANSMITTER) {
         // can be sent direct
         sendDown(frame);
-    }
-    else {
+    } else {
         DSME_ASSERT(msg->getHeader().getFrameType() != IEEE802154eMACHeader::ACKNOWLEDGEMENT); // switching is handled by ACK routine
         DSME_ASSERT(pendingTxFrame == nullptr);
 
@@ -344,39 +342,41 @@ bool DSMEPlatform::sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallb
 }
 
 void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
-    DSMEFrame *macPkt;
-    if(nullptr == (macPkt = dynamic_cast<DSMEFrame *>(pkt))) {
+    DSMEFrame* macPkt;
+    if(nullptr == (macPkt = dynamic_cast<DSMEFrame*>(pkt))) {
         DSME_ASSERT(false);
         return;
     }
 
     if(macPkt->hasBitError()) {
-        emit(corruptedFrameReceived,macPkt);
+        LOG_DEBUG("Received corrupted frame " << macPkt->detailedInfo());
+        emit(corruptedFrameReceived, macPkt);
         delete macPkt;
         return;
     }
 
-    emit(uncorruptedFrameReceived,macPkt);
+    emit(uncorruptedFrameReceived, macPkt);
 
     DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
     dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     dsmemsg->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - dsmemsg->getTotalSymbols()
-                            + 2*4 // Preamble
-                            + 2*1; // SFD
+            + 2 * 4 // Preamble
+            + 2 * 1; // SFD
 
     //LOG_INFO("handleLowerPacket " << (uint16_t)dsmemsg->getHeader().getSequenceNumber());
 
+    LOG_DEBUG("Passing received packet to ACKLayer");
     dsme->getAckLayer().receive(dsmemsg);
 }
 
 void DSMEPlatform::handleUpperPacket(cPacket* pkt) {
-    IMACProtocolControlInfo *const cInfo = check_and_cast<IMACProtocolControlInfo *>(pkt->removeControlInfo());
+    IMACProtocolControlInfo* const cInfo = check_and_cast<IMACProtocolControlInfo*>(pkt->removeControlInfo());
     LOG_INFO_PREFIX;
     LOG_INFO_PURE("Upper layer requests to send a message to ");
 
-    DSMEFrame *macPkt = new DSMEFrame();
+    DSMEFrame* macPkt = new DSMEFrame();
     macPkt->setNetworkProtocol(cInfo->getNetworkProtocol());
     macPkt->encapsulate(pkt);
 
@@ -410,45 +410,39 @@ void DSMEPlatform::scheduleStartOfCFP() {
 void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     if(msg == timer) {
         dsme->getEventDispatcher().timerInterrupt();
-    }
-    else if(msg == ccaTimer) {
+    } else if(msg == ccaTimer) {
         bool isIdle = (radio->getReceptionState() == IRadio::RECEPTION_STATE_IDLE) && channelInactive;
         LOG_DEBUG("CCA isIdle " << isIdle);
         dsme->dispatchCCAResult(isIdle);
-    }
-    else if(msg == cfpTimer) {
+    } else if(msg == cfpTimer) {
         dsme->handleStartOfCFP();
-    }
-    else if(strcmp(msg->getName(),"acktimer") == 0) {
+    } else if(strcmp(msg->getName(), "acktimer") == 0) {
         //LOG_INFO("send ACK")
         sendCopyNow((DSMEMessage*)msg->getParList().get(0), txEndCallback);
         // the ACK Message itself will be deleted inside the AckLayer
         delete msg;
-    }
-    else if(strcmp(msg->getName(),"receive") == 0) {
+    } else if(strcmp(msg->getName(), "receive") == 0) {
         //LOG_INFO("switch to receive")
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         delete msg;
-    }
-    else {
+    } else {
         MACProtocolBase::handleSelfMessage(msg);
     }
 }
 
-void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long value DETAILS_ARG) {
+void DSMEPlatform::receiveSignal(cComponent* source, simsignal_t signalID, long value DETAILS_ARG) {
     Enter_Method_Silent();
-    if (signalID == IRadio::transmissionStateChangedSignal) {
+    if(signalID == IRadio::transmissionStateChangedSignal) {
         IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(value);
-        if (transmissionState == IRadio::TRANSMISSION_STATE_TRANSMITTING && newRadioTransmissionState == IRadio::TRANSMISSION_STATE_IDLE) {
+        if(transmissionState == IRadio::TRANSMISSION_STATE_TRANSMITTING && newRadioTransmissionState == IRadio::TRANSMISSION_STATE_IDLE) {
             //LOG_INFO("Transmission ready")
             txEndCallback(true); // TODO could it be false?
-            scheduleAt(simTime(),new cMessage("receive"));
+            scheduleAt(simTime(), new cMessage("receive"));
         }
         transmissionState = newRadioTransmissionState;
-    }
-    else if(signalID == IRadio::radioModeChangedSignal) {
+    } else if(signalID == IRadio::radioModeChangedSignal) {
         IRadio::RadioMode newRadioMode = static_cast<IRadio::RadioMode>(value);
-        if(value == IRadio::RADIO_MODE_TRANSMITTER) {
+        if(newRadioMode == IRadio::RADIO_MODE_TRANSMITTER) {
             //LOG_INFO("switched to transmit")
             if(pendingTxFrame) {
                 //LOG_INFO("sendDown after tx switch")
@@ -456,12 +450,10 @@ void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long 
                 sendDown(pendingTxFrame);
                 pendingTxFrame = nullptr; // now owned by lower layer
             }
-        }
-        else if(value == IRadio::RADIO_MODE_RECEIVER) {
+        } else if(newRadioMode == IRadio::RADIO_MODE_RECEIVER) {
             //LOG_INFO("switched to receive")
         }
-    }
-    else if(signalID == IRadio::receptionStateChangedSignal) {
+    } else if(signalID == IRadio::receptionStateChangedSignal) {
         //LOG_INFO("receptionStateChanged to " << (uint16_t)value);
         channelInactive = false;
     }
@@ -487,7 +479,7 @@ bool DSMEPlatform::setChannelNumber(uint8_t k) {
     //LOG_DEBUG("Set channel to " << k);
     k -= 11;
     auto r = check_and_cast<FlatRadioBase*>(radio);
-    r->setCarrierFrequency(MHz(2405 + 5*k));
+    r->setCarrierFrequency(MHz(2405 + 5 * k));
     return true;
 }
 
@@ -498,34 +490,34 @@ void DSMEPlatform::printDSMEManagement(uint8_t management, DSMESABSpecification&
 
     LOG_DEBUG_PURE(" ");
     uint8_t type = management & 0x7;
-    switch ((ManagementType) type) {
-    case DEALLOCATION:
-        LOG_DEBUG_PURE("DEALLOCATION");
-        break;
-    case ALLOCATION:
-        LOG_DEBUG_PURE("ALLOCATION");
-        break;
-    case DUPLICATED_ALLOCATION_NOTIFICATION:
-        LOG_DEBUG_PURE("DUPLICATED-ALLOCATION-NOTIFICATION");
-        break;
-    case REDUCE:
-        LOG_DEBUG_PURE("REDUCE");
-        break;
-    case RESTART:
-        LOG_DEBUG_PURE("RESTART");
-        break;
-    case EXPIRATION:
-        LOG_DEBUG_PURE("EXPIRATION");
-        break;
-    default:
-        LOG_DEBUG_PURE((uint16_t) management);
+    switch((ManagementType) type) {
+        case DEALLOCATION:
+            LOG_DEBUG_PURE("DEALLOCATION");
+            break;
+        case ALLOCATION:
+            LOG_DEBUG_PURE("ALLOCATION");
+            break;
+        case DUPLICATED_ALLOCATION_NOTIFICATION:
+            LOG_DEBUG_PURE("DUPLICATED-ALLOCATION-NOTIFICATION");
+            break;
+        case REDUCE:
+            LOG_DEBUG_PURE("REDUCE");
+            break;
+        case RESTART:
+            LOG_DEBUG_PURE("RESTART");
+            break;
+        case EXPIRATION:
+            LOG_DEBUG_PURE("EXPIRATION");
+            break;
+        default:
+            LOG_DEBUG_PURE((uint16_t) management);
     }
 
     if(subBlock.getSubBlock().count(true) == 1) {
-        for (DSMESABSpecification::SABSubBlock::iterator it = subBlock.getSubBlock().beginSetBits(); it != subBlock.getSubBlock().endSetBits();
+        for(DSMESABSpecification::SABSubBlock::iterator it = subBlock.getSubBlock().beginSetBits(); it != subBlock.getSubBlock().endSetBits();
                 it++) {
             GTS gts = GTS::GTSfromAbsoluteIndex((*it) + subBlock.getSubBlockIndex() * numGTSlots * numChannels, numGTSlots, numChannels,
-                    numSuperFramesPerMultiSuperframe);
+                                                numSuperFramesPerMultiSuperframe);
 
             LOG_DEBUG_PURE(" " << gts.slotID << " " << gts.superframeID << " " << (uint16_t)gts.channel);
         }
@@ -534,7 +526,7 @@ void DSMEPlatform::printDSMEManagement(uint8_t management, DSMESABSpecification&
 
 void DSMEPlatform::printSequenceChartInfo(DSMEMessage* msg) {
 
-    IEEE802154eMACHeader &header = msg->getHeader();
+    IEEE802154eMACHeader& header = msg->getHeader();
 
     LOG_DEBUG_PREFIX;
 
@@ -544,98 +536,96 @@ void DSMEPlatform::printSequenceChartInfo(DSMEMessage* msg) {
 
     LOG_DEBUG_PURE((uint16_t) header.getSequenceNumber() << "|");
 
-    switch (header.getFrameType()) {
-    case IEEE802154eMACHeader::BEACON:
-        LOG_DEBUG_PURE("BEACON");
-        break;
-    case IEEE802154eMACHeader::DATA:
-        LOG_DEBUG_PURE("DATA");
-        break;
-    case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
-        LOG_DEBUG_PURE("ACK");
-        break;
-    case IEEE802154eMACHeader::COMMAND:
-    {
-        uint8_t cmd = msg->frame->getData()[0];
+    switch(header.getFrameType()) {
+        case IEEE802154eMACHeader::BEACON:
+            LOG_DEBUG_PURE("BEACON");
+            break;
+        case IEEE802154eMACHeader::DATA:
+            LOG_DEBUG_PURE("DATA");
+            break;
+        case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
+            LOG_DEBUG_PURE("ACK");
+            break;
+        case IEEE802154eMACHeader::COMMAND: {
+            uint8_t cmd = msg->frame->getData()[0];
 
-        switch ((CommandFrameIdentifier) cmd) {
-        case ASSOCIATION_REQUEST:
-            LOG_DEBUG_PURE("ASSOCIATION-REQUEST");
-            break;
-        case ASSOCIATION_RESPONSE:
-            LOG_DEBUG_PURE("ASSOCIATION-RESPONSE");
-            break;
-        case DISASSOCIATION_NOTIFICATION:
-            LOG_DEBUG_PURE("DISASSOCIATION-NOTIFICATION");
-            break;
-        case DATA_REQUEST:
-            LOG_DEBUG_PURE("DATA-REQUEST");
-            break;
-        case BEACON_REQUEST:
-            LOG_DEBUG_PURE("BEACON-REQUEST");
-            break;
-        case DSME_ASSOCIATION_REQUEST:
-            LOG_DEBUG_PURE("DSME-ASSOCIATION-REQUEST");
-            break;
-        case DSME_ASSOCIATION_RESPONSE:
-            LOG_DEBUG_PURE("DSME-ASSOCIATION-RESPONSE");
-            break;
-        case DSME_BEACON_ALLOCATION_NOTIFICATION:
-            LOG_DEBUG_PURE("DSME-BEACON-ALLOCATION-NOTIFICATION");
-            break;
-        case DSME_BEACON_COLLISION_NOTIFICATION:
-            LOG_DEBUG_PURE("DSME-BEACON-COLLISION-NOTIFICATION");
-            break;
-        case DSME_GTS_REQUEST:
-        case DSME_GTS_REPLY:
-        case DSME_GTS_NOTIFY:
-        {
-            DSMEMessage* m = getLoadedMessage(msg->getSendableCopy());
-            m->getHeader().decapsulateFrom(m);
+            switch((CommandFrameIdentifier) cmd) {
+                case ASSOCIATION_REQUEST:
+                    LOG_DEBUG_PURE("ASSOCIATION-REQUEST");
+                    break;
+                case ASSOCIATION_RESPONSE:
+                    LOG_DEBUG_PURE("ASSOCIATION-RESPONSE");
+                    break;
+                case DISASSOCIATION_NOTIFICATION:
+                    LOG_DEBUG_PURE("DISASSOCIATION-NOTIFICATION");
+                    break;
+                case DATA_REQUEST:
+                    LOG_DEBUG_PURE("DATA-REQUEST");
+                    break;
+                case BEACON_REQUEST:
+                    LOG_DEBUG_PURE("BEACON-REQUEST");
+                    break;
+                case DSME_ASSOCIATION_REQUEST:
+                    LOG_DEBUG_PURE("DSME-ASSOCIATION-REQUEST");
+                    break;
+                case DSME_ASSOCIATION_RESPONSE:
+                    LOG_DEBUG_PURE("DSME-ASSOCIATION-RESPONSE");
+                    break;
+                case DSME_BEACON_ALLOCATION_NOTIFICATION:
+                    LOG_DEBUG_PURE("DSME-BEACON-ALLOCATION-NOTIFICATION");
+                    break;
+                case DSME_BEACON_COLLISION_NOTIFICATION:
+                    LOG_DEBUG_PURE("DSME-BEACON-COLLISION-NOTIFICATION");
+                    break;
+                case DSME_GTS_REQUEST:
+                case DSME_GTS_REPLY:
+                case DSME_GTS_NOTIFY: {
+                    DSMEMessage* m = getLoadedMessage(msg->getSendableCopy());
+                    m->getHeader().decapsulateFrom(m);
 
-            MACCommand cmdd;
-            cmdd.decapsulateFrom(m);
-            GTSManagement man;
-            man.decapsulateFrom(m);
+                    MACCommand cmdd;
+                    cmdd.decapsulateFrom(m);
+                    GTSManagement man;
+                    man.decapsulateFrom(m);
 
-            switch (cmdd.getCmdId()) {
-            case DSME_GTS_REQUEST: {
-                LOG_DEBUG_PURE("DSME-GTS-REQUEST");
-                GTSRequestCmd req;
-                req.decapsulateFrom(m);
-                printDSMEManagement(msg->frame->getData()[1],req.getSABSpec(),cmdd.getCmdId());
-                break;
+                    switch(cmdd.getCmdId()) {
+                        case DSME_GTS_REQUEST: {
+                            LOG_DEBUG_PURE("DSME-GTS-REQUEST");
+                            GTSRequestCmd req;
+                            req.decapsulateFrom(m);
+                            printDSMEManagement(msg->frame->getData()[1], req.getSABSpec(), cmdd.getCmdId());
+                            break;
+                        }
+                        case DSME_GTS_REPLY: {
+                            LOG_DEBUG_PURE("DSME-GTS-REPLY");
+                            GTSReplyNotifyCmd reply;
+                            reply.decapsulateFrom(m);
+                            printDSMEManagement(msg->frame->getData()[1], reply.getSABSpec(), cmdd.getCmdId());
+                            break;
+                        }
+                        case DSME_GTS_NOTIFY: {
+                            LOG_DEBUG_PURE("DSME-GTS-NOTIFY");
+                            GTSReplyNotifyCmd notify;
+                            notify.decapsulateFrom(m);
+                            printDSMEManagement(msg->frame->getData()[1], notify.getSABSpec(), cmdd.getCmdId());
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+
+                    this->releaseMessage(m);
+
+                    break;
+                }
+                default:
+                    break;
             }
-            case DSME_GTS_REPLY: {
-                LOG_DEBUG_PURE("DSME-GTS-REPLY");
-                GTSReplyNotifyCmd reply;
-                reply.decapsulateFrom(m);
-                printDSMEManagement(msg->frame->getData()[1],reply.getSABSpec(),cmdd.getCmdId());
-                break;
-            }
-            case DSME_GTS_NOTIFY: {
-                LOG_DEBUG_PURE("DSME-GTS-NOTIFY");
-                GTSReplyNotifyCmd notify;
-                notify.decapsulateFrom(m);
-                printDSMEManagement(msg->frame->getData()[1],notify.getSABSpec(),cmdd.getCmdId());
-                break;
-            }
-            default:
-                break;
-            }
-
-            this->releaseMessage(m);
-
             break;
         }
         default:
+            LOG_DEBUG_PURE("UNKNOWN");
             break;
-        }
-        break;
-    }
-    default:
-        LOG_DEBUG_PURE("UNKNOWN");
-        break;
     }
 
     LOG_DEBUG_PURE("|"<<msg->getTotalSymbols());

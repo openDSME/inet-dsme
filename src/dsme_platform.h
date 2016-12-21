@@ -65,13 +65,14 @@
 #define LOG_DEBUG_PURE(x) LOG_INFO_PURE(x)
 #define LOG_DEBUG_PREFIX LOG_INFO_PREFIX
 
-#define DSME_ASSERT(x) if(!(x)) LOG_WARN("ASSERT"); ASSERT(x)
+void _simulation_will_terminate(void);
+
+#define DSME_ASSERT(x) do { if(!(x)) { _simulation_will_terminate(); LOG_WARN("ASSERT"); ASSERT(x); } } while(0)
 #define DSME_SIM_ASSERT(x) DSME_ASSERT(x)
 
 #include "DSMEMessage.h"
 #include "dsme_settings.h"
 #include "dsme_atomic.h"
 #include "DSMEPlatform.h"
-
 
 #endif
