@@ -447,7 +447,7 @@ void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long 
         transmissionState = newRadioTransmissionState;
     }
     else if(signalID == IRadio::radioModeChangedSignal) {
-        IRadio::RadioMode newRadioMode = static_cast<IRadio::RadioMode>(value);
+        //IRadio::RadioMode newRadioMode = static_cast<IRadio::RadioMode>(value);
         if(value == IRadio::RADIO_MODE_TRANSMITTER) {
             //LOG_INFO("switched to transmit")
             if(pendingTxFrame) {
