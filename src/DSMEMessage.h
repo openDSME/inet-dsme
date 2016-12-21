@@ -68,22 +68,22 @@ public:
     }
 
     bool hasPayload() override {
-        return (frame->getData().size() > 0 ) || (frame->hasEncapsulatedPacket() && frame->getEncapsulatedPacket()->getByteLength() > 0);
+        return (frame->getData().size() > 0) || (frame->hasEncapsulatedPacket() && frame->getEncapsulatedPacket()->getByteLength() > 0);
     }
 
     uint16_t getTotalSymbols() override {
         uint16_t bytes = macHdr.getSerializationLength()
-                                   + frame->getData().size()
-                                   + 4  // Preamble
-                                   + 1  // SFD
-                                   + 1  // PHY Header
-                                   + 2; // FCS
+                         + frame->getData().size()
+                         + 4  // Preamble
+                         + 1  // SFD
+                         + 1  // PHY Header
+                         + 2; // FCS
 
         if(frame->hasEncapsulatedPacket()) {
             bytes += frame->getEncapsulatedPacket()->getByteLength();
         }
 
-        return bytes*2; // 4 bit per symbol
+        return bytes * 2; // 4 bit per symbol
     }
 
 
@@ -113,17 +113,17 @@ private:
     DSMEFrame* frame;
 
     DSMEMessage() :
-            currentlySending(false),
-            frame(new DSMEFrame()) {
+        currentlySending(false),
+        frame(new DSMEFrame()) {
     }
 
     DSMEMessage(DSMEFrame* frame) :
-            currentlySending(false),
-            frame(frame) {
+        currentlySending(false),
+        frame(frame) {
     }
 
     ~DSMEMessage() {
-        if (frame != nullptr) {
+        if(frame != nullptr) {
             delete frame;
         }
     }

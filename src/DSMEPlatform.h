@@ -85,18 +85,18 @@ public:
     virtual void finish() override;
 
     /** @brief Handle messages from lower layer */
-    virtual void handleLowerPacket(cPacket *) override;
+    virtual void handleLowerPacket(cPacket*) override;
 
     /** @brief Handle messages from upper layer */
-    virtual void handleUpperPacket(cPacket *) override;
+    virtual void handleUpperPacket(cPacket*) override;
 
     /** @brief Handle self messages such as timers */
-    virtual void handleSelfMessage(cMessage *) override;
+    virtual void handleSelfMessage(cMessage*) override;
 
     /** @brief Handle control messages from lower layer */
-    virtual void receiveSignal(cComponent *source, simsignal_t signalID, long value DETAILS_ARG) override;
+    virtual void receiveSignal(cComponent* source, simsignal_t signalID, long value DETAILS_ARG) override;
 
-    inet::InterfaceEntry *createInterfaceEntry() override;
+    inet::InterfaceEntry* createInterfaceEntry() override;
 
     /* IDSMEPlatform */
 
@@ -105,12 +105,12 @@ public:
      * but keep the message (the caller has to ensure that the message is eventually released)
      * This might lead to an additional memory copy in the platform
      */
-    bool sendCopyNow(DSMEMessage *msg, Delegate<void(bool)> txEndCallback) override;
+    bool sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) override;
 
     /**
      * Send an ACK message, delay until aTurnaRoundTime after reception_time has expired
      */
-    bool sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg, Delegate<void(bool)> txEndCallback) override;
+    bool sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) override;
 
     void handleReceivedMessageFromAckLayer(DSMEMessage* message) override;
 
@@ -122,12 +122,12 @@ public:
 
     bool startCCA() override {
         channelInactive = true;
-        scheduleAt(simTime() + 8*symbolDuration, ccaTimer);
+        scheduleAt(simTime() + 8 * symbolDuration, ccaTimer);
         return true;
     }
 
     void startTimer(uint32_t symbolCounterValue) override {
-        SimTime time = symbolCounterValue*symbolDuration;
+        SimTime time = symbolCounterValue * symbolDuration;
         if(timer->isScheduled()) {
             cancelEvent(timer);
         }
@@ -135,7 +135,7 @@ public:
     }
 
     uint32_t getSymbolCounter() override {
-        return simTime()/symbolDuration;
+        return simTime() / symbolDuration;
     }
 
     bool setChannelNumber(uint8_t k) override;
@@ -211,7 +211,7 @@ private:
     DSMEFrame* pendingTxFrame;
 
     /** @brief The radio. */
-    inet::physicallayer::IRadio *radio;
+    inet::physicallayer::IRadio* radio;
     inet::physicallayer::IRadio::TransmissionState transmissionState;
 
     /** @brief the bit rate at which we transmit */
