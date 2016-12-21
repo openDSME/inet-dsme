@@ -6,6 +6,11 @@
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 
+void _simulation_will_terminate(void) {
+    /* This is only used during static code analysis to signal that the simulation will terminate. */
+    return;
+}
+
 using namespace inet;
 using namespace inet::physicallayer;
 

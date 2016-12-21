@@ -1,2 +1,5 @@
 
-#define DSME_ASSERT(x) do { if(!(x)) { __coverity_panic__(); } } while(0)
+void _simulation_will_terminate(void) {
+    __coverity_panic__();
+    return;
+}
