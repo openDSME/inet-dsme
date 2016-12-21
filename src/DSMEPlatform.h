@@ -131,7 +131,9 @@ public:
         if(timer->isScheduled()) {
             cancelEvent(timer);
         }
-        scheduleAt(time, timer);
+        if(simTime() <= time) {
+            scheduleAt(time, timer);
+        }
     }
 
     uint32_t getSymbolCounter() override {

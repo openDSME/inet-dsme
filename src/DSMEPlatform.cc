@@ -349,6 +349,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     }
 
     if(macPkt->hasBitError()) {
+        LOG_DEBUG("Received corrupted frame " << macPkt->detailedInfo());
         emit(corruptedFrameReceived, macPkt);
         delete macPkt;
         return;
@@ -366,6 +367,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
 
     //LOG_INFO("handleLowerPacket " << (uint16_t)dsmemsg->getHeader().getSequenceNumber());
 
+    LOG_DEBUG("Passing received packet to ACKLayer");
     dsme->getAckLayer().receive(dsmemsg);
 }
 
