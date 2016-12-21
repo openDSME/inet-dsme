@@ -638,6 +638,8 @@ void DSMEPlatform::printSequenceChartInfo(DSMEMessage* msg) {
         break;
     }
 
+    LOG_DEBUG_PURE("|"<<msg->getTotalSymbols());
+
     LOG_DEBUG_PURE(std::endl);
     return;
 }
