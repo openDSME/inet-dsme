@@ -56,6 +56,9 @@ namespace dsme {
 class DSMEPlatform;
 
 class DSMEMessage : public omnetpp::cOwnedObject, public IDSMEMessage {
+    friend class DSMEPlatform;
+    friend class DSMEMessageElement;
+
 public:
     void prependFrom(DSMEMessageElement* msg) override;
 
@@ -86,8 +89,6 @@ public:
         return bytes * 2; // 4 bit per symbol
     }
 
-
-    // gives the symbol counter at the end of the SFD
     uint32_t getStartOfFrameDelimiterSymbolCounter() override {
         return startOfFrameDelimiterSymbolCounter;
     }
@@ -96,29 +97,27 @@ public:
         return startOfFrameDelimiterSymbolCounter + 2 * (this->getHeader().getSerializationLength() + frame->getData().size()) + 2; // 2 Symbols for PHY header
     }
 
-
     IEEE802154eMACHeader& getHeader() override {
         return macHdr;
     }
 
-    bool receivedViaMCPS; // TODO better handling?
-    bool firstTry;
-    bool currentlySending;
+    bool receivedViaMCPS {false}; // TODO better handling?
+    bool firstTry {false};
+    bool currentlySending {false};
 
 private:
     // TODO
     //    uint16_t bits;
+
     IEEE802154eMACHeader macHdr;
 
     DSMEFrame* frame;
 
     DSMEMessage() :
-        currentlySending(false),
         frame(new DSMEFrame()) {
     }
 
     DSMEMessage(DSMEFrame* frame) :
-        currentlySending(false),
         frame(frame) {
     }
 
@@ -128,10 +127,7 @@ private:
         }
     }
 
-    uint32_t startOfFrameDelimiterSymbolCounter;
-
-    friend class DSMEPlatform;
-    friend class DSMEMessageElement;
+    uint32_t startOfFrameDelimiterSymbolCounter{0};
 
     DSMEFrame* getSendableCopy();
 

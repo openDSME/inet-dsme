@@ -73,7 +73,7 @@ class INET_API SP_GPSR : public cSimpleModule, public ILifecycle, public cListen
     // packet size
     int positionByteLength = -1;
 
-    RoutingStrategy routingStrategy;
+    RoutingStrategy routingStrategy {NEAREST_NEIGHBOR};
 
     // internal
     cMessage *beaconTimer = nullptr;

@@ -6,6 +6,7 @@
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 
+// coverity[+kill]
 void _simulation_will_terminate(void) {
     /* This is only used during static code analysis to signal that the simulation will terminate. */
     return;
@@ -47,9 +48,15 @@ DSMEPlatform::DSMEPlatform() :
     messagesInUse(0),
     msgId(0),
 
+    timer(nullptr),
+    ccaTimer(nullptr),
+    cfpTimer(nullptr),
+
     pendingTxFrame(nullptr),
+    radio(nullptr),
 
     transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED),
+    bitrate(0),
     channelInactive(true) {
 }
 
