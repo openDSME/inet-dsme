@@ -45,9 +45,9 @@
 
 #include <stdint.h>
 
-#include "openDSME/mac_services/dataStructures/DSMEMessageElement.h"
 #include "openDSME/dsmeLayer/messages/IEEE802154eMACHeader.h"
 #include "openDSME/interfaces/IDSMEMessage.h"
+#include "openDSME/mac_services/dataStructures/DSMEMessageElement.h"
 
 #include "DSMEFrame_m.h"
 
@@ -75,12 +75,10 @@ public:
     }
 
     uint16_t getTotalSymbols() override {
-        uint16_t bytes = macHdr.getSerializationLength()
-                         + frame->getData().size()
-                         + 4  // Preamble
-                         + 1  // SFD
-                         + 1  // PHY Header
-                         + 2; // FCS
+        uint16_t bytes = macHdr.getSerializationLength() + frame->getData().size() + 4 // Preamble
+                         + 1                                                           // SFD
+                         + 1                                                           // PHY Header
+                         + 2;                                                          // FCS
 
         if(frame->hasEncapsulatedPacket()) {
             bytes += frame->getEncapsulatedPacket()->getByteLength();
@@ -101,9 +99,9 @@ public:
         return macHdr;
     }
 
-    bool receivedViaMCPS {false}; // TODO better handling?
-    bool firstTry {false};
-    bool currentlySending {false};
+    bool receivedViaMCPS{false}; // TODO better handling?
+    bool firstTry{false};
+    bool currentlySending{false};
 
 private:
     // TODO
@@ -113,12 +111,10 @@ private:
 
     DSMEFrame* frame;
 
-    DSMEMessage() :
-        frame(new DSMEFrame()) {
+    DSMEMessage() : frame(new DSMEFrame()) {
     }
 
-    DSMEMessage(DSMEFrame* frame) :
-        frame(frame) {
+    DSMEMessage(DSMEFrame* frame) : frame(frame) {
     }
 
     ~DSMEMessage() {
@@ -137,7 +133,6 @@ private:
         return f;
     }
 };
-
 }
 
 #endif

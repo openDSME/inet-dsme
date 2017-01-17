@@ -46,13 +46,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "omnetpp.h"
 #include "inet/linklayer/base/MACProtocolBase.h"
 #include "inet/linklayer/contract/IMACProtocol.h"
 #include "inet/physicallayer/contract/packetlevel/IRadio.h"
+#include "omnetpp.h"
 
 #include "DSMEFrame_m.h"
 #include "DSMEMessage.h"
+#include "dsme_settings.h"
 #include "openDSME/dsmeAdaptionLayer/DSMEAdaptionLayer.h"
 #include "openDSME/helper/DSMEDelegate.h"
 #include "openDSME/interfaces/IDSMEPlatform.h"
@@ -61,7 +62,6 @@
 #include "openDSME/mac_services/mlme_sap/MLME_SAP.h"
 #include "openDSME/mac_services/pib/MAC_PIB.h"
 #include "openDSME/mac_services/pib/PHY_PIB.h"
-#include "dsme_settings.h"
 
 namespace dsme {
 
@@ -196,7 +196,6 @@ private:
     Delegate<void(bool)> txEndCallback;
 
 public:
-
     static void setSeed(uint16_t seed) {
         srand(seed);
     }
@@ -234,7 +233,6 @@ private:
      */
     DSMEPlatform& operator=(const DSMEPlatform&);
 };
-
 }
 
 #endif

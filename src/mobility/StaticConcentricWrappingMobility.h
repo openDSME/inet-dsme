@@ -40,8 +40,7 @@ protected:
     virtual void setInitialPosition() override;
 
 public:
-    StaticConcentricWrappingMobility() {
-    }
+    StaticConcentricWrappingMobility() = default;
 };
 
 } /* inet_dsme */

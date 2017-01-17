@@ -46,9 +46,18 @@
 #if 1
 #define palId_id() ((static_cast<DSMEPlatform*>(cSimulation::getActiveSimulation()->getContextModule()))->getAddress().getShortAddress())
 #define cometos std
-#define LOG_INFO(x) do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": " << x << std::endl; } while(0)
-#define LOG_INFO_PURE(x) do{ EV_INFO << x;} while(0)
-#define LOG_INFO_PREFIX do{ EV_INFO << (simTime()) << " \t " << palId_id() << ": ";} while(0)
+#define LOG_INFO(x)                                                               \
+    do {                                                                          \
+        EV_INFO << (simTime()) << " \t " << palId_id() << ": " << x << std::endl; \
+    } while(0)
+#define LOG_INFO_PURE(x) \
+    do {                 \
+        EV_INFO << x;    \
+    } while(0)
+#define LOG_INFO_PREFIX                                         \
+    do {                                                        \
+        EV_INFO << (simTime()) << " \t " << palId_id() << ": "; \
+    } while(0)
 #define HEXOUT std::hex
 #define DECOUT std::dec
 #define LOG_ENDL std::endl
@@ -67,12 +76,19 @@
 
 void _simulation_will_terminate(void);
 
-#define DSME_ASSERT(x) do { if(!(x)) { _simulation_will_terminate(); LOG_WARN("ASSERT"); ASSERT(x); } } while(0)
+#define DSME_ASSERT(x)                    \
+    do {                                  \
+        if(!(x)) {                        \
+            _simulation_will_terminate(); \
+            LOG_WARN("ASSERT");           \
+            ASSERT(x);                    \
+        }                                 \
+    } while(0)
 #define DSME_SIM_ASSERT(x) DSME_ASSERT(x)
 
 #include "DSMEMessage.h"
-#include "dsme_settings.h"
-#include "dsme_atomic.h"
 #include "DSMEPlatform.h"
+#include "dsme_atomic.h"
+#include "dsme_settings.h"
 
 #endif
