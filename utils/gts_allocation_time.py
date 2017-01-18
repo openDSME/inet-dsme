@@ -21,7 +21,7 @@ parser.add_argument("-f", "--filter", type=str, default="[0-9]*", help="unit of 
 parser.add_argument("-i", "--image", help="output an image", action='store_true')
 args = parser.parse_args()
 
-length = 500 / int(args.step)
+length = 600 / int(args.step)
 
 allocationVector = numpy.zeros((length,3))
 totalAlloc = 0
