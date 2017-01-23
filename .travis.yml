@@ -17,6 +17,7 @@ addons:
     - python-matplotlib
 
 before_install:
+  - python --version
   - git config --global user.email travis@example.com
   - git config --global user.name travis
   - PATH=~/.local/bin:$PATH
@@ -32,9 +33,9 @@ install:
 script:
   - ./build.sh $INET
   - ./ci_test.sh $INET
-  - python2.7 ./ci_analyze.py -v
+  - ./ci_analyze.py -v
   - rm results/DSME-mac.log # too large to store
-  - python2.7 utils/ci_to_jekyll.py -m src/openDSME results
+  - utils/ci_to_jekyll.py -m src/openDSME results
 
 cache:
   directories:
