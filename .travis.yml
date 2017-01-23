@@ -17,7 +17,9 @@ addons:
     - python-matplotlib
 
 before_install:
+  - which python
   - python --version
+  - ./ci_python.py
   - git config --global user.email travis@example.com
   - git config --global user.name travis
   - PATH=~/.local/bin:$PATH
