@@ -4,7 +4,7 @@ dist: trusty
 language: cpp
 
 python:
-  - "2.7_with_system_site_packages"
+  - 2.7
 
 addons:
   apt:
@@ -15,12 +15,13 @@ addons:
     - g++-4.8
     - libav-tools
     - libavcodec-extra-54
+    - python-tk
+    - python-pip
+
+virtualenv:
+  system_site_packages: true
 
 before_install:
-  - sudo apt-get install -qq python-tk python-numpy python-scipy python-matplotlib
-  - which python
-  - python --version
-  - ./ci_python.py
   - git config --global user.email travis@example.com
   - git config --global user.name travis
   - PATH=~/.local/bin:$PATH
@@ -31,6 +32,12 @@ before_install:
   - cat ~/.ssh/config
 
 install:
+  - pip install --use-mirrors numpy
+  - pip install --use-mirrors scipy
+  - pip install --use-mirrors matplotlib
+  - which python
+  - python --version
+  - ./ci_python.py
   - source ./install-dependencies.sh
 
 script:
