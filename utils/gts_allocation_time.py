@@ -40,7 +40,7 @@ for line in open(args.log):
             source = int(m.group(4)) - 1
             destination = int(m.group(6)) - 1
             time = float(m.group(1))
-            pos = math.floor(math.floor(time) / int(args.step))
+            pos = int(math.floor(math.floor(time) / int(args.step)))
             if m.group(2) == 'de':
                 totalDealloc += 1
                 allocationVector[pos][1] += 1
