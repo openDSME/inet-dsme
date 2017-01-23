@@ -38,7 +38,7 @@ def main(args):
 
     resultdir = '/inet-dsme/results/'+vals['date']+'-'+vals['sanitized_commit']
 
-    call(['utils/analyze.py','results'])
+    call(['python2.7 utils/analyze.py','results'])
 
     index = textwrap.dedent("""\
         ---
@@ -131,8 +131,8 @@ def main(args):
         indexfile.write(index)
 
     if args.video:
-        call(['utils/gts_allocation.py','--no-show','-l','results/DSME-mac.log','-o','results/gts_allocation.mp4'])
-    call(['utils/gts_allocation_time.py','-l','results/DSME-mac.log','-o','results/gts_allocation.png', '-i'])
+        call(['python2.7 utils/gts_allocation.py','--no-show','-l','results/DSME-mac.log','-o','results/gts_allocation.mp4'])
+    call(['python2.7 utils/gts_allocation_time.py','-l','results/DSME-mac.log','-o','results/gts_allocation.png', '-i'])
 
 
 if __name__ == '__main__':
