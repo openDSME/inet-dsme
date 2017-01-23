@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 
 parser = argparse.ArgumentParser(description="Extracts the number of allocated and deallocated slots per second.")
 parser.add_argument("-l", "--log", type=str, required=True, help="the log file to parse")
-parser.add_argument("-o", "--output", type=str, default="gts_allocation.csv", help="the output file")
+parser.add_argument("-o", "--output", type=str, default="gts_allocation.png", help="the output file")
 parser.add_argument("-s", "--step", type=str, default="1", help="unit of time")
 parser.add_argument("-v", "--visual", help="plot the data on screen", action='store_true')
 parser.add_argument("-f", "--filter", type=str, default="[0-9]*", help="unit of time")
