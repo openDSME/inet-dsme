@@ -32,9 +32,9 @@ install:
 script:
   - ./build.sh $INET
   - ./ci_test.sh $INET
-  - ./ci_analyze.py -v
+  - python2.7 ./ci_analyze.py -v
   - rm results/DSME-mac.log # too large to store
-  - utils/ci_to_jekyll.py -m src/openDSME results
+  - python2.7 utils/ci_to_jekyll.py -m src/openDSME results
 
 cache:
   directories:
