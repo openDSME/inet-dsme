@@ -53,6 +53,7 @@ DSMEPlatform::DSMEPlatform()
       cfpTimer(nullptr),
 
       pendingTxFrame(nullptr),
+      pendingSendRequest(false),
       radio(nullptr),
 
       transmissionState(IRadio::TRANSMISSION_STATE_UNDEFINED),
@@ -299,7 +300,7 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg,
     return true;
 }
 
-bool DSMEPlatform::sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
+bool DSMEPlatform::prepareSendingCopy(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
     if(msg == nullptr) {
         return false;
     }
@@ -332,19 +333,39 @@ bool DSMEPlatform::sendCopyNow(DSMEMessage* msg, Delegate<void(bool)> txEndCallb
             DSME_ASSERT(false);
     }
 
-    if(radio->getRadioMode() == IRadio::RADIO_MODE_TRANSMITTER) {
-        // can be sent direct
-        sendDown(frame);
-    } else {
-        DSME_ASSERT(msg->getHeader().getFrameType() != IEEE802154eMACHeader::ACKNOWLEDGEMENT); // switching is handled by ACK routine
-        DSME_ASSERT(pendingTxFrame == nullptr);
+    DSME_ASSERT(pendingTxFrame == nullptr);
 
-        pendingTxFrame = frame;
+    pendingTxFrame = frame;
+
+    if(radio->getRadioMode() != IRadio::RADIO_MODE_TRANSMITTER) {
+        DSME_ASSERT(msg->getHeader().getFrameType() != IEEE802154eMACHeader::ACKNOWLEDGEMENT); // switching is handled by ACK routine
         radio->setRadioMode(IRadio::RADIO_MODE_TRANSMITTER);
-        // wait for switch
     }
 
     return true;
+}
+
+bool DSMEPlatform::sendNow() {
+    DSME_ASSERT(pendingTxFrame);
+    DSME_ASSERT(!pendingSendRequest);
+    if(radio->getRadioMode() == IRadio::RADIO_MODE_TRANSMITTER) {
+        // can be sent direct
+        sendDown(pendingTxFrame);
+        pendingTxFrame = nullptr;
+    }
+    else {
+        pendingSendRequest = true;
+    }
+    // otherwise receiveSignal will be called eventually
+    return true;
+}
+
+void DSMEPlatform::abortPreparedTransmission() {
+    DSME_ASSERT(!pendingSendRequest);
+    DSME_ASSERT(pendingTxFrame);
+    delete pendingTxFrame;
+    pendingTxFrame = nullptr;
+    scheduleAt(simTime(), new cMessage("receive"));
 }
 
 void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
@@ -423,7 +444,10 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
         dsme->handleStartOfCFP();
     } else if(strcmp(msg->getName(), "acktimer") == 0) {
         // LOG_INFO("send ACK")
-        sendCopyNow((DSMEMessage*)msg->getParList().get(0), txEndCallback);
+        bool result = prepareSendingCopy((DSMEMessage*)msg->getParList().get(0), txEndCallback);
+        ASSERT(result);
+        result = sendNow();
+        ASSERT(result);
         // the ACK Message itself will be deleted inside the AckLayer
         delete msg;
     } else if(strcmp(msg->getName(), "receive") == 0) {
@@ -449,11 +473,12 @@ void DSMEPlatform::receiveSignal(cComponent* source, simsignal_t signalID, long 
         IRadio::RadioMode newRadioMode = static_cast<IRadio::RadioMode>(value);
         if(newRadioMode == IRadio::RADIO_MODE_TRANSMITTER) {
             // LOG_INFO("switched to transmit")
-            if(pendingTxFrame) {
+            if(pendingSendRequest) {
                 // LOG_INFO("sendDown after tx switch")
 
                 sendDown(pendingTxFrame);
                 pendingTxFrame = nullptr; // now owned by lower layer
+                pendingSendRequest = false;
             }
         } else if(newRadioMode == IRadio::RADIO_MODE_RECEIVER) {
             // LOG_INFO("switched to receive")
