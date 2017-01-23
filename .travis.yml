@@ -2,6 +2,10 @@
 sudo: required
 dist: trusty
 language: cpp
+
+python:
+  - "2.7_with_system_site_packages"
+
 addons:
   apt:
     sources:
@@ -11,12 +15,9 @@ addons:
     - g++-4.8
     - libav-tools
     - libavcodec-extra-54
-    - python-tk
-    - python-numpy
-    - python-scipy
-    - python-matplotlib
 
 before_install:
+  - sudo apt-get install -qq python-tk python-numpy python-scipy python-matplotlib
   - which python
   - python --version
   - ./ci_python.py
