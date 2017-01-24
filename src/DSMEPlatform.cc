@@ -287,6 +287,8 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg,
     acktimer->getParList().setTakeOwnership(false); // ackMsg is still owned by the AckLayer
     acktimer->getParList().addAt(0, ackMsg);
 
+    this->txEndCallback = txEndCallback;
+
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     uint32_t endOfReception = receivedMsg->getStartOfFrameDelimiterSymbolCounter() + receivedMsg->getTotalSymbols() - 2 * 4 // Preamble
                               - 2 * 1;                                                                                      // SFD
