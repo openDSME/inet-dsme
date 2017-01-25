@@ -225,8 +225,8 @@ private:
 
     inet::MACAddress addr;
 
-    void printSequenceChartInfo(DSMEMessage* msg);
-    void printDSMEManagement(uint8_t management, DSMESABSpecification& sabSpec, CommandFrameIdentifier cmd);
+    std::string getSequenceChartInfo(DSMEMessage* msg, bool outgoing);
+    std::string getDSMEManagement(uint8_t management, DSMESABSpecification& sabSpec, CommandFrameIdentifier cmd);
 
     bool channelInactive;
 
