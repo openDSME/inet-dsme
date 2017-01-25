@@ -153,6 +153,10 @@ public:
 
     virtual void scheduleStartOfCFP() override;
 
+    virtual uint8_t getMinCoordinatorLQI() {
+        return 150; // corresponds roughly to 20% PER
+    }
+
 private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
 

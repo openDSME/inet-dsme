@@ -8,6 +8,7 @@
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
+#include "INETMath.h"
 
 // coverity[+kill]
 void _simulation_will_terminate(void) {
@@ -373,6 +374,18 @@ void DSMEPlatform::abortPreparedTransmission() {
     scheduleAt(simTime(), new cMessage("receive"));
 }
 
+uint8_t PERtoLQI(double per) {
+    // inverse function of the graph given in the ATmega256RFR2 datasheet
+    double lqi = -22.2222 * log(0.00360656*(-1+(1/(1-per))));
+    if(lqi > 255) {
+        lqi = 255;
+    }
+    else if(lqi < 0) {
+        lqi = 0;
+    }
+    return (uint8_t)(lqi+0.5);
+}
+
 std::string getErrorInfo(DSMEFrame* macPkt) {
     std::stringstream ss;
 
@@ -380,8 +393,9 @@ std::string getErrorInfo(DSMEFrame* macPkt) {
     ss << control->getBitErrorCount() << ", ";
     ss << std::setprecision(3) << control->getBitErrorRate() * 100.0 << "%, ";
     ss << control->getPacketErrorRate() * 100.0 << "%, ";
-    ss << "SNIR: " << control->getMinSNIR() << ", ";
-    ss << "RSSI: " << control->getMinRSSI();
+    ss << "LQI " << PERtoLQI(control->getPacketErrorRate()) << ", ";
+    ss << "SNIR: " << inet::math::fraction2dB(control->getMinSNIR()) << " dB, ";
+    ss << "RSSI: " << inet::math::mW2dBm(control->getMinRSSI().get()*1000) << " dBm ";
 
     return ss.str();
 }
@@ -410,15 +424,16 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
     dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
+    // Get LQI
+    inet::physicallayer::ReceptionIndication* control = check_and_cast<inet::physicallayer::ReceptionIndication*>(macPkt->getControlInfo());
+    dsmemsg->setLQI(PERtoLQI(control->getPacketErrorRate()));
+
     LOG_DEBUG("Received valid frame     " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
 
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     dsmemsg->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - dsmemsg->getTotalSymbols() + 2 * 4 // Preamble
                                                   + 2 * 1;                                                // SFD
 
-    // LOG_INFO("handleLowerPacket " << (uint16_t)dsmemsg->getHeader().getSequenceNumber());
-
-    LOG_DEBUG("Passing received packet to ACKLayer");
     dsme->getAckLayer().receive(dsmemsg);
 }
 

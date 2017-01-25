@@ -99,17 +99,24 @@ public:
         return macHdr;
     }
 
+    void setLQI(uint8_t lqi) {
+        this->lqi = lqi;
+    }
+
+    uint8_t getLQI() {
+        return lqi;
+    }
+
     bool receivedViaMCPS{false}; // TODO better handling?
     bool firstTry{false};
     bool currentlySending{false};
 
 private:
-    // TODO
-    //    uint16_t bits;
-
     IEEE802154eMACHeader macHdr;
 
     DSMEFrame* frame;
+
+    uint8_t lqi;
 
     DSMEMessage() : frame(new DSMEFrame()) {
     }
