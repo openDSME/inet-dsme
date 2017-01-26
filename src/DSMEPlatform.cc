@@ -2,13 +2,13 @@
 
 #include <iomanip>
 
+#include "INETMath.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/FindModule.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
-#include "INETMath.h"
 
 // coverity[+kill]
 void _simulation_will_terminate(void) {
@@ -358,8 +358,7 @@ bool DSMEPlatform::sendNow() {
         // can be sent direct
         sendDown(pendingTxFrame);
         pendingTxFrame = nullptr;
-    }
-    else {
+    } else {
         pendingSendRequest = true;
     }
     // otherwise receiveSignal will be called eventually
@@ -376,14 +375,13 @@ void DSMEPlatform::abortPreparedTransmission() {
 
 uint8_t PERtoLQI(double per) {
     // inverse function of the graph given in the ATmega256RFR2 datasheet
-    double lqi = -22.2222 * log(0.00360656*(-1+(1/(1-per))));
+    double lqi = -22.2222 * log(0.00360656 * (-1 + (1 / (1 - per))));
     if(lqi > 255) {
         lqi = 255;
-    }
-    else if(lqi < 0) {
+    } else if(lqi < 0) {
         lqi = 0;
     }
-    return (uint8_t)(lqi+0.5);
+    return (uint8_t)(lqi + 0.5);
 }
 
 std::string getErrorInfo(DSMEFrame* macPkt) {
@@ -395,7 +393,7 @@ std::string getErrorInfo(DSMEFrame* macPkt) {
     ss << control->getPacketErrorRate() * 100.0 << "%, ";
     ss << "LQI " << PERtoLQI(control->getPacketErrorRate()) << ", ";
     ss << "SNIR: " << inet::math::fraction2dB(control->getMinSNIR()) << " dB, ";
-    ss << "RSSI: " << inet::math::mW2dBm(control->getMinRSSI().get()*1000) << " dBm ";
+    ss << "RSSI: " << inet::math::mW2dBm(control->getMinRSSI().get() * 1000) << " dBm ";
 
     return ss.str();
 }
@@ -410,7 +408,6 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     if(macPkt->hasBitError()) {
         DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
         dsmemsg->getHeader().decapsulateFrom(dsmemsg);
-
 
         LOG_DEBUG("Received corrupted frame " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
         emit(corruptedFrameReceived, macPkt);
