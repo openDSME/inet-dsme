@@ -3,8 +3,8 @@
 #include <iomanip>
 
 #include "INETMath.h"
-#include "inet/common/FindModule.h"
 #include "inet/common/ModuleAccess.h"
+#include "inet/common/FindModule.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "openDSME/dsmeLayer/DSMELayer.h"
