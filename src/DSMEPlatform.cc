@@ -3,8 +3,8 @@
 #include <iomanip>
 
 #include "INETMath.h"
-#include "inet/common/ModuleAccess.h"
 #include "inet/common/FindModule.h"
+#include "inet/common/ModuleAccess.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "openDSME/dsmeLayer/DSMELayer.h"
@@ -224,8 +224,11 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
 }
 
-void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
-    DSMEFrame* macPkt = msg->decapsulateFrame();
+void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
+
+    DSMEFrame* macPkt = dsmeMsg->decapsulateFrame();
     releaseMessage(msg);
     cPacket* packet = macPkt->decapsulate();
 
@@ -239,7 +242,7 @@ void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
     sendUp(packet);
 }
 
-void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status status) {
+void DSMEPlatform::handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status status) {
     releaseMessage(msg);
 }
 
@@ -261,19 +264,21 @@ DSMEMessage* DSMEPlatform::getLoadedMessage(DSMEFrame* frame) {
     return msg;
 }
 
-void DSMEPlatform::releaseMessage(DSMEMessage* msg) {
+void DSMEPlatform::releaseMessage(IDSMEMessage* msg) {
     DSME_ASSERT(messagesInUse > 0);
     DSME_ASSERT(msg != nullptr);
     messagesInUse--;
 
 #if 1
-    msgsActive.erase(msgMap[msg]);
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
+    msgsActive.erase(msgMap[dsmeMsg]);
 #endif
 
     delete msg;
 }
 
-void DSMEPlatform::handleReceivedMessageFromAckLayer(DSMEMessage* message) {
+void DSMEPlatform::handleReceivedMessageFromAckLayer(IDSMEMessage* message) {
     DSME_ASSERT(receiveFromAckLayerDelegate);
     receiveFromAckLayerDelegate(message);
 }
@@ -286,10 +291,13 @@ void DSMEPlatform::setReceiveDelegate(receive_delegate_t receiveDelegate) {
     this->receiveFromAckLayerDelegate = receiveDelegate;
 }
 
-bool DSMEPlatform::sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) {
+bool DSMEPlatform::sendDelayedAck(IDSMEMessage* ackMsg, IDSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) {
+    DSMEMessage* dsmeAckMsg = dynamic_cast<DSMEMessage*>(ackMsg);
+    DSME_ASSERT(dsmeAckMsg != nullptr);
+
     cMessage* acktimer = new cMessage("acktimer");
     acktimer->getParList().setTakeOwnership(false); // ackMsg is still owned by the AckLayer
-    acktimer->getParList().addAt(0, ackMsg);
+    acktimer->getParList().addAt(0, dsmeAckMsg);
 
     this->txEndCallback = txEndCallback;
 
@@ -306,17 +314,20 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg,
     return true;
 }
 
-bool DSMEPlatform::prepareSendingCopy(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
+bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
     if(msg == nullptr) {
         return false;
     }
+
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
 
     LOG_DEBUG(getSequenceChartInfo(msg, true));
 
     LOG_INFO("sendCopyNow " << (uint64_t)msg);
 
     this->txEndCallback = txEndCallback;
-    DSMEFrame* frame = msg->getSendableCopy();
+    DSMEFrame* frame = dsmeMsg->getSendableCopy();
 
     switch(msg->getHeader().getFrameType()) {
         case IEEE802154eMACHeader::BEACON:
@@ -594,7 +605,10 @@ std::string DSMEPlatform::getDSMEManagement(uint8_t management, DSMESABSpecifica
     return ss.str();
 }
 
-std::string DSMEPlatform::getSequenceChartInfo(DSMEMessage* msg, bool outgoing) {
+std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing) {
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
+
     std::stringstream ss;
 
     IEEE802154eMACHeader& header = msg->getHeader();
@@ -620,7 +634,7 @@ std::string DSMEPlatform::getSequenceChartInfo(DSMEMessage* msg, bool outgoing) 
             ss << "ACK";
             break;
         case IEEE802154eMACHeader::COMMAND: {
-            uint8_t cmd = msg->frame->getData()[0];
+            uint8_t cmd = dsmeMsg->frame->getData()[0];
 
             switch((CommandFrameIdentifier)cmd) {
                 case ASSOCIATION_REQUEST:
@@ -653,7 +667,7 @@ std::string DSMEPlatform::getSequenceChartInfo(DSMEMessage* msg, bool outgoing) 
                 case DSME_GTS_REQUEST:
                 case DSME_GTS_REPLY:
                 case DSME_GTS_NOTIFY: {
-                    DSMEMessage* m = getLoadedMessage(msg->getSendableCopy());
+                    DSMEMessage* m = getLoadedMessage(dsmeMsg->getSendableCopy());
                     m->getHeader().decapsulateFrom(m);
 
                     MACCommand cmdd;
@@ -666,21 +680,21 @@ std::string DSMEPlatform::getSequenceChartInfo(DSMEMessage* msg, bool outgoing) 
                             ss << "DSME-GTS-REQUEST";
                             GTSRequestCmd req;
                             req.decapsulateFrom(m);
-                            ss << getDSMEManagement(msg->frame->getData()[1], req.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->frame->getData()[1], req.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         case DSME_GTS_REPLY: {
                             ss << "DSME-GTS-REPLY";
                             GTSReplyNotifyCmd reply;
                             reply.decapsulateFrom(m);
-                            ss << getDSMEManagement(msg->frame->getData()[1], reply.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->frame->getData()[1], reply.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         case DSME_GTS_NOTIFY: {
                             ss << "DSME-GTS-NOTIFY";
                             GTSReplyNotifyCmd notify;
                             notify.decapsulateFrom(m);
-                            ss << getDSMEManagement(msg->frame->getData()[1], notify.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->frame->getData()[1], notify.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         default:
