@@ -1,4 +1,8 @@
 #include "DSMEPlatform.h"
+
+#include <iomanip>
+
+#include "INETMath.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/FindModule.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
@@ -179,7 +183,7 @@ void DSMEPlatform::initialize(int stage) {
         this->mac_pib.macMaxFrameRetries = par("macMaxFrameRetries");
 
         this->mac_pib.macDSMEGTSExpirationTime = par("macDSMEGTSExpirationTime");
-        this->mac_pib.macResponseWaitTime = 16;
+        this->mac_pib.macResponseWaitTime = 32;
 
         this->mac_pib.recalculateDependentProperties();
 
@@ -220,8 +224,11 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
 }
 
-void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
-    DSMEFrame* macPkt = msg->decapsulateFrame();
+void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
+
+    DSMEFrame* macPkt = dsmeMsg->decapsulateFrame();
     releaseMessage(msg);
     cPacket* packet = macPkt->decapsulate();
 
@@ -235,7 +242,7 @@ void DSMEPlatform::handleIndicationFromMCPS(DSMEMessage* msg) {
     sendUp(packet);
 }
 
-void DSMEPlatform::handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status status) {
+void DSMEPlatform::handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status status) {
     releaseMessage(msg);
 }
 
@@ -257,19 +264,21 @@ DSMEMessage* DSMEPlatform::getLoadedMessage(DSMEFrame* frame) {
     return msg;
 }
 
-void DSMEPlatform::releaseMessage(DSMEMessage* msg) {
+void DSMEPlatform::releaseMessage(IDSMEMessage* msg) {
     DSME_ASSERT(messagesInUse > 0);
     DSME_ASSERT(msg != nullptr);
     messagesInUse--;
 
 #if 1
-    msgsActive.erase(msgMap[msg]);
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
+    msgsActive.erase(msgMap[dsmeMsg]);
 #endif
 
     delete msg;
 }
 
-void DSMEPlatform::handleReceivedMessageFromAckLayer(DSMEMessage* message) {
+void DSMEPlatform::handleReceivedMessageFromAckLayer(IDSMEMessage* message) {
     DSME_ASSERT(receiveFromAckLayerDelegate);
     receiveFromAckLayerDelegate(message);
 }
@@ -282,10 +291,13 @@ void DSMEPlatform::setReceiveDelegate(receive_delegate_t receiveDelegate) {
     this->receiveFromAckLayerDelegate = receiveDelegate;
 }
 
-bool DSMEPlatform::sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) {
+bool DSMEPlatform::sendDelayedAck(IDSMEMessage* ackMsg, IDSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) {
+    DSMEMessage* dsmeAckMsg = dynamic_cast<DSMEMessage*>(ackMsg);
+    DSME_ASSERT(dsmeAckMsg != nullptr);
+
     cMessage* acktimer = new cMessage("acktimer");
     acktimer->getParList().setTakeOwnership(false); // ackMsg is still owned by the AckLayer
-    acktimer->getParList().addAt(0, ackMsg);
+    acktimer->getParList().addAt(0, dsmeAckMsg);
 
     this->txEndCallback = txEndCallback;
 
@@ -302,17 +314,20 @@ bool DSMEPlatform::sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg,
     return true;
 }
 
-bool DSMEPlatform::prepareSendingCopy(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
+bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
     if(msg == nullptr) {
         return false;
     }
 
-    printSequenceChartInfo(msg);
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
+
+    LOG_DEBUG(getSequenceChartInfo(msg, true));
 
     LOG_INFO("sendCopyNow " << (uint64_t)msg);
 
     this->txEndCallback = txEndCallback;
-    DSMEFrame* frame = msg->getSendableCopy();
+    DSMEFrame* frame = dsmeMsg->getSendableCopy();
 
     switch(msg->getHeader().getFrameType()) {
         case IEEE802154eMACHeader::BEACON:
@@ -354,8 +369,7 @@ bool DSMEPlatform::sendNow() {
         // can be sent direct
         sendDown(pendingTxFrame);
         pendingTxFrame = nullptr;
-    }
-    else {
+    } else {
         pendingSendRequest = true;
     }
     // otherwise receiveSignal will be called eventually
@@ -370,6 +384,31 @@ void DSMEPlatform::abortPreparedTransmission() {
     scheduleAt(simTime(), new cMessage("receive"));
 }
 
+uint8_t PERtoLQI(double per) {
+    // inverse function of the graph given in the ATmega256RFR2 datasheet
+    double lqi = -22.2222 * log(0.00360656 * (-1 + (1 / (1 - per))));
+    if(lqi > 255) {
+        lqi = 255;
+    } else if(lqi < 0) {
+        lqi = 0;
+    }
+    return (uint8_t)(lqi + 0.5);
+}
+
+std::string getErrorInfo(DSMEFrame* macPkt) {
+    std::stringstream ss;
+
+    inet::physicallayer::ReceptionIndication* control = check_and_cast<inet::physicallayer::ReceptionIndication*>(macPkt->getControlInfo());
+    ss << control->getBitErrorCount() << ", ";
+    ss << std::setprecision(3) << control->getBitErrorRate() * 100.0 << "%, ";
+    ss << control->getPacketErrorRate() * 100.0 << "%, ";
+    ss << "LQI " << PERtoLQI(control->getPacketErrorRate()) << ", ";
+    ss << "SNIR: " << inet::math::fraction2dB(control->getMinSNIR()) << " dB, ";
+    ss << "RSSI: " << inet::math::mW2dBm(control->getMinRSSI().get() * 1000) << " dBm ";
+
+    return ss.str();
+}
+
 void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     DSMEFrame* macPkt;
     if(nullptr == (macPkt = dynamic_cast<DSMEFrame*>(pkt))) {
@@ -378,9 +417,13 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     }
 
     if(macPkt->hasBitError()) {
-        LOG_DEBUG("Received corrupted frame " << macPkt->detailedInfo());
+        DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
+        dsmemsg->getHeader().decapsulateFrom(dsmemsg);
+
+        LOG_DEBUG("Received corrupted frame " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
         emit(corruptedFrameReceived, macPkt);
-        delete macPkt;
+
+        releaseMessage(dsmemsg);
         return;
     }
 
@@ -389,13 +432,16 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
     dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
+    // Get LQI
+    inet::physicallayer::ReceptionIndication* control = check_and_cast<inet::physicallayer::ReceptionIndication*>(macPkt->getControlInfo());
+    dsmemsg->setLQI(PERtoLQI(control->getPacketErrorRate()));
+
+    LOG_DEBUG("Received valid frame     " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
+
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     dsmemsg->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - dsmemsg->getTotalSymbols() + 2 * 4 // Preamble
                                                   + 2 * 1;                                                // SFD
 
-    // LOG_INFO("handleLowerPacket " << (uint16_t)dsmemsg->getHeader().getSequenceNumber());
-
-    LOG_DEBUG("Passing received packet to ACKLayer");
     dsme->getAckLayer().receive(dsmemsg);
 }
 
@@ -515,34 +561,36 @@ bool DSMEPlatform::setChannelNumber(uint8_t k) {
     return true;
 }
 
-void DSMEPlatform::printDSMEManagement(uint8_t management, DSMESABSpecification& subBlock, CommandFrameIdentifier cmd) {
+std::string DSMEPlatform::getDSMEManagement(uint8_t management, DSMESABSpecification& subBlock, CommandFrameIdentifier cmd) {
+    std::stringstream ss;
+
     uint8_t numChannels = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumChannels();
     uint8_t numGTSlots = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumGTSlots();
     uint8_t numSuperFramesPerMultiSuperframe = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumberSuperframesPerMultiSuperframe();
 
-    LOG_DEBUG_PURE(" ");
+    ss << " ";
     uint8_t type = management & 0x7;
     switch((ManagementType)type) {
         case DEALLOCATION:
-            LOG_DEBUG_PURE("DEALLOCATION");
+            ss << "DEALLOCATION";
             break;
         case ALLOCATION:
-            LOG_DEBUG_PURE("ALLOCATION");
+            ss << "ALLOCATION";
             break;
         case DUPLICATED_ALLOCATION_NOTIFICATION:
-            LOG_DEBUG_PURE("DUPLICATED-ALLOCATION-NOTIFICATION");
+            ss << "DUPLICATED-ALLOCATION-NOTIFICATION";
             break;
         case REDUCE:
-            LOG_DEBUG_PURE("REDUCE");
+            ss << "REDUCE";
             break;
         case RESTART:
-            LOG_DEBUG_PURE("RESTART");
+            ss << "RESTART";
             break;
         case EXPIRATION:
-            LOG_DEBUG_PURE("EXPIRATION");
+            ss << "EXPIRATION";
             break;
         default:
-            LOG_DEBUG_PURE((uint16_t)management);
+            ss << (uint16_t)management;
     }
 
     if(subBlock.getSubBlock().count(true) == 1) {
@@ -550,67 +598,76 @@ void DSMEPlatform::printDSMEManagement(uint8_t management, DSMESABSpecification&
             GTS gts = GTS::GTSfromAbsoluteIndex((*it) + subBlock.getSubBlockIndex() * numGTSlots * numChannels, numGTSlots, numChannels,
                                                 numSuperFramesPerMultiSuperframe);
 
-            LOG_DEBUG_PURE(" " << gts.slotID << " " << gts.superframeID << " " << (uint16_t)gts.channel);
+            ss << " " << gts.slotID << " " << gts.superframeID << " " << (uint16_t)gts.channel;
         }
     }
+
+    return ss.str();
 }
 
-void DSMEPlatform::printSequenceChartInfo(DSMEMessage* msg) {
+std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing) {
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+    DSME_ASSERT(dsmeMsg != nullptr);
+
+    std::stringstream ss;
+
     IEEE802154eMACHeader& header = msg->getHeader();
 
-    LOG_DEBUG_PREFIX;
+    if(outgoing) {
+        ss << (uint16_t)header.getDestAddr().getShortAddress() << "|";
+    } else {
+        ss << (uint16_t)header.getSrcAddr().getShortAddress() << "|";
+    }
 
-    LOG_DEBUG_PURE((uint16_t)header.getDestAddr().getShortAddress() << "|");
+    ss << (uint16_t)header.hasSequenceNumber() << "|";
 
-    LOG_DEBUG_PURE((uint16_t)header.hasSequenceNumber() << "|");
-
-    LOG_DEBUG_PURE((uint16_t)header.getSequenceNumber() << "|");
+    ss << (uint16_t)header.getSequenceNumber() << "|";
 
     switch(header.getFrameType()) {
         case IEEE802154eMACHeader::BEACON:
-            LOG_DEBUG_PURE("BEACON");
+            ss << "BEACON";
             break;
         case IEEE802154eMACHeader::DATA:
-            LOG_DEBUG_PURE("DATA");
+            ss << "DATA";
             break;
         case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
-            LOG_DEBUG_PURE("ACK");
+            ss << "ACK";
             break;
         case IEEE802154eMACHeader::COMMAND: {
-            uint8_t cmd = msg->frame->getData()[0];
+            uint8_t cmd = dsmeMsg->frame->getData()[0];
 
             switch((CommandFrameIdentifier)cmd) {
                 case ASSOCIATION_REQUEST:
-                    LOG_DEBUG_PURE("ASSOCIATION-REQUEST");
+                    ss << "ASSOCIATION-REQUEST";
                     break;
                 case ASSOCIATION_RESPONSE:
-                    LOG_DEBUG_PURE("ASSOCIATION-RESPONSE");
+                    ss << "ASSOCIATION-RESPONSE";
                     break;
                 case DISASSOCIATION_NOTIFICATION:
-                    LOG_DEBUG_PURE("DISASSOCIATION-NOTIFICATION");
+                    ss << "DISASSOCIATION-NOTIFICATION";
                     break;
                 case DATA_REQUEST:
-                    LOG_DEBUG_PURE("DATA-REQUEST");
+                    ss << "DATA-REQUEST";
                     break;
                 case BEACON_REQUEST:
-                    LOG_DEBUG_PURE("BEACON-REQUEST");
+                    ss << "BEACON-REQUEST";
                     break;
                 case DSME_ASSOCIATION_REQUEST:
-                    LOG_DEBUG_PURE("DSME-ASSOCIATION-REQUEST");
+                    ss << "DSME-ASSOCIATION-REQUEST";
                     break;
                 case DSME_ASSOCIATION_RESPONSE:
-                    LOG_DEBUG_PURE("DSME-ASSOCIATION-RESPONSE");
+                    ss << "DSME-ASSOCIATION-RESPONSE";
                     break;
                 case DSME_BEACON_ALLOCATION_NOTIFICATION:
-                    LOG_DEBUG_PURE("DSME-BEACON-ALLOCATION-NOTIFICATION");
+                    ss << "DSME-BEACON-ALLOCATION-NOTIFICATION";
                     break;
                 case DSME_BEACON_COLLISION_NOTIFICATION:
-                    LOG_DEBUG_PURE("DSME-BEACON-COLLISION-NOTIFICATION");
+                    ss << "DSME-BEACON-COLLISION-NOTIFICATION";
                     break;
                 case DSME_GTS_REQUEST:
                 case DSME_GTS_REPLY:
                 case DSME_GTS_NOTIFY: {
-                    DSMEMessage* m = getLoadedMessage(msg->getSendableCopy());
+                    DSMEMessage* m = getLoadedMessage(dsmeMsg->getSendableCopy());
                     m->getHeader().decapsulateFrom(m);
 
                     MACCommand cmdd;
@@ -620,24 +677,24 @@ void DSMEPlatform::printSequenceChartInfo(DSMEMessage* msg) {
 
                     switch(cmdd.getCmdId()) {
                         case DSME_GTS_REQUEST: {
-                            LOG_DEBUG_PURE("DSME-GTS-REQUEST");
+                            ss << "DSME-GTS-REQUEST";
                             GTSRequestCmd req;
                             req.decapsulateFrom(m);
-                            printDSMEManagement(msg->frame->getData()[1], req.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->frame->getData()[1], req.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         case DSME_GTS_REPLY: {
-                            LOG_DEBUG_PURE("DSME-GTS-REPLY");
+                            ss << "DSME-GTS-REPLY";
                             GTSReplyNotifyCmd reply;
                             reply.decapsulateFrom(m);
-                            printDSMEManagement(msg->frame->getData()[1], reply.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->frame->getData()[1], reply.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         case DSME_GTS_NOTIFY: {
-                            LOG_DEBUG_PURE("DSME-GTS-NOTIFY");
+                            ss << "DSME-GTS-NOTIFY";
                             GTSReplyNotifyCmd notify;
                             notify.decapsulateFrom(m);
-                            printDSMEManagement(msg->frame->getData()[1], notify.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->frame->getData()[1], notify.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         default:
@@ -654,13 +711,12 @@ void DSMEPlatform::printSequenceChartInfo(DSMEMessage* msg) {
             break;
         }
         default:
-            LOG_DEBUG_PURE("UNKNOWN");
+            ss << "UNKNOWN";
             break;
     }
 
-    LOG_DEBUG_PURE("|" << msg->getTotalSymbols());
+    ss << "|" << msg->getTotalSymbols();
 
-    LOG_DEBUG_PURE(std::endl);
-    return;
+    return ss.str();
 }
 }

@@ -73,7 +73,7 @@ class DSMEPlatform : public inet::MACProtocolBase, public inet::IMACProtocol, pu
     using omnetpp::cSimpleModule::send;
 
 public:
-    typedef Delegate<void(DSMEMessage* msg)> receive_delegate_t;
+    typedef Delegate<void(IDSMEMessage* msg)> receive_delegate_t;
 
     DSMEPlatform();
     virtual ~DSMEPlatform();
@@ -105,7 +105,7 @@ public:
      * but keep the message (the caller has to ensure that the message is eventually released)
      * This might lead to an additional memory copy in the platform
      */
-    bool prepareSendingCopy(DSMEMessage* msg, Delegate<void(bool)> txEndCallback) override;
+    bool prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> txEndCallback) override;
 
     bool sendNow() override;
 
@@ -114,9 +114,9 @@ public:
     /**
      * Send an ACK message, delay until aTurnaRoundTime after reception_time has expired
      */
-    bool sendDelayedAck(DSMEMessage* ackMsg, DSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) override;
+    bool sendDelayedAck(IDSMEMessage* ackMsg, IDSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) override;
 
-    void handleReceivedMessageFromAckLayer(DSMEMessage* message) override;
+    void handleReceivedMessageFromAckLayer(IDSMEMessage* message) override;
 
     bool isReceptionFromAckLayerPossible() override;
 
@@ -149,15 +149,19 @@ public:
     // TODO handle error case
     DSMEMessage* getEmptyMessage() override;
 
-    void releaseMessage(DSMEMessage* msg) override;
+    void releaseMessage(IDSMEMessage* msg) override;
 
     virtual void scheduleStartOfCFP() override;
+
+    virtual uint8_t getMinCoordinatorLQI() override {
+        return 150; // corresponds roughly to 20% PER
+    }
 
 private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
 
-    void handleIndicationFromMCPS(DSMEMessage* msg);
-    void handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status status);
+    void handleIndicationFromMCPS(IDSMEMessage* msg);
+    void handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status status);
 
     bool send(DSMEFrame* frame);
 
@@ -225,8 +229,8 @@ private:
 
     inet::MACAddress addr;
 
-    void printSequenceChartInfo(DSMEMessage* msg);
-    void printDSMEManagement(uint8_t management, DSMESABSpecification& sabSpec, CommandFrameIdentifier cmd);
+    std::string getSequenceChartInfo(IDSMEMessage* msg, bool outgoing);
+    std::string getDSMEManagement(uint8_t management, DSMESABSpecification& sabSpec, CommandFrameIdentifier cmd);
 
     bool channelInactive;
 
