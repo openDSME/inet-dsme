@@ -2,6 +2,7 @@
 
 import fileinput
 import re
+import subprocess
 
 import datetime as dt
 import matplotlib.pyplot as plt
@@ -18,6 +19,8 @@ maxtime = 0
 
 symbolDuration = (16/(1000.0*1000.0))
 
+reftime = -1
+
 for line in fileinput.input():
     m = re.search("\[INFO\]\s*([0-9.]*)\s*([0-9]*):\s*[0-9]*\|[0-9]*\|[0-9]*\|(.*)\|([0-9]*)",line)
     #m = re.search("[INFO]\s*(.**)\s*([0-9]*):\s*[0-9]*",line)
@@ -25,8 +28,10 @@ for line in fileinput.input():
         time = float(m.group(1))
         sender = int(m.group(2))
         mtype = m.group(3)
+        if reftime < 0 and mtype == "BEACON":
+            reftime = time            
         duration = float(m.group(4))*symbolDuration
-        print time,sender,mtype
+        #print time,sender,mtype
 
         if sender not in data:
             data[sender] = []
@@ -35,16 +40,16 @@ for line in fileinput.input():
         types.add(mtype)
         maxtime = max(time,maxtime)
 
-        if time > 40:
-            break
-
-reftime = data[1][0][0]
+        #if time > 40:
+        #    break
 
 SO = 3
 MO = 5
 BO = 7
-slotDuration = 60*(2**SO)*symbolDuration
+symbolsPerSlot = 60*(2**SO)
+slotDuration = symbolsPerSlot*symbolDuration
 aBaseSuperframeDuration = 16*slotDuration
+#reftime +=  int(250 / aBaseSuperframeDuration)*aBaseSuperframeDuration
 
 def fill_grid():
     musus = 2**(BO-MO)
@@ -84,9 +89,10 @@ for mtype in types:
     i += 1
 
 colors['BEACON'] = "#0000ff"
-colors['DATA'] = "#aa00ff"
+#colors['DATA'] = "#aa00ff"
+colors['DATA'] = "#ff0000"
 
-print colors
+#print colors
 
 maxsender = max(data.keys())
 pos = arange(1.5,maxsender+1.5,0.5)
@@ -116,12 +122,17 @@ for area in grid:
             green = min(green+80,255)
             blue = min(blue+80,255)
         color = "#%02x%02x%02x"%(red,green,blue)
-        ax.barh(1.0, end - start, left=start, height=maxsender*0.5, color=color, alpha = 0.4, linewidth=0)
+        ax.barh(1.0, end - start, left=start, height=maxsender*0.5, color=color, alpha = 0.1, linewidth=0)
  
 for sender in sorted(data.keys()):
     for pkt in data[sender]:
         start = pkt[0]
         end = start+pkt[2]
+        if pkt[1] == "BEACON":
+            lateness = int(round((start - reftime)/symbolDuration))%(symbolsPerSlot*16)
+            if lateness > (symbolsPerSlot*16)/2:
+                lateness -= (symbolsPerSlot*16)
+            print "%f,%i,%i"%(start,sender,lateness)
         ax.barh((sender*0.5)+1.0, end - start, left=start, height=0.5, align='center', color=colors[pkt[1]], alpha = 1, linewidth=0)
 
  
@@ -159,3 +170,5 @@ ax.invert_yaxis()
 #plt.savefig('gantt.svg')
 #plt.show()
 plt.savefig('foo.pdf',bbox_inches='tight')
+
+subprocess.call(['convert','-density','200','foo.pdf','foo.png'])
