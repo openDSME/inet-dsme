@@ -21,13 +21,27 @@ symbolDuration = (16/(1000.0*1000.0))
 
 reftime = -1
 
+INET = 0
+CONTIKI = 1
+log = INET
+
 for line in fileinput.input():
-    m = re.search("\[INFO\]\s*([0-9.]*)\s*([0-9]*):\s*[0-9]*\|[0-9]*\|[0-9]*\|(.*)\|([0-9]*)",line)
-    #m = re.search("[INFO]\s*(.**)\s*([0-9]*):\s*[0-9]*",line)
+    if log == INET:
+        m = re.search("\[INFO\]\s*([0-9.]*)\s*([0-9]*):\s*[0-9]*\|[0-9]*\|[0-9]*\|(.*)\|([0-9]*)",line)
+    else:
+        m = re.search("Contiki [0-9]+\s*([0-9.]+)\s*Mote Contiki ([0-9]+).*br.[0-9]+\|[0-9]+\|[0-9]+\|(.*)<br.",line)
     if m:
         time = float(m.group(1))
+        if log == CONTIKI:
+            time /= 1000000.0
+
+        if time > 40:
+            continue
+
+        print line
         sender = int(m.group(2))
         mtype = m.group(3)
+
         if reftime < 0 and mtype == "BEACON":
             reftime = time            
         duration = float(m.group(4))*symbolDuration
