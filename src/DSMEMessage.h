@@ -123,6 +123,14 @@ public:
         this->currentlySending = currentlySending;
     }
 
+    void increaseRetryCounter() override {
+        retries++;
+    }
+
+    uint8_t getRetryCounter() override {
+        return retries;
+    }
+
 private:
     bool receivedViaMCPS{false}; // TODO better handling?
     bool firstTry{false};
@@ -132,7 +140,8 @@ private:
 
     DSMEFrame* frame;
 
-    uint8_t lqi;
+    uint8_t lqi{0};
+    uint8_t retries{0};
 
     DSMEMessage() : frame(new DSMEFrame()) {
     }
