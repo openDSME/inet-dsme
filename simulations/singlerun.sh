@@ -1,12 +1,12 @@
 #!/bin/bash
 
 pushd ../
-make || exit 1
+make -j8 || exit 1
 popd
 
-CONFIG=DSME
-RUN=3
-REP=1
+CONFIG=DSME-Multi
+RUN=5
+REP=2
 VECTOR_RECORDING=true
 #VECTOR_RECORDING=false
 

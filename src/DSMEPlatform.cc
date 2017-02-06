@@ -157,12 +157,12 @@ void DSMEPlatform::initialize(int stage) {
         // switching time of the radio
         if(radioModule->hasPar("timeRXToTX")) {
             simtime_t rxToTx = radioModule->par("timeRXToTX").doubleValue();
-            if(rxToTx > aTurnaroundTimeSymbols) {
+            if(rxToTx > aTurnaroundTime) {
                 throw cRuntimeError(
                     "Parameter \"aTurnaroundTimeSymbols\" (%f) does not match"
                     " the radios RX to TX switching time (%f)! It"
                     " should be equal or bigger",
-                    SIMTIME_DBL(aTurnaroundTimeSymbols * symbolDuration), SIMTIME_DBL(rxToTx));
+                    SIMTIME_DBL(aTurnaroundTime * symbolDuration), SIMTIME_DBL(rxToTx));
             }
         }
 
@@ -184,8 +184,6 @@ void DSMEPlatform::initialize(int stage) {
 
         this->mac_pib.macDSMEGTSExpirationTime = par("macDSMEGTSExpirationTime");
         this->mac_pib.macResponseWaitTime = 32;
-
-        this->mac_pib.recalculateDependentProperties();
 
         this->mac_pib.macIsPANCoord = par("isPANCoordinator");
 
@@ -304,7 +302,7 @@ bool DSMEPlatform::sendDelayedAck(IDSMEMessage* ackMsg, IDSMEMessage* receivedMs
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     uint32_t endOfReception = receivedMsg->getStartOfFrameDelimiterSymbolCounter() + receivedMsg->getTotalSymbols() - 2 * 4 // Preamble
                               - 2 * 1;                                                                                      // SFD
-    uint32_t ackTime = endOfReception + aTurnaroundTimeSymbols;
+    uint32_t ackTime = endOfReception + aTurnaroundTime;
     uint32_t now = getSymbolCounter();
     uint32_t diff = ackTime - now;
 
