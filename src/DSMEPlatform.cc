@@ -41,7 +41,7 @@ void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
 }
 
 DSMEPlatform::DSMEPlatform()
-    : phy_pib(10),
+    : phy_pib(),
       mac_pib(phy_pib),
 
       dsme(new DSMELayer()),
@@ -114,6 +114,13 @@ void DSMEPlatform::initialize(int stage) {
     MACProtocolBase::initialize(stage);
 
     if(stage == INITSTAGE_LOCAL) {
+        /* 11 <= phyCurrentChannel <= 26 for 2450 MHz band DSSS */
+        channelList_t DSSS2450_channels(16);
+        for(uint8_t i = 0; i < 16; i++) {
+            DSSS2450_channels[i] = 11 + i;
+        }
+        this->phy_pib.setDSSS2450ChannelPage(DSSS2450_channels);
+
         this->dsme->setPHY_PIB(&(this->phy_pib));
         this->dsme->setMAC_PIB(&(this->mac_pib));
         this->dsme->setMCPS(&(this->mcps_sap));
