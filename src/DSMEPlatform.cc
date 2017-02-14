@@ -9,6 +9,7 @@
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
+#include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
 // coverity[+kill]
 void _simulation_will_terminate(void) {
