@@ -57,13 +57,11 @@ constexpr uint8_t PRE_EVENT_SHIFT = const_redefines::macSIFSPeriod;
 constexpr uint8_t MIN_CSMA_SLOTS = 0; // 0 for CAP reduction
 constexpr uint8_t MAX_GTSLOTS = const_redefines::aNumSuperframeSlots - MIN_CSMA_SLOTS - 1;
 constexpr uint8_t MAX_CHANNELS = 16;
-constexpr uint8_t MIN_CHANNEL = 11;
 constexpr uint8_t MAX_NEIGHBORS = 25;
 
 constexpr uint8_t MIN_SO = 1;
 constexpr uint8_t MAX_BO = 10;
 constexpr uint8_t MAX_MO = 9;
-constexpr uint16_t MAX_SLOTS_PER_SUPERFRAMES = 1 << (uint16_t)(MAX_BO - MIN_SO);
 constexpr uint16_t MAX_TOTAL_SUPERFRAMES = 1 << (uint16_t)(MAX_BO - MIN_SO);
 constexpr uint16_t MAX_SUPERFRAMES_PER_MULTI_SUPERFRAME = 1 << (uint16_t)(MAX_MO - MIN_SO);
 constexpr uint16_t MAX_OCCUPIED_SLOTS = MAX_SUPERFRAMES_PER_MULTI_SUPERFRAME * MAX_GTSLOTS * MAX_CHANNELS;
