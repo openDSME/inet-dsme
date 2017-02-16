@@ -25,6 +25,7 @@ def mean_confidence_interval(data, confidence=0.95):
 
 def main(args):
     measures = ['minPRR','meanPRR','maxDelay','meanDelay']
+    args.parameter = ['configname']+args.parameter
 
     allhosts = set()
     aggregated = {}
@@ -40,10 +41,15 @@ def main(args):
         
         repetitions.add(r.param["seedset"])
         for m in measures:
-            aggregated.setdefault(r.param["configname"],{}).setdefault(r.param[args.parameter],{}).setdefault(m,{})[r.param["seedset"]] = r.measure[m]
+            sub = aggregated
+            for param in args.parameter:
+                sub = sub.setdefault(r.param[param],{})
+            sub.setdefault(m,{})[r.param["seedset"]] = r.measure[m]
+
+    print aggregated
 
     with open(args.output+'/aggregated.csv','w') as resultfile:
-        cols = ['config',args.parameter]
+        cols = args.parameter[:]
         for m in measures:
             cols += [m, m+"_error"]
 
@@ -51,13 +57,17 @@ def main(args):
         headers = dict( (n,n) for n in cols )
         writer.writerow(headers)
 
-        for config,v in aggregated.iteritems():
-            for param in sorted(v.keys()):
-                result = { 'config': config,
-                                  args.parameter: param,
-                                  }
+        #for config,v in aggregated.iteritems():
+        stack = map(lambda (k,v): ([k],v), aggregated.iteritems())
+        #for param in sorted(v.keys()):
+        while stack:
+            keys, v = stack.pop()
+            if not v.keys()[0] in measures: # not yet deep enough
+                stack.extend(map(lambda (k,v): (keys+[k],v), v.iteritems()))
+            else:
+                result = dict(zip(args.parameter, keys))
                 for k in measures: 
-                    (m,h) = mean_confidence_interval(v[param][k].values())
+                    (m,h) = mean_confidence_interval(v[k].values())
 
                     if np.isnan(m):# TODO remove
                         m = 0
@@ -75,9 +85,9 @@ def main(args):
         perhost = {}
         for r in runs:
             for host in allhosts:
-                setname = "%s-%s-%s-"%(r.param['configname'],r.param[args.parameter],r.param['seedset'])
-                sets.add(setname+"received")
-                sets.add(setname+"lost")
+                setname = "-".join(str(r.param[p]) for p in args.parameter+['seedset'])
+                sets.add(setname+"-received")
+                sets.add(setname+"-lost")
                 if r.hosts.has_key(host):
                     received = r.hosts[host]['sinkRcvdPk:count']
                     lost = r.hosts[host]['sentPk:count']-r.hosts[host]['sinkRcvdPk:count']
@@ -85,8 +95,8 @@ def main(args):
                     received = 0
                     lost = 100
 
-                perhost.setdefault(host,{})[setname+"received"] = received
-                perhost[host][setname+"lost"] = lost
+                perhost.setdefault(host,{})[setname+"-received"] = received
+                perhost[host][setname+"-lost"] = lost
 
         cols = ['address']
         cols += sorted(sets)
@@ -103,7 +113,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p','--parameter', help="Parameter of x-Axis", default='sendInt')
+    parser.add_argument('-p','--parameter', help="Parameter of x-Axis", default=['sendInt'],nargs='*')
     parser.add_argument('output', help='Output directory')
     parser.add_argument('input', help='Input scalar files', nargs='+')
     args = parser.parse_args()
