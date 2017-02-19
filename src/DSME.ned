@@ -28,7 +28,8 @@ simple DSME extends MACProtocolBase like IMACProtocol
         int numCSMASlots = 8;
 
         int superframeOrder = default(3);			// 4 bits
-        int multiSuperframeOrder = default(5);		// 3 bits
+        //int multiSuperframeOrder = default(5);		// 3 bits
+        int multiSuperframeOrder = default(6);		// 3 bits
         int beaconOrder = default(7);				// 4 bits
 
         int finalCAPSlot = default(8);				// 4 bits

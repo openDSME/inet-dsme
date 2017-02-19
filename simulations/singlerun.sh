@@ -5,8 +5,8 @@ make || exit 1
 popd
 
 CONFIG=DSME
-RUN=3
-REP=1
+RUN=2
+REP=0
 VECTOR_RECORDING=true
 #VECTOR_RECORDING=false
 
