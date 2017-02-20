@@ -25,8 +25,8 @@ my_colors = list(islice(cycle(['b', 'r', 'y', 'k', 'g']), None, len(df)))
 
 #dta = df['optSlots'].astype(float)
 
-#df['actCap'] = df['musuDuration']/df['maxServiceTimePerQueueLength']
-df['actCap'] = df['musuDuration']/df['maServiceTimePerQueueLength']
+df['actCap'] = df['musuDuration']/df['maxServiceTimePerQueueLength']
+#df['actCap'] = df['musuDuration']/df['maServiceTimePerQueueLength']
 df['minCap'] = df[['actCap','slots']].min(axis=1)
 df = df[['optSlots','slots','minCap']]
 print df

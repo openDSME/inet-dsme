@@ -29,7 +29,7 @@ t = 0 : sampletime : sampletime*(rows(input)-1);
 dat = iddata(output, input, sampletime);
 
 %[sys, x0] = arx(dat,  'na',2, 'nb', 2, 'nk', 0);
-[sys, x0] = arx(dat,300);
+[sys, x0] = arx(dat,2);
 tf(sys);
 [y, t, x] = lsim (sys,input,t,x0);
 figure
@@ -39,3 +39,7 @@ plot(t,y,'r');
 hold on;
 plot(t,output,'g');
 hold on;
+
+figure;
+
+impulse(sys)
