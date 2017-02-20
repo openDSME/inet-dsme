@@ -28,7 +28,7 @@
 #ifndef WEBSOCKETPP_TRANSPORT_SECURITY_NONE_HPP
 #define WEBSOCKETPP_TRANSPORT_SECURITY_NONE_HPP
 
-#include <websocketpp/transport/asio/security/base.hpp>
+#include "base.hpp"
 
 #include <boost/asio.hpp>
 

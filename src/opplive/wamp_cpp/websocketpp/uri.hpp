@@ -28,8 +28,8 @@
 #ifndef WEBSOCKETPP_URI_HPP
 #define WEBSOCKETPP_URI_HPP
 
-#include <websocketpp/common/memory.hpp>
-#include <websocketpp/common/regex.hpp>
+#include "common/memory.hpp"
+#include "common/regex.hpp"
 
 #include <exception>
 #include <iostream>

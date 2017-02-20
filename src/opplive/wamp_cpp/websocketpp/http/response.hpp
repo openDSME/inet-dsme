@@ -28,7 +28,7 @@
 #ifndef HTTP_PARSER_RESPONSE_HPP
 #define HTTP_PARSER_RESPONSE_HPP
 
-#include <websocketpp/http/parser.hpp>
+#include "parser.hpp"
 
 namespace websocketpp {
 namespace http {
@@ -163,6 +163,6 @@ private:
 } // namespace http
 } // namespace websocketpp
 
-#include <websocketpp/http/impl/response.hpp>
+#include "impl/response.hpp"
 
 #endif // HTTP_PARSER_RESPONSE_HPP

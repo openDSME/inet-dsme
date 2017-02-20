@@ -28,9 +28,9 @@
 #ifndef WEBSOCKETPP_TRANSPORT_ASIO_BASE_HPP
 #define WEBSOCKETPP_TRANSPORT_ASIO_BASE_HPP
 
-#include <websocketpp/common/cpp11.hpp>
-#include <websocketpp/common/functional.hpp>
-#include <websocketpp/common/system_error.hpp>
+#include "../../common/cpp11.hpp"
+#include "../../common/functional.hpp"
+#include "../../common/system_error.hpp"
 
 #include <boost/system/error_code.hpp>
 

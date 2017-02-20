@@ -28,11 +28,11 @@
 #ifndef WEBSOCKETPP_TRANSPORT_BASE_HPP
 #define WEBSOCKETPP_TRANSPORT_BASE_HPP
 
-#include <websocketpp/common/cpp11.hpp>
-#include <websocketpp/common/connection_hdl.hpp>
-#include <websocketpp/common/functional.hpp>
-#include <websocketpp/common/system_error.hpp>
-#include <websocketpp/uri.hpp>
+#include "../../common/cpp11.hpp"
+#include "../../common/connection_hdl.hpp"
+#include "../../common/functional.hpp"
+#include "../../common/system_error.hpp"
+#include "../../uri.hpp"
 
 #include <iostream>
 

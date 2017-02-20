@@ -32,7 +32,7 @@
 #include <iostream>
 #include <map>
 
-#include <websocketpp/http/constants.hpp>
+#include "constants.hpp"
 
 namespace websocketpp {
 namespace http {
@@ -435,6 +435,6 @@ protected:
 } // namespace http
 } // namespace websocketpp
 
-#include <websocketpp/http/impl/parser.hpp>
+#include "impl/parser.hpp"
 
 #endif // HTTP_PARSER_HPP

@@ -31,7 +31,7 @@
 #include <algorithm>
 #include <sstream>
 
-#include <websocketpp/http/parser.hpp>
+#include "../parser.hpp"
 
 namespace websocketpp {
 namespace http {

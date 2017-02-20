@@ -1,7 +1,7 @@
 #ifndef WAMPSERVER_H_
 #define WAMPSERVER_H_
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
+#include "websocketpp/config/asio_no_tls.hpp"
+#include "websocketpp/server.hpp"
 
 #include <boost/bimap.hpp>
 
@@ -13,7 +13,7 @@
 #include <iostream>
 
 #include <boost/filesystem.hpp>
-#include <WAMPMessageHandler.h>
+#include "WAMPMessageHandler.h"
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;

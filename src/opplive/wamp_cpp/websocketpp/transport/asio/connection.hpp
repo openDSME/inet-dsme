@@ -28,16 +28,16 @@
 #ifndef WEBSOCKETPP_TRANSPORT_ASIO_CON_HPP
 #define WEBSOCKETPP_TRANSPORT_ASIO_CON_HPP
 
-#include <websocketpp/common/memory.hpp>
-#include <websocketpp/common/functional.hpp>
-#include <websocketpp/common/connection_hdl.hpp>
-#include <websocketpp/logger/levels.hpp>
-#include <websocketpp/http/constants.hpp>
-#include <websocketpp/transport/asio/base.hpp>
-#include <websocketpp/transport/base/connection.hpp>
+#include "../../common/memory.hpp"
+#include "../../common/functional.hpp"
+#include "../../common/connection_hdl.hpp"
+#include "../../logger/levels.hpp"
+#include "../../http/constants.hpp"
+#include "base.hpp"
+#include "../base/connection.hpp"
 
-#include <websocketpp/base64/base64.hpp>
-#include <websocketpp/error.hpp>
+#include "../../base64/base64.hpp"
+#include "../../error.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>

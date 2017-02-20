@@ -37,12 +37,12 @@
     #include <arpa/inet.h>
 #endif
 
-#include <websocketpp/processors/processor.hpp>
+#include "processor.hpp"
 
-#include <websocketpp/frame.hpp>
-#include <websocketpp/utf8_validator.hpp>
+#include "../frame.hpp"
+#include "../utf8_validator.hpp"
 
-#include <websocketpp/common/md5.hpp>
+#include "../common/md5.hpp"
 
 namespace websocketpp {
 namespace processor {

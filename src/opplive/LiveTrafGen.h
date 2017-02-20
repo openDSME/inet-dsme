@@ -66,7 +66,7 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
 
   protected:
     virtual void initialize(int stage) override;
-    virtual void scheduleNextPacket(simtime_t previous);
+    virtual void scheduleNextPacket(simtime_t previous) override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void sendPacket() override;
 

@@ -30,8 +30,8 @@
 
 #include <string>
 
-#include <websocketpp/common/cpp11.hpp>
-#include <websocketpp/common/system_error.hpp>
+#include "common/cpp11.hpp"
+#include "common/system_error.hpp"
 
 namespace websocketpp {
 

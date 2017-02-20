@@ -1,6 +1,7 @@
-#include "RPCallable.h"
 #include <thread>
-#include "Topic.h"
+
+#include "opplive/wamp_cpp/RPCallable.h"
+#include "opplive/wamp_cpp/Topic.h"
 
 class DemoServer : public RPCallable<DemoServer>
 {

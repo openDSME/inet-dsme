@@ -42,7 +42,7 @@
 #include "inet/networklayer/generic/GenericDatagram.h"
 #endif
 
-#include "../LiveTrafGen.h"
+#include "../opplive/LiveTrafGen.h"
 
 namespace inet {
 

@@ -28,11 +28,11 @@
 #ifndef WEBSOCKETPP_TRANSPORT_ASIO_HPP
 #define WEBSOCKETPP_TRANSPORT_ASIO_HPP
 
-#include <websocketpp/common/functional.hpp>
-#include <websocketpp/logger/levels.hpp>
-#include <websocketpp/transport/base/endpoint.hpp>
-#include <websocketpp/transport/asio/connection.hpp>
-#include <websocketpp/transport/asio/security/none.hpp>
+#include "../../common/functional.hpp"
+#include "../../logger/levels.hpp"
+#include "../base/endpoint.hpp"
+#include "connection.hpp"
+#include "security/none.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>

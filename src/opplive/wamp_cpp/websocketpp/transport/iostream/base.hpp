@@ -28,8 +28,8 @@
 #ifndef WEBSOCKETPP_TRANSPORT_IOSTREAM_BASE_HPP
 #define WEBSOCKETPP_TRANSPORT_IOSTREAM_BASE_HPP
 
-#include <websocketpp/common/system_error.hpp>
-#include <websocketpp/common/cpp11.hpp>
+#include "../../common/system_error.hpp"
+#include "../../common/cpp11.hpp"
 
 #include <string>
 

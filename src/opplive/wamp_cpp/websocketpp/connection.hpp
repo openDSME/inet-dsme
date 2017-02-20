@@ -28,16 +28,16 @@
 #ifndef WEBSOCKETPP_CONNECTION_HPP
 #define WEBSOCKETPP_CONNECTION_HPP
 
-#include <websocketpp/close.hpp>
-#include <websocketpp/common/connection_hdl.hpp>
-#include <websocketpp/common/cpp11.hpp>
-#include <websocketpp/common/functional.hpp>
-#include <websocketpp/error.hpp>
-#include <websocketpp/frame.hpp>
-#include <websocketpp/http/constants.hpp>
-#include <websocketpp/logger/levels.hpp>
-#include <websocketpp/processors/processor.hpp>
-#include <websocketpp/transport/base/connection.hpp>
+#include "close.hpp"
+#include "common/connection_hdl.hpp"
+#include "common/cpp11.hpp"
+#include "common/functional.hpp"
+#include "error.hpp"
+#include "frame.hpp"
+#include "http/constants.hpp"
+#include "logger/levels.hpp"
+#include "processors/processor.hpp"
+#include "transport/base/connection.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -1187,6 +1187,6 @@ private:
 
 } // namespace websocketpp
 
-#include <websocketpp/impl/connection_impl.hpp>
+#include "impl/connection_impl.hpp"
 
 #endif // WEBSOCKETPP_CONNECTION_HPP

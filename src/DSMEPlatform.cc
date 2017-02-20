@@ -11,8 +11,8 @@
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
-#include "LiveTrafGen.h"
-#include "wamp_cpp/WAMPServer.h"
+#include "opplive/LiveTrafGen.h"
+#include "opplive/wamp_cpp/WAMPServer.h"
 #include "DemoServer.h"
 
 // coverity[+kill]
@@ -253,7 +253,8 @@ void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
 }
 
 void DSMEPlatform::handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status status) {
-    DSMEFrame* macPkt = msg->decapsulateFrame();
+    DSMEMessage* dsme_msg = dynamic_cast<DSMEMessage*>(msg);
+    DSMEFrame* macPkt = dsme_msg->decapsulateFrame();
     releaseMessage(msg);
 
     if(macPkt->hasEncapsulatedPacket()) {

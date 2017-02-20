@@ -28,10 +28,10 @@
 #ifndef WEBSOCKETPP_EXTENSION_PERMESSAGE_DEFLATE_DISABLED_HPP
 #define WEBSOCKETPP_EXTENSION_PERMESSAGE_DEFLATE_DISABLED_HPP
 
-#include <websocketpp/common/cpp11.hpp>
-#include <websocketpp/common/system_error.hpp>
+#include "../../common/cpp11.hpp"
+#include "../../common/system_error.hpp"
 
-#include <websocketpp/extensions/extension.hpp>
+#include "../extension.hpp"
 
 #include <map>
 #include <string>

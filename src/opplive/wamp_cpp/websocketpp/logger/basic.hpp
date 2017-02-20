@@ -43,8 +43,8 @@
 #include <ctime>
 #include <iostream>
 
-#include <websocketpp/common/stdint.hpp>
-#include <websocketpp/logger/levels.hpp>
+#include "../common/stdint.hpp"
+#include "levels.hpp"
 
 namespace websocketpp {
 namespace log {

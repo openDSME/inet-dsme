@@ -28,14 +28,14 @@
 #ifndef WEBSOCKETPP_CONNECTION_IMPL_HPP
 #define WEBSOCKETPP_CONNECTION_IMPL_HPP
 
-#include <websocketpp/common/system_error.hpp>
+#include "../common/system_error.hpp"
 
-#include <websocketpp/processors/processor.hpp>
+#include "../processors/processor.hpp"
 
-#include <websocketpp/processors/hybi00.hpp>
-#include <websocketpp/processors/hybi07.hpp>
-#include <websocketpp/processors/hybi08.hpp>
-#include <websocketpp/processors/hybi13.hpp>
+#include "../processors/hybi00.hpp"
+#include "../processors/hybi07.hpp"
+#include "../processors/hybi08.hpp"
+#include "../processors/hybi13.hpp"
 
 namespace websocketpp {
 

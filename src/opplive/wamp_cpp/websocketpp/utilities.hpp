@@ -29,7 +29,7 @@
 #define WEBSOCKETPP_UTILITIES_HPP
 
 #include <algorithm>
-#include <websocketpp/common/stdint.hpp>
+#include "common/stdint.hpp"
 
 namespace websocketpp {
 namespace utility {
@@ -81,6 +81,6 @@ std::string to_hex(const char* input, size_t length);
 } // namespace utility
 } // namespace websocketpp
 
-#include <websocketpp/impl/utilities_impl.hpp>
+#include "impl/utilities_impl.hpp"
 
 #endif // WEBSOCKETPP_UTILITIES_HPP

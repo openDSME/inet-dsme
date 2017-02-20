@@ -30,10 +30,10 @@
 
 #include <algorithm>
 
-#include <websocketpp/common/system_error.hpp>
-#include <websocketpp/common/network.hpp>
+#include "common/system_error.hpp"
+#include "common/network.hpp"
 
-#include <websocketpp/utilities.hpp>
+#include "utilities.hpp"
 
 namespace websocketpp {
 /// Data structures and utility functions for manipulating WebSocket frames
