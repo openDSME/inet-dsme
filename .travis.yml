@@ -1,0 +1,55 @@
+#sudo: false
+sudo: required
+dist: trusty
+language: cpp
+
+python:
+  - 2.7
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.8
+    - g++-4.8
+    - libav-tools
+    - libavcodec-extra-54
+    - python-tk
+    - python-pip
+
+virtualenv:
+  system_site_packages: true
+
+before_install:
+  - git config --global user.email travis@example.com
+  - git config --global user.name travis
+  - PATH=~/.local/bin:$PATH
+  - openssl aes-256-cbc -K $encrypted_ea54299d5f4f_key -iv $encrypted_ea54299d5f4f_iv -in utils/publish_key.enc -out ~/.ssh/publish_key -d
+  - chmod u=rw,og= ~/.ssh/publish_key
+  - echo "Host github.com" >> ~/.ssh/config
+  - echo "  IdentityFile ~/.ssh/publish_key" >> ~/.ssh/config
+  - cat ~/.ssh/config
+
+install:
+  - pip install numpy
+  - pip install scipy
+  - pip install matplotlib
+  - which python
+  - python --version
+  - ./ci_python.py
+  - source ./install-dependencies.sh
+
+script:
+  - ./build.sh $INET
+  - ./ci_test.sh $INET
+  - ./ci_analyze.py -v
+  - rm results/DSME-mac.log # too large to store
+  - utils/ci_to_jekyll.py -m src/openDSME results
+
+cache:
+  directories:
+  - omnetdownload
+  - omnetpp-5.0
+  - inet
+

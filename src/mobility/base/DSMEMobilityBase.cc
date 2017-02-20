@@ -199,7 +199,7 @@ static int reflect(double min, double max, double& coordinate, double& speed)
 void DSMEMobilityBase::reflectIfOutside(Coord& targetPosition, Coord& speed, double& angle)
 {
     int sign;
-    double dummy;
+    double dummy = 0.0;
     if (lastPosition.x < constraintAreaMin.x || constraintAreaMax.x < lastPosition.x) {
         sign = reflect(constraintAreaMin.x, constraintAreaMax.x, lastPosition.x, speed.x);
         reflect(constraintAreaMin.x, constraintAreaMax.x, targetPosition.x, dummy);

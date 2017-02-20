@@ -45,9 +45,9 @@
 
 #include <stdint.h>
 
-#include "openDSME/mac_services/dataStructures/DSMEMessageElement.h"
 #include "openDSME/dsmeLayer/messages/IEEE802154eMACHeader.h"
 #include "openDSME/interfaces/IDSMEMessage.h"
+#include "openDSME/mac_services/dataStructures/DSMEMessageElement.h"
 
 #include "DSMEFrame_m.h"
 
@@ -56,6 +56,9 @@ namespace dsme {
 class DSMEPlatform;
 
 class DSMEMessage : public omnetpp::cOwnedObject, public IDSMEMessage {
+    friend class DSMEPlatform;
+    friend class DSMEMessageElement;
+
 public:
     void prependFrom(DSMEMessageElement* msg) override;
 
@@ -68,26 +71,22 @@ public:
     }
 
     bool hasPayload() override {
-        return (frame->getData().size() > 0 ) || (frame->hasEncapsulatedPacket() && frame->getEncapsulatedPacket()->getByteLength() > 0);
+        return (frame->getData().size() > 0) || (frame->hasEncapsulatedPacket() && frame->getEncapsulatedPacket()->getByteLength() > 0);
     }
 
     uint16_t getTotalSymbols() override {
-        uint16_t bytes = macHdr.getSerializationLength()
-                                   + frame->getData().size()
-                                   + 4  // Preamble
-                                   + 1  // SFD
-                                   + 1  // PHY Header
-                                   + 2; // FCS
+        uint16_t bytes = macHdr.getSerializationLength() + frame->getData().size() + 4 // Preamble
+                         + 1                                                           // SFD
+                         + 1                                                           // PHY Header
+                         + 2;                                                          // FCS
 
         if(frame->hasEncapsulatedPacket()) {
             bytes += frame->getEncapsulatedPacket()->getByteLength();
         }
 
-        return bytes*2; // 4 bit per symbol
+        return bytes * 2; // 4 bit per symbol
     }
 
-
-    // gives the symbol counter at the end of the SFD
     uint32_t getStartOfFrameDelimiterSymbolCounter() override {
         return startOfFrameDelimiterSymbolCounter;
     }
@@ -96,42 +95,67 @@ public:
         return startOfFrameDelimiterSymbolCounter + 2 * (this->getHeader().getSerializationLength() + frame->getData().size()) + 2; // 2 Symbols for PHY header
     }
 
-
     IEEE802154eMACHeader& getHeader() override {
         return macHdr;
     }
 
-    bool receivedViaMCPS; // TODO better handling?
-    bool firstTry;
-    bool currentlySending;
+    void setLQI(uint8_t lqi) {
+        this->lqi = lqi;
+    }
+
+    uint8_t getLQI() override {
+        return lqi;
+    }
+
+    bool getReceivedViaMCPS() override {
+        return this->receivedViaMCPS;
+    }
+
+    void setReceivedViaMCPS(bool receivedViaMCPS) override {
+        this->receivedViaMCPS = receivedViaMCPS;
+    }
+
+    bool getCurrentlySending() override {
+        return this->currentlySending;
+    }
+
+    void setCurrentlySending(bool currentlySending) override {
+        this->currentlySending = currentlySending;
+    }
+
+    void increaseRetryCounter() override {
+        retries++;
+    }
+
+    uint8_t getRetryCounter() override {
+        return retries;
+    }
 
 private:
-    // TODO
-    //    uint16_t bits;
+    bool receivedViaMCPS{false}; // TODO better handling?
+    bool firstTry{false};
+    bool currentlySending{false};
+
     IEEE802154eMACHeader macHdr;
 
     DSMEFrame* frame;
 
-    DSMEMessage() :
-            currentlySending(false),
-            frame(new DSMEFrame()) {
+    uint8_t lqi{0};
+    uint8_t retries{0};
+
+    DSMEMessage() : frame(new DSMEFrame()) {
     }
 
-    DSMEMessage(DSMEFrame* frame) :
-            currentlySending(false),
-            frame(frame) {
+    DSMEMessage(DSMEFrame* frame) : frame(frame) {
     }
 
     ~DSMEMessage() {
-        if (frame != nullptr) {
+        if(frame != nullptr) {
             delete frame;
         }
     }
 
-    uint32_t startOfFrameDelimiterSymbolCounter;
-
-    friend class DSMEPlatform;
-    friend class DSMEMessageElement;
+    uint32_t startOfFrameDelimiterSymbolCounter{0};
 
     DSMEFrame* getSendableCopy();
 
@@ -141,7 +165,6 @@ private:
         return f;
     }
 };
-
 }
 
 #endif

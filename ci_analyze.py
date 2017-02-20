@@ -4,6 +4,7 @@ import textwrap
 import subprocess
 import datetime
 import argparse
+import glob
 
 def printcmd(args,shell):
     print "$",
@@ -38,7 +39,7 @@ def main(args):
 
     resultdir = '/inet-dsme/results/'+vals['date']+'-'+vals['sanitized_commit']
 
-    call(['utils/analyze.py','results'])
+    call(['utils/analyze.py','results']+glob.glob('results/*.sca'))
 
     index = textwrap.dedent("""\
         ---

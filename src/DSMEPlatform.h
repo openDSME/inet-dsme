@@ -46,13 +46,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "omnetpp.h"
 #include "inet/linklayer/base/MACProtocolBase.h"
 #include "inet/linklayer/contract/IMACProtocol.h"
 #include "inet/physicallayer/contract/packetlevel/IRadio.h"
+#include "omnetpp.h"
 
 #include "DSMEFrame_m.h"
 #include "DSMEMessage.h"
+#include "dsme_settings.h"
 #include "openDSME/dsmeAdaptionLayer/DSMEAdaptionLayer.h"
 #include "openDSME/helper/DSMEDelegate.h"
 #include "openDSME/interfaces/IDSMEPlatform.h"
@@ -61,11 +62,9 @@
 #include "openDSME/mac_services/mlme_sap/MLME_SAP.h"
 #include "openDSME/mac_services/pib/MAC_PIB.h"
 #include "openDSME/mac_services/pib/PHY_PIB.h"
-#include "dsme_settings.h"
 
 namespace dsme {
 
-struct DSMESettings;
 class DSMELayer;
 class DSMEAdaptionLayer;
 
@@ -74,7 +73,7 @@ class DSMEPlatform : public inet::MACProtocolBase, public inet::IMACProtocol, pu
     using omnetpp::cSimpleModule::send;
 
 public:
-    typedef Delegate<void(DSMEMessage* msg)> receive_delegate_t;
+    typedef Delegate<void(IDSMEMessage* msg)> receive_delegate_t;
 
     DSMEPlatform();
     virtual ~DSMEPlatform();
@@ -86,18 +85,18 @@ public:
     virtual void finish() override;
 
     /** @brief Handle messages from lower layer */
-    virtual void handleLowerPacket(cPacket *) override;
+    virtual void handleLowerPacket(cPacket*) override;
 
     /** @brief Handle messages from upper layer */
-    virtual void handleUpperPacket(cPacket *) override;
+    virtual void handleUpperPacket(cPacket*) override;
 
     /** @brief Handle self messages such as timers */
-    virtual void handleSelfMessage(cMessage *) override;
+    virtual void handleSelfMessage(cMessage*) override;
 
     /** @brief Handle control messages from lower layer */
-    virtual void receiveSignal(cComponent *source, simsignal_t signalID, long value DETAILS_ARG) override;
+    virtual void receiveSignal(cComponent* source, simsignal_t signalID, long value DETAILS_ARG) override;
 
-    inet::InterfaceEntry *createInterfaceEntry() override;
+    inet::InterfaceEntry* createInterfaceEntry() override;
 
     /* IDSMEPlatform */
 
@@ -106,14 +105,18 @@ public:
      * but keep the message (the caller has to ensure that the message is eventually released)
      * This might lead to an additional memory copy in the platform
      */
-    bool sendCopyNow(DSMEMessage *msg, Delegate<void(bool)> txEndCallback) override;
+    bool prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> txEndCallback) override;
+
+    bool sendNow() override;
+
+    void abortPreparedTransmission() override;
 
     /**
      * Send an ACK message, delay until aTurnaRoundTime after reception_time has expired
      */
-    bool sendDelayedAck(DSMEMessage *ackMsg, DSMEMessage *receivedMsg, Delegate<void(bool)> txEndCallback) override;
+    bool sendDelayedAck(IDSMEMessage* ackMsg, IDSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) override;
 
-    void handleReceivedMessageFromAckLayer(DSMEMessage* message) override;
+    void handleReceivedMessageFromAckLayer(IDSMEMessage* message) override;
 
     bool isReceptionFromAckLayerPossible() override;
 
@@ -123,20 +126,22 @@ public:
 
     bool startCCA() override {
         channelInactive = true;
-        scheduleAt(simTime() + 8*symbolDuration, ccaTimer);
+        scheduleAt(simTime() + 8 * symbolDuration, ccaTimer);
         return true;
     }
 
     void startTimer(uint32_t symbolCounterValue) override {
-        SimTime time = symbolCounterValue*symbolDuration;
+        SimTime time = symbolCounterValue * symbolDuration;
         if(timer->isScheduled()) {
             cancelEvent(timer);
         }
-        scheduleAt(time, timer);
+        if(simTime() <= time) {
+            scheduleAt(time, timer);
+        }
     }
 
     uint32_t getSymbolCounter() override {
-        return simTime()/symbolDuration;
+        return simTime() / symbolDuration;
     }
 
     bool setChannelNumber(uint8_t k) override;
@@ -144,16 +149,19 @@ public:
     // TODO handle error case
     DSMEMessage* getEmptyMessage() override;
 
-    void releaseMessage(DSMEMessage* msg) override;
+    void releaseMessage(IDSMEMessage* msg) override;
 
     virtual void scheduleStartOfCFP() override;
+
+    virtual uint8_t getMinCoordinatorLQI() override {
+        return 150; // corresponds roughly to 20% PER
+    }
 
 private:
     DSMEMessage* getLoadedMessage(DSMEFrame* frame);
 
-    void handleIndicationFromMCPS(DSMEMessage* msg);
-
-    void handleConfirmFromMCPS(DSMEMessage* msg, DataStatus::Data_Status status);
+    void handleIndicationFromMCPS(IDSMEMessage* msg);
+    void handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status status);
 
     bool send(DSMEFrame* frame);
 
@@ -196,7 +204,6 @@ private:
     Delegate<void(bool)> txEndCallback;
 
 public:
-
     static void setSeed(uint16_t seed) {
         srand(seed);
     }
@@ -211,11 +218,10 @@ public:
 
 private:
     DSMEFrame* pendingTxFrame;
-
-    DSMESettings* settings;
+    bool pendingSendRequest;
 
     /** @brief The radio. */
-    inet::physicallayer::IRadio *radio;
+    inet::physicallayer::IRadio* radio;
     inet::physicallayer::IRadio::TransmissionState transmissionState;
 
     /** @brief the bit rate at which we transmit */
@@ -223,8 +229,8 @@ private:
 
     inet::MACAddress addr;
 
-    void printSequenceChartInfo(DSMEMessage* msg);
-    void printDSMEManagement(uint8_t management, DSMESABSpecification& sabSpec, CommandFrameIdentifier cmd);
+    std::string getSequenceChartInfo(IDSMEMessage* msg, bool outgoing);
+    std::string getDSMEManagement(uint8_t management, DSMESABSpecification& sabSpec, CommandFrameIdentifier cmd);
 
     bool channelInactive;
 
@@ -236,7 +242,6 @@ private:
      */
     DSMEPlatform& operator=(const DSMEPlatform&);
 };
-
 }
 
 #endif

@@ -36,8 +36,7 @@ protected:
     virtual void handleSelfMessage(cMessage *message) override;
 
 public:
-    DSMEStationaryMobility() {
-    }
+    DSMEStationaryMobility() = default;
 
     DSMEStationaryMobility(Coord position) {
         lastPosition = position;

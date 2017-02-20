@@ -12,9 +12,6 @@ def floatifpossible(val):
 class Run():
     def __init__(self):
         self.param = {}
-        self.param['sendInt'] = None
-        self.param['configname'] = None
-        self.param['seedset'] = None
         self.measure = {}
         self.hosts = {}
         self.host_patterns = [("trafficgen","sentPk:count"),
@@ -23,16 +20,19 @@ class Run():
                               ("trafficgen","sinkRcvdPkDelay:mean")]
 
     def load(self, file):
-        exps = map(lambda p: (p, re.compile("attr "+p+"(.*)")), self.param.keys())
-        host_exps = map(lambda p: (p[1], re.compile("scalar .*\.host\[([0-9]*)\]\.wrappedHost\."+p[0]+".*"+p[1]+"(.*)")), self.host_patterns)
-
         with open(file) as f:
+            # Read header
+            attr_exp = re.compile("attr ([^ ]*) (.*)")
             for line in f:
-                for (p, exp) in exps:
-                    m = exp.match(line)
-                    if m:
-                        self.param[p] = floatifpossible(m.group(1))
+                if len(line.strip()) == 0:
+                    break
+                m = attr_exp.match(line)
+                if m:
+                     self.param[m.group(1)] = floatifpossible(m.group(2))
 
+            # Read body
+            host_exps = map(lambda p: (p[1], re.compile("scalar .*\.host\[([0-9]*)\]\.wrappedHost\."+p[0]+".*"+p[1]+"(.*)")), self.host_patterns)
+            for line in f:
                 for (name, exp) in host_exps:
                     m = exp.match(line)
                     if m:
