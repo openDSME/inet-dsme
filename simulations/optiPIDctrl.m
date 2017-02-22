@@ -18,7 +18,8 @@ function C = optiPIDctrl (Kp, Ti, Td)
   Ki = Kp/Ti;
   Kd = Kp*Td;
   
-  C = pid(Kp,Ki,Kd,2);
+  %C = pid(Kp,Ki,Kd,2);
+  C = pid(Kp,Ki); %,Kd,2);
   
   C = c2d(C,dt);
   

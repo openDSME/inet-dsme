@@ -6,7 +6,6 @@ from pandas.tools.plotting import scatter_matrix
 import numpy as np
 from scipy.optimize import curve_fit
 import random
-from queue import *
 
 from itertools import cycle, islice
 
@@ -15,7 +14,7 @@ df = pd.read_csv('test.log')
 #df = df[df['to'] == 2]
 df = df[df['from'] == 2]
 df = df[df['to'] == 1]
-df = df[df.index > 500]
+#df = df[df.index > 10000]
 
 #df = df[df['slots'] > 0]
 #df["expOut"] = df['musuDuration']/df['slots']
@@ -33,7 +32,11 @@ df = df[df.index > 500]
 #df = df[['maExpectedServiceTime','expectedServiceTime','exp','maServiceTime','avgServiceTime']]
 #df = df[['maExpectedServiceTime','maServiceTime','avgServiceTime']]
 df['myStSlots'] = df['queue']*df['musuDuration']/df['avgServiceTime']
-df2 = df[['slots','optSlots','stSlots','myStSlots','finOptSlots']]
+#df2 = df[['slots','optSlots','stSlots','myStSlots','finOptSlots']]
+#df2 = df[['slots','optSlots','queue','predictedCapacity','maIn']]
+#df2 = df[['slots','optSlots']]
+#df2 = df[['optSlots','predictedCapacity']]
+df2 = df[['queue','queue']]
 
 print df
 

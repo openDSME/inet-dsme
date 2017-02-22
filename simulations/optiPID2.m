@@ -189,7 +189,10 @@ output = InputData(:,2);
 sampletime = 1;
 t = 0 : sampletime : sampletime*(rows(input)-1);
 dat = iddata(output, input, sampletime);
-[P, x0] = arx(dat,4);
+%[P, x0] = arx(dat,3);
+z = tf('z',sampletime)
+p = 0.1
+P = 0.7*(p/(z-(1-p)))
 
 
 % Relative Weighting Factors: PLAY AROUND WITH THESE!
@@ -295,11 +298,13 @@ for i = 1:length(t)
 end
 
 figure
-%plot(t,input,'b');
-%hold on;
-%plot(t,y1,'g');
-%hold on;
-plot(t,yy,'b');
+plot(t,input,'b');
 hold on;
-plot(t,y2,'k');
+plot(t,y1,'k');
 hold on;
+plot(t,output,'g');
+hold on;
+%plot(t,yy,'b');
+%hold on;
+%plot(t,y2,'k');
+%hold on;

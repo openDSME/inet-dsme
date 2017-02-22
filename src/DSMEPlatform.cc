@@ -123,6 +123,9 @@ void DSMEPlatform::initialize(int stage) {
         scanChannels.add(par("commonChannel"));
         this->dsmeAdaptionLayer.initialize(scanChannels);
 
+        this->dsmeAdaptionLayer.settings.Kp = par("Kp");
+        this->dsmeAdaptionLayer.settings.Ki = par("Ki");
+
         /* Initialize Address */
         IEEE802154MacAddress address;
         const char* addrstr = par("address");
