@@ -6,10 +6,11 @@ from pandas.tools.plotting import scatter_matrix
 import numpy as np
 from scipy.optimize import curve_fit
 import random
+import sys
 
 from itertools import cycle, islice
 
-df = pd.read_csv('test.log')
+df = pd.read_csv(sys.argv[1])
 #df = df[df['from'] == 8]
 #df = df[df['to'] == 2]
 df = df[df['from'] == 2]
@@ -35,10 +36,10 @@ df['myStSlots'] = df['queue']*df['musuDuration']/df['avgServiceTime']
 #df2 = df[['slots','optSlots','stSlots','myStSlots','finOptSlots']]
 #df2 = df[['slots','optSlots','queue','predictedCapacity','maIn']]
 #df2 = df[['slots','optSlots']]
-#df2 = df[['optSlots','predictedCapacity']]
-df2 = df[['queue','queue']]
+df2 = df[['optSlots','requiredCapacity','predictedCapacity','Ipart']]
+#df2 = df[['queue','queue']]
 
-print df
+df2 = df2.set_index([range(0,len(df2))])
 
 my_colors = list(islice(cycle(['b', 'r', 'y', 'k', 'g']), None, len(df)))
 
