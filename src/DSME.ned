@@ -28,8 +28,8 @@ simple DSME extends MACProtocolBase like IMACProtocol
         int numCSMASlots = 8;
 
         int superframeOrder = default(3);			// 4 bits
-        //int multiSuperframeOrder = default(5);		// 3 bits
-        int multiSuperframeOrder = default(6);		// 3 bits
+        int multiSuperframeOrder = default(5);		// 3 bits
+        //int multiSuperframeOrder = default(6);		// 3 bits
         int beaconOrder = default(7);				// 4 bits
 
         int finalCAPSlot = default(8);				// 4 bits
@@ -71,8 +71,10 @@ simple DSME extends MACProtocolBase like IMACProtocol
         // 802.15.4-2006, page 164
         int macMaxFrameRetries = default(3);
         
-        double Kp = default(0.85);
-        double Ki = default(0.45);
+        //double Kp = default(0.85);
+        //double Ki = default(0.45);
+        double Kp = default(0);
+        double Ki = default(-1.15);
         
         @signal[unicastDataSentDown](type=cPacket);
         @signal[broadcastDataSentDown](type=cPacket);
