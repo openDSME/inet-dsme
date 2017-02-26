@@ -73,8 +73,9 @@ simple DSME extends MACProtocolBase like IMACProtocol
         
         //double Kp = default(0.85);
         //double Ki = default(0.45);
-        double Kp = default(0);
-        double Ki = default(-1.15);
+        double Kp = default(1.0);
+        //double Ki = default(-0.15);
+        double Ki = default(-0.05);
         
         @signal[unicastDataSentDown](type=cPacket);
         @signal[broadcastDataSentDown](type=cPacket);
