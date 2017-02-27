@@ -35,9 +35,11 @@ df = df[df['to'] == 1]
 df['myStSlots'] = df['queue']*df['musuDuration']/df['avgServiceTime']
 #df2 = df[['slots','optSlots','stSlots','myStSlots','finOptSlots']]
 #df2 = df[['slots','optSlots','queue','predictedCapacity','maIn']]
-#df2 = df[['slots','optSlots']]
-df2 = df[['optSlots','requiredCapacity','predictedCapacity','Ipart']]
+df2 = df[['slots','optSlots']]
+#df2 = df[['optSlots','requiredCapacity','predictedCapacity','Ipart']]
 #df2 = df[['queue','queue']]
+
+print df2
 
 df2 = df2.set_index([range(0,len(df2))])
 
