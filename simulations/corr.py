@@ -31,15 +31,20 @@ def find_rho_Pbs(K,PRR,s):
     res = optimize.minimize(Pbs, 0.9)
     return res['x'][0]
 
-K = 20
-PRR = 0.99
-print find_rho_Pb(K,PRR)
+PRR = 0.999
+K = 22
+for i in range(1,10):
+    print K/i, find_rho_Pb(K/i,PRR)
 
 sd = []
 rd = []
-for i in range(1,200):
+for i in range(2,200):
+#for i in range(2,20):
     s = i/100.0
     sd.append(s)
+    #K = i
+    #s = 1
+    #sd.append(K)
     rd.append(find_rho_Pbs(K,PRR,s))
 
 z = np.polyfit(sd,rd,3)
