@@ -15,7 +15,8 @@ df = pd.read_csv(sys.argv[1])
 #df = df[df['to'] == 2]
 df = df[df['from'] == 2]
 df = df[df['to'] == 1]
-#df = df[df.index > 10000]
+df = df[df.index > 40000]
+df = df[df.index < 60000]
 
 #df = df[df['slots'] > 0]
 #df["expOut"] = df['musuDuration']/df['slots']
@@ -35,8 +36,10 @@ df = df[df['to'] == 1]
 df['myStSlots'] = df['queue']*df['musuDuration']/df['avgServiceTime']
 #df2 = df[['slots','optSlots','stSlots','myStSlots','finOptSlots']]
 #df2 = df[['slots','optSlots','queue','predictedCapacity','maIn']]
-df2 = df[['slots','optSlots']]
+#df2 = df[['slots','optSlots']]
 #df2 = df[['optSlots','requiredCapacity','predictedCapacity','Ipart']]
+#df2 = df[['optSlots','requiredCapacity','predictedCapacity','c']]
+df2 = df[['requiredCapacity','predictedCapacity','queue','c','newError']]
 #df2 = df[['queue','queue']]
 
 print df2

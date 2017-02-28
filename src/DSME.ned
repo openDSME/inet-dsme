@@ -71,11 +71,12 @@ simple DSME extends MACProtocolBase like IMACProtocol
         // 802.15.4-2006, page 164
         int macMaxFrameRetries = default(3);
         
-        double Kp = default(0.1);
-        double Ki = default(0.25);
+        //double Kp = default(0.1);
+        //double Ki = default(0.25);
         //double Kp = default(0.85);
         //double Ki = default(0.45);
-        //double Kp = default(1.0);
+        double Kp = default(1.0);
+        double Ki = default(-0.25);
         //double Ki = default(-0.15);
         //double Ki = default(-0.05);
         
