@@ -10,11 +10,11 @@ import inet.linklayer.contract.IMACProtocol;
 simple DSME extends MACProtocolBase like IMACProtocol
 {
     parameters:
-        int flipNode;
-        int flipLink;
-        int flipTime;
-        int flipOption;
-        int evaluationTime;
+        int flipNode = default(0);
+        int flipLink = default(0);
+        int flipTime = default(10000);
+        int flipOption = default(0);
+        int evaluationTime = default(0);
 
         string address = default("auto"); // MAC address as hex string (12 hex digits), or
                                           // "auto". "auto" values will be replaced by
