@@ -237,7 +237,6 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
         dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
         LOG_DEBUG("Missed frame " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
-        emit(corruptedFrameReceived, macPkt);
 
         releaseMessage(dsmemsg);
         return;
@@ -446,7 +445,6 @@ void DSMEPlatform::abortPreparedTransmission() {
 
 bool DSMEPlatform::sendDelayedAck(IDSMEMessage* ackMsg, IDSMEMessage* receivedMsg, Delegate<void(bool)> txEndCallback) {
     DSME_ASSERT(this->transceiverIsOn);
-
     DSMEMessage* dsmeAckMsg = dynamic_cast<DSMEMessage*>(ackMsg);
     DSME_ASSERT(dsmeAckMsg != nullptr);
 
