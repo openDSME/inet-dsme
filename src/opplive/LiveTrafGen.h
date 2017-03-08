@@ -41,12 +41,13 @@ enum PacketResult {
 /**
  * IP traffic generator application for live results
  */
-class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
+class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>, public cVisitor
 {
   protected:
     simtime_t intermediatePRRInterval;
     double intermediatePRRAlpha;
 
+    static simsignal_t intermediatePowerMeasurement;
     static simsignal_t intermediatePRRSignal;
     static simsignal_t nodeDroppedPk;
 
@@ -73,6 +74,8 @@ class INET_API LiveTrafGen : public PRRTrafGen,  public RPCallable<LiveTrafGen>
     virtual void receiveSignal(cComponent *prev, simsignal_t t, cObject *obj DETAILS_ARG) override;
 
     void messageDeliveredOrDropped(cPacket* pkt, PacketResult result);
+
+    virtual void visit(cObject *obj) override;
 
   public:
     LiveTrafGen();

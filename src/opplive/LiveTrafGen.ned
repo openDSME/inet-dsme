@@ -31,6 +31,8 @@ simple LiveTrafGen extends PRRTrafGen
         
         @signal[intermediatePRR](type=string);
         @signal[nodeDroppedPk](type=string);
+        @signal[intermediatePowerMeasurement](type=string);
+
         @class(inet::LiveTrafGen);
 }
 

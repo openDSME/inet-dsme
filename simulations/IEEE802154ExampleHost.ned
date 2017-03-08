@@ -48,6 +48,7 @@ module IEEE802154ExampleHost extends WirelessHost
         
         @statistic[intermediatePRR](title="intermediate PRR"; source=intermediatePRR; record=traffic_live; interpolationmode=none);
         @statistic[nodeDroppedPk](title="dropped Packet"; source=nodeDroppedPk; record=dropped_live; interpolationmode=none);
+        @statistic[intermediatePowerMeasurement](title="intermediate Power"; source=intermediatePowerMeasurement; record=power_live; interpolationmode=none);
 
         *.gnp.procDelay = default(2ms);
 

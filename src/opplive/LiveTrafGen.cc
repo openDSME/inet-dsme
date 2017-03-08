@@ -22,6 +22,7 @@
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/contract/IL3AddressType.h"
 #include "inet/networklayer/contract/INetworkProtocolControlInfo.h"
+#include "inet/power/storage/IdealEnergyStorage.h"
 
 #include "inet/linklayer/base/MACFrameBase_m.h"
 #include "wamp_cpp/EventManager.h"
@@ -32,6 +33,7 @@ namespace inet {
 
 Define_Module(LiveTrafGen);
 
+simsignal_t LiveTrafGen::intermediatePowerMeasurement = registerSignal("intermediatePowerMeasurement");
 simsignal_t LiveTrafGen::intermediatePRRSignal = registerSignal("intermediatePRR");
 simsignal_t LiveTrafGen::nodeDroppedPk = registerSignal("nodeDroppedPk");
 
@@ -42,6 +44,9 @@ cMessage *LiveTrafGen::intermediatePRRTimer = 0;
 
 std::vector<std::vector<std::array<unsigned int,PACKET_RESULT_LENGTH>>> LiveTrafGen::droppedHistory;
 unsigned int LiveTrafGen::history_index = 0;
+
+inet::power::J currentPowerValue{0};
+inet::power::J lastPowerValue{0};
 
 LiveTrafGen::LiveTrafGen()
 {
@@ -140,6 +145,23 @@ void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr, PacketResu
     droppedHistory[history_index][index][result]++;
 }
 
+void LiveTrafGen::visit(cObject *obj) {
+    if(std::string(obj->getName()) == std::string("host")) {
+        cModule* module = dynamic_cast<cModule*>(obj);
+
+        if(module != nullptr) {
+            cModule* wrapped = module->getSubmodule("wrappedHost");
+            if(wrapped != nullptr) {
+                cModule* energy = wrapped->getSubmodule("energyStorage");
+                if(energy != nullptr) {
+                    inet::power::IdealEnergyStorage* storage = dynamic_cast<inet::power::IdealEnergyStorage*>(energy);
+                    currentPowerValue += storage->getEnergyBalance();
+                }
+            }
+        }
+    }
+}
+
 void LiveTrafGen::handleMessage(cMessage *msg)
 {
     if(msg == intermediatePRRTimer) {
@@ -151,6 +173,20 @@ void LiveTrafGen::handleMessage(cMessage *msg)
             EventManager::getInstance().publish("http://opendsme.org/events/initialized",1);
         }
         startingCountdown--;
+
+        cSimulation* activeSimulation = getSimulation()->getActiveSimulation();
+        cModule* net = activeSimulation->getSystemModule();
+        net->forEachChild(this);
+
+        inet::power::J delta = lastPowerValue - currentPowerValue;
+        lastPowerValue = currentPowerValue;
+        currentPowerValue = inet::power::J{0};
+
+        std::stringstream powerstream;
+        powerstream << simTime().dbl();
+        powerstream << "," << delta.get();
+        std::cout << powerstream.str() << std::endl;
+        emit(intermediatePowerMeasurement, powerstream.str().c_str());
 
         //cnt++;
         //double val = sentCurrentInterval;

@@ -20,23 +20,27 @@
 #include <sstream>
 
 namespace inet {
-
 class TrafficLifeRecorder : public LiveRecorder {
 public:
     TrafficLifeRecorder() : LiveRecorder("http://opendsme.org/events/1"){
-
     }
 };
 
 class DroppedLifeRecorder : public LiveRecorder {
 public:
     DroppedLifeRecorder() : LiveRecorder("http://opendsme.org/events/2"){
+    }
+};
 
+class PowerLifeRecorder : public LiveRecorder {
+public:
+    PowerLifeRecorder() : LiveRecorder("http://opendsme.org/events/3"){
     }
 };
 
 Register_ResultRecorder("traffic_live", TrafficLifeRecorder);
 Register_ResultRecorder("dropped_live", DroppedLifeRecorder);
+Register_ResultRecorder("power_live", PowerLifeRecorder);
 
 WAMPServer* LiveRecorder::server = nullptr;
 
