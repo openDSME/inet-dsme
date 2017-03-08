@@ -599,8 +599,61 @@ void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
     sendUp(packet);
 }
 
-void DSMEPlatform::handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status status) {
+void DSMEPlatform::handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status dataStatus) {
+    DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
+
+    DSMEFrame* macPkt = dsmeMsg->decapsulateFrame();
     releaseMessage(msg);
+
+    if(macPkt->hasEncapsulatedPacket()) {
+        cPacket *netPkt = macPkt->decapsulate();
+
+        if(netPkt->hasEncapsulatedPacket()) {
+            cPacket *appPkt = netPkt->decapsulate();
+            LiveTrafGen* trafGen = dynamic_cast<LiveTrafGen*>(appPkt->getSenderModule());
+            if(trafGen != nullptr) {
+
+                PacketResult result;
+                switch(dataStatus) {
+                case DataStatus::Data_Status::SUCCESS:
+                    result = PacketResult::DELIVERED;
+                    break;
+                case DataStatus::Data_Status::TRANSACTION_OVERFLOW:
+                    result = PacketResult::QUEUE_FULL;
+                    break;
+                case DataStatus::Data_Status::CHANNEL_ACCESS_FAILURE:
+                    result = PacketResult::CHANNEL_BUSY;
+                    break;
+                case DataStatus::Data_Status::INVALID_GTS:
+                    result = PacketResult::NO_GTS;
+                    break;
+                case DataStatus::Data_Status::NO_ACK:
+                    result = PacketResult::NO_ACK;
+                    break;
+                case DataStatus::Data_Status::TRANSACTION_EXPIRED:
+                case DataStatus::Data_Status::INVALID_ADDRESS:
+                case DataStatus::Data_Status::COUNTER_ERROR:
+                case DataStatus::Data_Status::FRAME_TOO_LONG:
+                case DataStatus::Data_Status::UNAVAILABLE_KEY:
+                case DataStatus::Data_Status::UNSUPPORTED_SECURITY:
+                case DataStatus::Data_Status::INVALID_PARAMETER:
+                case DataStatus::Data_Status::ACK_RCVD_NODSN_NOSA:
+                default:
+                    ASSERT(false);
+                }
+
+                if(dataStatus != DataStatus::Data_Status::SUCCESS) {
+                    trafGen->handleDroppedPacket(appPkt, this->mac_pib.macShortAddress, result);
+                }
+            }
+
+            delete appPkt;
+        }
+
+        delete netPkt;
+    }
+
+    delete macPkt;
 }
 
 void DSMEPlatform::signalNewMsg(DSMEMessage* msg) {
