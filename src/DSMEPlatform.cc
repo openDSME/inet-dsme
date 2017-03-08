@@ -7,6 +7,7 @@
 #include "inet/common/FindModule.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
 #include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
+#include "inet/physicallayer/contract/packetlevel/IRadio.h"
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
@@ -481,10 +482,12 @@ bool DSMEPlatform::startCCA() {
 
 void DSMEPlatform::turnTransceiverOn() {
     this->transceiverIsOn = true;
+    this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
 }
 
 void DSMEPlatform::turnTransceiverOff(){
     this->transceiverIsOn = false;
+    this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_OFF);
 }
 
 /****** IDSMEPlatform ******/
