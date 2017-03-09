@@ -176,6 +176,8 @@ void DSMEPlatform::initialize(int stage) {
             this->mac_pib.macPANId = par("macPANId");
         }
 
+        this->mac_pib.macCapReduction = par("macCapReduction");
+
         this->mac_pib.macAssociatedPANCoord = par("isPANCoordinator");
         this->mac_pib.macBeaconOrder = par("beaconOrder");
         this->mac_pib.macSuperframeOrder = par("superframeOrder");
