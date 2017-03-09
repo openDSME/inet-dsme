@@ -640,7 +640,8 @@ void DSMEPlatform::handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Sta
                 case DataStatus::Data_Status::INVALID_PARAMETER:
                 case DataStatus::Data_Status::ACK_RCVD_NODSN_NOSA:
                 default:
-                    ASSERT(false);
+                    std::cout << palId_id() << ": Unsupportet Status: " << dataStatus << std::endl;
+                    result = PacketResult::QUEUE_FULL;
                 }
 
                 if(dataStatus != DataStatus::Data_Status::SUCCESS) {
