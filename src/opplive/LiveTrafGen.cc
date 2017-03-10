@@ -137,7 +137,12 @@ void LiveTrafGen::handleDroppedPacket(cPacket *msg, uint16_t srcAddr, PacketResu
     messageDeliveredOrDropped(msg,result);
     ASSERT(srcAddr > 0);
 
-    unsigned int index = srcAddr - 1;
+    unsigned int index;
+    if(srcAddr == 0xFFFE || srcAddr == 0xFFFF) {
+        index = 0;
+    } else {
+        index = srcAddr - 1;
+    }
 
     if(droppedHistory[history_index].size() <= index) {
         droppedHistory[history_index].resize(index + 1);
@@ -213,25 +218,23 @@ void LiveTrafGen::handleMessage(cMessage *msg)
 
 
         unsigned int maxSize = 0;
-        for(auto& vec : droppedHistory) {
-            if(vec.size() > maxSize) {
-                maxSize = vec.size();
+        for(auto& nodes_vec : droppedHistory) {
+            if(nodes_vec.size() > maxSize) {
+                maxSize = nodes_vec.size();
             }
         }
 
         std::vector<std::array<unsigned int,PACKET_RESULT_LENGTH>> droppedLastInterval;
         droppedLastInterval.resize(maxSize);
 
-        for(auto& vec : droppedHistory) {
-            for(unsigned int i = 0; i < vec.size(); i++) {
-                for(unsigned int j = 0; j < PACKET_RESULT_LENGTH; j++) {
-                    droppedLastInterval[i][j] += vec[i][j];
+        for(auto& nodes_vec : droppedHistory) {
+            for(unsigned int node_id = 0; node_id < nodes_vec.size(); node_id++) {
+                for(unsigned int packet_result_id = 0; packet_result_id < PACKET_RESULT_LENGTH; packet_result_id++) {
+                    droppedLastInterval[node_id][packet_result_id] += nodes_vec[node_id][packet_result_id];
                 }
             }
         }
 
-        std::stringstream droppedStream;
-        Json::FastWriter writer;
         Json::Value results(Json::arrayValue);
         for(auto& node : droppedLastInterval) {
             Json::Value noderesults(Json::arrayValue);
@@ -242,6 +245,8 @@ void LiveTrafGen::handleMessage(cMessage *msg)
             results.append(noderesults);
         }
 
+        Json::FastWriter writer;
+        std::stringstream droppedStream;
         droppedStream << writer.write(results);
         emit(nodeDroppedPk, droppedStream.str().c_str());
 
