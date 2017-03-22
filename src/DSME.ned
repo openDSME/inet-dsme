@@ -14,7 +14,7 @@ simple DSME extends MACProtocolBase like IMACProtocol
         int flipLink = default(0);
         int flipTime = default(10000);
         int flipOption = default(0);
-        int evaluationTime = default(0);
+        int evaluationDuration = default(0);
 
         string address = default("auto"); // MAC address as hex string (12 hex digits), or
                                           // "auto". "auto" values will be replaced by
