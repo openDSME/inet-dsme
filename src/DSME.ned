@@ -12,7 +12,7 @@ simple DSME extends MACProtocolBase like IMACProtocol
     parameters:
         int flipNode = default(0);
         int flipLink = default(0);
-        int flipTime = default(10000);
+        int flipTime = default(-1);
         int flipOption = default(0);
         int evaluationDuration = default(0);
 
