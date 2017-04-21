@@ -206,6 +206,9 @@ public:
     IEEE802154MacAddress& getAddress() {
         return this->mac_pib.macExtendedAddress;
     }
+
+private:
+    GTSScheduling* scheduling = nullptr;
 };
 
 } /* namespace dsme */

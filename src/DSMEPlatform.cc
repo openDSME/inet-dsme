@@ -10,6 +10,7 @@
 #include "inet/physicallayer/contract/packetlevel/IRadio.h"
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
+#include "openDSME/dsmeAdaptionLayer/scheduling/PIDScheduling.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
 // coverity[+kill]
@@ -79,6 +80,7 @@ DSMEPlatform::DSMEPlatform()
 
 DSMEPlatform::~DSMEPlatform() {
     delete dsme;
+    delete scheduling;
 
     cancelAndDelete(ccaTimer);
     cancelAndDelete(cfpTimer);
@@ -125,7 +127,8 @@ void DSMEPlatform::initialize(int stage) {
 
         channelList_t scanChannels;
         scanChannels.add(par("commonChannel"));
-        this->dsmeAdaptionLayer.initialize(scanChannels);
+        scheduling = new PIDScheduling();
+        this->dsmeAdaptionLayer.initialize(scanChannels,scheduling);
 
         /* Initialize Address */
         IEEE802154MacAddress address;
