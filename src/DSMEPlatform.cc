@@ -127,7 +127,7 @@ void DSMEPlatform::initialize(int stage) {
 
         channelList_t scanChannels;
         scanChannels.add(par("commonChannel"));
-        scheduling = new PIDScheduling();
+        scheduling = new PIDScheduling(this->dsmeAdaptionLayer);
         this->dsmeAdaptionLayer.initialize(scanChannels,scheduling);
 
         /* Initialize Address */
