@@ -35,7 +35,7 @@ def main(args):
         vals[d]['datetime'] = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct'],cwd=d).strip()))
         vals[d]['date'] = vals[d]['datetime'].strftime("%Y-%m-%d")
         vals[d]['sanitized_commit'] = check_output(['git','log','-1','--pretty=%f-%h'],cwd=d).strip()
-        vals[d]['subject'] = check_output(['git','log','-1','--pretty=%s'],cwd=d).strip()
+        vals[d]['subject'] = check_output(['git','log','-1','--pretty=%s'],cwd=d).strip().replace(":","&#58;")
         vals[d]['post_file'] = check_output(['git','log','-1','--date=short','--pretty=%cd-%f-%h'],cwd=d).strip()
 
     maxtimepath = max(vals, key = lambda v: vals[v]['datetime'])
