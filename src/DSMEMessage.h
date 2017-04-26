@@ -95,6 +95,10 @@ public:
         return startOfFrameDelimiterSymbolCounter + 2 * (this->getHeader().getSerializationLength() + frame->getData().size()) + 2; // 2 Symbols for PHY header
     }
 
+    void setReceptionSymbolCounter(uint32_t counter) override {
+        startOfFrameDelimiterSymbolCounter = counter - (2 * (this->getHeader().getSerializationLength() + frame->getData().size()) + 2);
+    }
+
     IEEE802154eMACHeader& getHeader() override {
         return macHdr;
     }
