@@ -209,6 +209,9 @@ void DSMEPlatform::initialize(int stage) {
         this->dsmeAdaptionLayer.setIndicationCallback(DELEGATE(&DSMEPlatform::handleIndicationFromMCPS, *this));
         this->dsmeAdaptionLayer.setConfirmCallback(DELEGATE(&DSMEPlatform::handleConfirmFromMCPS, *this));
 
+        this->minBroadcastLQI = par("minBroadcastLQI");
+        this->minCoordinatorLQI = par("minCoordinatorLQI");
+
         this->dsme->initialize(this);
     } else if(stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
@@ -580,10 +583,16 @@ void DSMEPlatform::scheduleStartOfCFP() {
 }
 
 uint8_t DSMEPlatform::getMinCoordinatorLQI() {
-    return 150; // corresponds roughly to 20% PER
+    return minCoordinatorLQI;
 }
 
 void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
+    if(msg->getHeader().getDestAddr().isBroadcast()
+       && msg->getLQI() < minBroadcastLQI) {
+        releaseMessage(msg);
+        return;
+    }
+
     DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
     DSME_ASSERT(dsmeMsg != nullptr);
 
