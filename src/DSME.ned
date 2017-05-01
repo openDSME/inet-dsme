@@ -69,6 +69,10 @@ simple DSME extends MACProtocolBase like IMACProtocol
         // 802.15.4-2006, page 164
         int macMaxFrameRetries = default(3);
 
+        // LQI 150 corresponds roughly to 20% PER
+        int minBroadcastLQI = default(150);
+        int minCoordinatorLQI = default(150);
+
         @signal[unicastDataSentDown](type=cPacket);
         @signal[broadcastDataSentDown](type=cPacket);
         @signal[commandSentDown](type=cPacket);

@@ -190,6 +190,8 @@ private:
     bool channelInactive{true};
 
     bool transceiverIsOn{false};
+    uint8_t minBroadcastLQI{0};
+    uint8_t minCoordinatorLQI{0};
 
 public:
     SimTime symbolDuration;
