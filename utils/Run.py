@@ -31,7 +31,7 @@ class Run():
                      self.param[m.group(1)] = floatifpossible(m.group(2))
 
             # Read body
-            host_exps = map(lambda p: (p[1], re.compile("scalar .*\.host\[([0-9]*)\](.wrappedHost)?."+p[0]+".*"+p[1]+"(.*)")), self.host_patterns)
+            host_exps = [(p[1], re.compile("scalar .*\.host\[([0-9]*)\](.wrappedHost)?."+p[0]+".*"+p[1]+"(.*)")) for p in self.host_patterns]
             for line in f:
                 for (name, exp) in host_exps:
                     m = exp.match(line)
@@ -45,7 +45,7 @@ class Run():
 
         # minPRR
         try:
-            self.measure['minPRR'] = min(map(lambda h: h["PRR"], self.hosts.values()))
+            self.measure['minPRR'] = min(list(h["PRR"] for h in self.hosts.values()))
         except ValueError:
             self.measure['minPRR'] = float('nan')
 
@@ -53,13 +53,13 @@ class Run():
         with warnings.catch_warnings():
             warnings.filterwarnings('error')
             try:
-                self.measure['meanPRR'] = np.mean(map(lambda h: h["PRR"], self.hosts.values()))
+                self.measure['meanPRR'] = np.mean(list(h["PRR"] for h in self.hosts.values()))
             except RuntimeWarning:
                 self.measure['meanPRR'] = float('nan')
 
         # maxDelay
         try:
-            self.measure['maxDelay'] = max(map(lambda h: h["sinkRcvdPkDelay:max"], self.hosts.values()))
+            self.measure['maxDelay'] = max(list(h["sinkRcvdPkDelay:max"] for h in self.hosts.values()))
         except ValueError:
             self.measure['maxDelay'] = float('nan')
 
@@ -67,6 +67,6 @@ class Run():
         with warnings.catch_warnings():
             warnings.filterwarnings('error')
             try:
-                self.measure['meanDelay'] = np.mean(map(lambda h: h["sinkRcvdPkDelay:mean"], self.hosts.values()))
+                self.measure['meanDelay'] = np.mean(list(h["sinkRcvdPkDelay:mean"] for h in self.hosts.values()))
             except RuntimeWarning:
                 self.measure['meanDelay'] = float('nan')
