@@ -4,6 +4,9 @@ import argparse
 import subprocess
 import re
 from concurrent.futures import ThreadPoolExecutor
+import os
+
+INET_DSME = os.path.dirname(__file__)+"/../"
 
 def runcmd(cmd):
     print(" ".join(cmd))
@@ -29,16 +32,18 @@ def main(args):
     for repetition in range(0,int(args.repetitions)):
         for config in configs:
             for run in range(0,config['runs']):
+                name = str(config['config'])+"-"+str(run)+"-"+str(repetition)
                 cmds.append(["opp_run",
-                       "--repeat="+str(args.repetitions),
-                       "--result-dir="+str(args.results),
+                       "--repeat=1",
                        "-u","Cmdenv",
                        "-r",str(run),
-                       "--seed-set",str(repetition),
+                       "--output-scalar-file="+args.results+"/"+name+".sca",
+                       "--output-vector-file="+args.results+"/"+name+".vec",
+                       "--seed-set="+str(repetition),
                        "-c",config['config'],
-                       "-n", "simulations:src:"+args.inet+"/examples:"+args.inet+"/src",
+                       "-n", INET_DSME+"simulations:"+INET_DSME+"src:"+args.inet+"/examples:"+args.inet+"/src",
                        "-l",args.inet+"/src/INET",
-                       "-l","src/inet-dsme",
+                       "-l",INET_DSME+"src/inet-dsme",
                        args.config])
 
     executor = ThreadPoolExecutor(max_workers=int(args.jobs))

@@ -31,14 +31,14 @@ class Run():
                      self.param[m.group(1)] = floatifpossible(m.group(2))
 
             # Read body
-            host_exps = map(lambda p: (p[1], re.compile("scalar .*\.host\[([0-9]*)\]\.wrappedHost\."+p[0]+".*"+p[1]+"(.*)")), self.host_patterns)
+            host_exps = map(lambda p: (p[1], re.compile("scalar .*\.host\[([0-9]*)\](.wrappedHost)?."+p[0]+".*"+p[1]+"(.*)")), self.host_patterns)
             for line in f:
                 for (name, exp) in host_exps:
                     m = exp.match(line)
                     if m:
                         host = int(m.group(1))
                         if host != 0:
-                            self.hosts.setdefault(host,{})[name] = floatifpossible(m.group(2))
+                            self.hosts.setdefault(host,{})[name] = floatifpossible(m.group(3))
 
         for k in self.hosts.keys():
             self.hosts[k]["PRR"] = self.hosts[k]["sinkRcvdPk:count"]/self.hosts[k]["sentPk:count"]
