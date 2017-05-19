@@ -2,7 +2,6 @@
 
 #include <iomanip>
 
-#include "INETMath.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/FindModule.h"
 #include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
@@ -26,13 +25,13 @@ Define_Module(dsme::DSMEPlatform);
 
 namespace dsme {
 
-simsignal_t DSMEPlatform::broadcastDataSentDown = registerSignal("broadcastDataSentDown");
-simsignal_t DSMEPlatform::unicastDataSentDown = registerSignal("unicastDataSentDown");
-simsignal_t DSMEPlatform::commandSentDown = registerSignal("commandSentDown");
-simsignal_t DSMEPlatform::beaconSentDown = registerSignal("beaconSentDown");
-simsignal_t DSMEPlatform::ackSentDown = registerSignal("ackSentDown");
-simsignal_t DSMEPlatform::uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
-simsignal_t DSMEPlatform::corruptedFrameReceived = registerSignal("corruptedFrameReceived");
+simsignal_t DSMEPlatform::broadcastDataSentDown;
+simsignal_t DSMEPlatform::unicastDataSentDown;
+simsignal_t DSMEPlatform::commandSentDown;
+simsignal_t DSMEPlatform::beaconSentDown;
+simsignal_t DSMEPlatform::ackSentDown;
+simsignal_t DSMEPlatform::uncorruptedFrameReceived;
+simsignal_t DSMEPlatform::corruptedFrameReceived;
 
 void translateMacAddress(MACAddress& from, IEEE802154MacAddress& to) {
     // TODO correct translation
@@ -76,6 +75,13 @@ DSMEPlatform::DSMEPlatform()
       mcps_sap(*dsme),
       mlme_sap(*dsme),
       dsmeAdaptionLayer(*dsme) {
+    broadcastDataSentDown = registerSignal("broadcastDataSentDown");
+    unicastDataSentDown = registerSignal("unicastDataSentDown");
+    commandSentDown = registerSignal("commandSentDown");
+    beaconSentDown = registerSignal("beaconSentDown");
+    ackSentDown = registerSignal("ackSentDown");
+    uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
+    corruptedFrameReceived = registerSignal("corruptedFrameReceived");
 }
 
 DSMEPlatform::~DSMEPlatform() {

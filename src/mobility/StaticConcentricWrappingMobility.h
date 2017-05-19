@@ -22,8 +22,6 @@
 #ifndef __INET_DSME_STATICCONCENTRICWRAPPINGMOBILITY_H
 #define __INET_DSME_STATICCONCENTRICWRAPPINGMOBILITY_H
 
-#include <INETDefs.h>
-
 #include "DSMEStationaryMobility.h"
 
 namespace inet_dsme {
