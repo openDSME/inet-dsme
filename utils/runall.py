@@ -3,7 +3,7 @@
 import argparse 
 import subprocess
 import re
-from multiprocessing.pool import ThreadPool
+from concurrent.futures import ThreadPoolExecutor
 
 def runcmd(cmd):
     print(" ".join(cmd))
@@ -41,8 +41,8 @@ def main(args):
                        "-l","src/inet-dsme",
                        args.config])
 
-    p = ThreadPool(int(args.jobs))
-    p.map(runcmd, cmds)
+    executor = ThreadPoolExecutor(max_workers=int(args.jobs))
+    executor.map(runcmd,cmds)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
