@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import textwrap
 import subprocess
@@ -7,11 +7,11 @@ import argparse
 import glob
 
 def printcmd(args,shell):
-    print "$",
+    print("$",end='')
     if shell:
-        print args
+        print(args)
     else:
-        print " ".join(args)
+        print(" ".join(args))
 
 def call(args,shell=False):
     printcmd(args,shell)
@@ -37,7 +37,7 @@ def main(args):
     else:
         vals = vals[dsme_path]
 
-    resultdir = '/inet-dsme/results/'+vals['date']+'-'+vals['sanitized_commit']
+    resultdir = "/inet-dsme/results/"+str(vals['date'])+"-"+str(vals['sanitized_commit'])
 
     call(['utils/analyze.py','results']+glob.glob('results/*.sca'))
 

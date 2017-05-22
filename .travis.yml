@@ -10,7 +10,7 @@ branches:
     - opplive
 
 python:
-  - 2.7
+  - 3
 
 addons:
   apt:
@@ -21,8 +21,8 @@ addons:
     - g++-4.8
     - libav-tools
     - libavcodec-extra-54
-    - python-tk
-    - python-pip
+    - python3-tk
+    - python3-pip
 
 virtualenv:
   system_site_packages: true
@@ -38,9 +38,9 @@ before_install:
   - cat ~/.ssh/config
 
 install:
-  - pip install numpy
-  - pip install scipy
-  - pip install matplotlib
+  - pip3 install numpy
+  - pip3 install scipy
+  - pip3 install matplotlib
   - which python
   - python --version
   - ./ci_python.py
