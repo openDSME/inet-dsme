@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import numpy
@@ -6,7 +6,7 @@ import re
 import math
 
 import os
-if not os.environ.has_key('DISPLAY'):
+if 'DISPLAY' not in os.environ:
     import matplotlib
     matplotlib.use("Agg")
 
@@ -21,7 +21,7 @@ parser.add_argument("-f", "--filter", type=str, default="[0-9]*", help="unit of 
 parser.add_argument("-i", "--image", help="output an image", action='store_true')
 args = parser.parse_args()
 
-length = 600 / int(args.step)
+length = int(600 / int(args.step))
 
 allocationVector = numpy.zeros((length,3))
 totalAlloc = 0
@@ -49,9 +49,9 @@ for line in open(args.log):
                 allocationVector[pos][2] += 1
 
 
-print "Data collection finished"
+print("Data collection finished")
 
-print "Dealloc %i  Alloc %i"%(totalDealloc,totalAlloc)
+print("Dealloc %i  Alloc %i"%(totalDealloc,totalAlloc))
 
 if not args.image:
     numpy.savetxt(args.output, allocationVector, delimiter=";")

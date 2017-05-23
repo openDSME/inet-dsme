@@ -29,8 +29,8 @@ def main(args):
         vals[d]['datetime'] = datetime.datetime.fromtimestamp(int(check_output(['git','log','-1','--pretty=%ct'],cwd=d).strip()))
         vals[d]['date'] = vals[d]['datetime'].strftime("%Y-%m-%d")
         vals[d]['datetime_str'] = vals[d]['datetime'].strftime("%F %T %z")
-        vals[d]['sanitized_commit'] = check_output(['git','log','-1','--pretty=%f-%h'],cwd=d).strip()
-        vals[d]['subject'] = check_output(['git','log','-1','--pretty=%s'],cwd=d).strip()
+        vals[d]['sanitized_commit'] = check_output(['git','log','-1','--pretty=%f-%h'],cwd=d).strip().decode("utf-8")
+        vals[d]['subject'] = check_output(['git','log','-1','--pretty=%s'],cwd=d).strip().decode("utf-8")
 
     if vals['.']['datetime'] > vals[dsme_path]['datetime']:
         vals = vals['.']

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 import numpy
@@ -6,7 +6,7 @@ import re
 from collections import deque
 
 import os
-if not os.environ.has_key('DISPLAY'):
+if 'DISPLAY' not in os.environ:
     import matplotlib
     matplotlib.use("Agg")
 
@@ -21,9 +21,9 @@ def printMatrix(a):
    cols = a.shape[1]
    for i in range(0,rows):
       for j in range(0,cols):
-         print("%2.0f" %a[i,j]),
-      print
-   print
+         print(("%2.0f" %a[i,j]), end=' ')
+      print()
+   print()
 
 
 parser = argparse.ArgumentParser(description="Creates an animation from a log file to visualise the GTS allocation process.")
@@ -53,7 +53,7 @@ nodesOnInnerCircles = 0
 
 f = open(args.log)
 for i in range(1000):
-    line = f.next()
+    line = next(f)
 #for line in open(args.log):
     m = re.search("^\[\w*\]\s*0\s*([0-9]*): POSITION: x=([0-9.]+), y=([0-9.]+)", line)
     if m:
@@ -169,7 +169,7 @@ def animate(i):
 
 final_time, unused =  allocationMatrixHistory[keys - 1]
 
-print "Data collection finished"
+print("Data collection finished")
 
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=int(final_time) + 10, interval=1, blit=True)
 
@@ -178,5 +178,5 @@ anim.save(args.output, writer='avconv', fps=2, extra_args=['-vcodec', 'libx264']
 if not args.no_show: 
     plt.show()
 
-print "Dealloc %i  Alloc %i\n"%(totalDealloc,totalAlloc)
+print("Dealloc %i  Alloc %i\n"%(totalDealloc,totalAlloc))
 
