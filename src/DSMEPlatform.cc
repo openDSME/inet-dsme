@@ -128,8 +128,8 @@ void DSMEPlatform::initialize(int stage) {
 
         channelList_t scanChannels;
         scanChannels.add(par("commonChannel"));
-        //scheduling = new TPSQ(this->dsmeAdaptionLayer);
-        scheduling = new STAS(this->dsmeAdaptionLayer);
+        scheduling = new TPSQ(this->dsmeAdaptionLayer);
+        //scheduling = new STAS(this->dsmeAdaptionLayer);
         this->dsmeAdaptionLayer.initialize(scanChannels,scheduling);
 
         /* Initialize Address */
