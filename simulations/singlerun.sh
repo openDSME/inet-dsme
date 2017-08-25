@@ -4,8 +4,8 @@ pushd ../
 make -j8 || exit 1
 popd
 
-CONFIG=DSME
-RUN=5
+CONFIG=DSME-Multi
+RUN=6
 REP=2
 VECTOR_RECORDING=true
 #VECTOR_RECORDING=false
