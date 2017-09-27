@@ -238,6 +238,7 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsForCAP", dsme->getMessageDispatcher().getNumUpperPacketsForCAP());
     recordScalar("numUpperPacketsForGTS", dsme->getMessageDispatcher().getNumUpperPacketsForGTS());
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
+    recordScalar("macChannelOffset", dsme->getMAC_PIB().macChannelOffset);
 }
 
 void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
@@ -639,7 +640,7 @@ std::string DSMEPlatform::getDSMEManagement(uint8_t management, DSMESABSpecifica
     std::stringstream ss;
 
     uint8_t numChannels = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumChannels();
-    uint8_t numGTSlots = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumGTSlots();
+    uint8_t numGTSlots = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumGTSlots(1);
     uint8_t numSuperFramesPerMultiSuperframe = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumberSuperframesPerMultiSuperframe();
 
     ss << " ";
