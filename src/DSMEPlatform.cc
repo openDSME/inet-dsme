@@ -10,6 +10,7 @@
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/PIDScheduling.h"
+#include "openDSME/dsmeAdaptionLayer/scheduling/TPS.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
 // coverity[+kill]
@@ -133,7 +134,16 @@ void DSMEPlatform::initialize(int stage) {
 
         channelList_t scanChannels;
         scanChannels.add(par("commonChannel"));
-        scheduling = new PIDScheduling(this->dsmeAdaptionLayer);
+        const char* schedulingSelection = par("scheduling");
+        if(!strcmp(schedulingSelection, "PID")) {
+            scheduling = new PIDScheduling(this->dsmeAdaptionLayer);
+        }
+        else if(!strcmp(schedulingSelection, "TPS")) {
+            scheduling = new TPS(this->dsmeAdaptionLayer);
+        }
+        else {
+            ASSERT(false);
+        }
         this->dsmeAdaptionLayer.initialize(scanChannels,scheduling);
 
         /* Initialize Address */
