@@ -23,6 +23,9 @@ addons:
     - libavcodec-extra-54
     - python3-tk
     - python3-pip
+    - python3-numpy
+    - python3-scipy
+    - python3-matplotlib
 
 virtualenv:
   system_site_packages: true
@@ -38,9 +41,6 @@ before_install:
   - cat ~/.ssh/config
 
 install:
-  - pip3 install numpy
-  - pip3 install scipy
-  - pip3 install matplotlib
   - which python
   - python --version
   - ./ci_python.py
