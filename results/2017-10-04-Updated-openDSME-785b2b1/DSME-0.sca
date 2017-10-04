@@ -1,0 +1,413 @@
+version 2
+run DSME-0-20171004-12:50:01-19078
+attr beaconInterval 10s
+attr configname DSME
+attr datetime 20171004-12:50:01
+attr experiment DSME
+attr inifile simulations/multi_gateway.ini
+attr iterationvars "$packetLength=76B, $sendInt=2, $beaconInterval=10s, $0=10s/2, $1=3 * 10s"
+attr iterationvars2 "$packetLength=76B, $sendInt=2, $beaconInterval=10s, $0=10s/2, $1=3 * 10s, $repetition=0"
+attr measurement "$packetLength=76B, $sendInt=2, $beaconInterval=10s, $0=10s/2, $1=3 * 10s"
+attr network multi_gateway.Net802154MultiGateway
+attr packetLength 76B
+attr processid 19078
+attr repetition 0
+attr replication #0
+attr resultdir ../results
+attr runnumber 0
+attr seedset 0
+attr sendInt 2
+param **.configurator.addStaticRoutes false
+param **.dumpRoutes false
+param **.dumpTopology false
+param **.host[*].**.gpsr.beaconInterval "${beaconInterval = 10s}"
+param **.host[*].**.gpsr.maxJitter ${$beaconInterval/2}
+param **.host[*].**.gpsr.neighborValidityInterval "${3 * $beaconInterval}"
+param **.host[*].**.gpsr.positionByteLength "2 B"
+param **.host[*].**.gpsr.routingStrategy "\"StraightestPath\""
+param **.host[*].**.trafficgen.continueSendingDummyPackets true
+param **.host[*].**.trafficgen.coolDownDuration 15s
+param **.host[*].**.trafficgen.destAddresses "\"host[0].wrappedHost(modulepath)\""
+param **.host[*].**.trafficgen.packetLength "${packetLength = 76B}"
+param **.host[*].**.trafficgen.sendInterval "exponential(${sendInt=1.0..2.5 step 0.25}s)"
+param **.host[*].**.trafficgen.startTime 30s
+param **.host[*].**.trafficgen.warmUpDuration 190s
+param **.host[*].**.wlan[*].mac.macCapReduction false
+param **.host[*].**.wlan[*].mac.macDSMEGTSExpirationTime 7
+param **.host[*].**.wlan[*].macType "\"DSME\""
+param **.host[*].**.wlan[*].radio.receiver.minInterferencePower "-100 dBm"
+param **.host[*].hostType "\"SimpleHost\""
+param **.host[*].mobilityType "\"StaticConcentricWrappingMobility\""
+param **.host[0].**.trafficgen.numPackets 0
+param **.host[0].**.wlan[*].mac.isPANCoordinator true
+param **.host[1..].**.trafficgen.numPackets 100
+param **.numHosts 2
+param **.radioMedium.rangeFilter "\"interferenceRange\""
+param **.routingTable.addressType "\"modulepath\""
+param **.routingTableType "\"GenericRoutingTable\""
+
+scalar . 	beaconInterval 	10
+attr unit  s
+scalar . 	packetLength 	76
+attr unit  B
+scalar . 	sendInt 	2
+scalar Net802154MultiGateway.host[0].mobility 	x 	100
+scalar Net802154MultiGateway.host[0].mobility 	y 	100
+scalar Net802154MultiGateway.host[0].mobility 	z 	0
+scalar Net802154MultiGateway.host[0].wrappedHost.mobility 	x 	100
+scalar Net802154MultiGateway.host[0].wrappedHost.mobility 	y 	100
+scalar Net802154MultiGateway.host[0].wrappedHost.mobility 	z 	0
+scalar Net802154MultiGateway.host[0].wrappedHost.mobility 	x 	100
+scalar Net802154MultiGateway.host[0].wrappedHost.mobility 	y 	100
+scalar Net802154MultiGateway.host[0].wrappedHost.mobility 	z 	0
+scalar Net802154MultiGateway.host[1].mobility 	x 	200
+scalar Net802154MultiGateway.host[1].mobility 	y 	100
+scalar Net802154MultiGateway.host[1].mobility 	z 	0
+scalar Net802154MultiGateway.host[1].wrappedHost.mobility 	x 	200
+scalar Net802154MultiGateway.host[1].wrappedHost.mobility 	y 	100
+scalar Net802154MultiGateway.host[1].wrappedHost.mobility 	z 	0
+scalar Net802154MultiGateway.host[1].wrappedHost.mobility 	x 	200
+scalar Net802154MultiGateway.host[1].wrappedHost.mobility 	y 	100
+scalar Net802154MultiGateway.host[1].wrappedHost.mobility 	z 	0
+scalar Net802154MultiGateway.host[0].wrappedHost.lo[0].lo 	droppedPkBitError:count 	0
+attr interpolationmode  none
+attr source  dropPkBitError
+attr title  "packets dropped/bit error, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.lo[0].lo 	droppedPkBitError:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkBitError
+attr title  "packets dropped/bit error, sum(packetBytes)"
+scalar Net802154MultiGateway.host[0].wrappedHost.lo[0].lo 	rcvdPkFromHL:count 	0
+attr interpolationmode  none
+attr source  packetReceivedFromUpper
+attr title  "packets received from higher layer, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.lo[0].lo 	rcvdPkFromHL:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  packetReceivedFromUpper
+attr title  "packets received from higher layer, sum(packetBytes)"
+scalar Net802154MultiGateway.host[0].wrappedHost.lo[0].lo 	passedUpPk:count 	0
+attr interpolationmode  none
+attr source  packetSentToUpper
+attr title  "packets passed to higher layer, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.lo[0].lo 	passedUpPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  packetSentToUpper
+attr title  "packets passed to higher layer, sum(packetBytes)"
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	numUpperPacketsForCAP 	139
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	numUpperPacketsForGTS 	0
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	numUpperPacketsDroppedFullQueue 	0
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	macChannelOffset 	0
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	corruptedFrameReceived:count 	0
+attr interpolationmode  none
+attr source  corruptedFrameReceived
+attr title  "corrupted frame received, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	uncorruptedFrameReceived:count 	582
+attr interpolationmode  none
+attr source  uncorruptedFrameReceived
+attr title  "uncorrupted frame received, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	unicastDataSentDown:count 	0
+attr interpolationmode  none
+attr source  unicastDataSentDown
+attr title  "unicast packet sent down of type DATA, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac 	broadDataSentDown:count 	43
+attr interpolationmode  none
+attr source  broadcastDataSentDown
+attr title  "broadcast packet sent down of type DATA, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].radio 	transmissionState:count 	2352
+attr interpolationmode  sample-hold
+attr source  transmissionStateChanged
+attr title  "Radio transmission state, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].radio 	receptionState:count 	9535
+attr interpolationmode  sample-hold
+attr source  receptionStateChanged
+attr title  "Radio reception state, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.wlan[0].radio 	radioMode:count 	8372
+attr interpolationmode  sample-hold
+attr source  radioModeChanged
+attr title  "Radio mode, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.udp 	droppedPkBadChecksum:count 	0
+attr interpolationmode  none
+attr title  "packets dropped (checksum error), count"
+scalar Net802154MultiGateway.host[0].wrappedHost.udp 	droppedPkWrongPort:count 	0
+attr interpolationmode  none
+attr title  "packets dropped (wrong port), count"
+scalar Net802154MultiGateway.host[0].wrappedHost.udp 	passedUpPk:count 	0
+attr interpolationmode  none
+attr title  "packets passed up, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.udp 	rcvdPk:count 	0
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.udp 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, sum(packetBytes)"
+scalar Net802154MultiGateway.host[0].wrappedHost.udp 	sentPk:count 	0
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.udp 	sentPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, sum(packetBytes)"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	rcvdPkFrom-host[1]:count 	100
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	sentDummyPk:count 	209
+attr interpolationmode  none
+attr source  sentDummyPk
+attr title  "dummy packets sent, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	sinkRcvdPk:count 	0
+attr interpolationmode  none
+attr source  sinkRcvdPk
+attr title  "own packets received by sink, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	sinkRcvdPkDelay:mean 	-nan
+attr interpolationmode  none
+attr source  messageAge(sinkRcvdPk)
+attr title  "delay of own packets received by sink, mean"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	sinkRcvdPkDelay:max 	-nan
+attr interpolationmode  none
+attr source  messageAge(sinkRcvdPk)
+attr title  "delay of own packets received by sink, max"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	PRR:last 	-nan
+attr interpolationmode  none
+attr source  count(sinkRcvdPk)/count(sentPk)
+attr title  "PRR, last"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	rcvdPk:count 	100
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	rcvdPk:sum(packetBytes) 	7600
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, sum(packetBytes)"
+statistic Net802154MultiGateway.host[0].wrappedHost.trafficgen 	endToEndDelay:histogram
+field count 100
+field mean 0.34758307548132
+field stddev 0.27949880947604
+field sum 34.758307548132
+field sqrsum 19.815238301459
+field min 0.010004570807
+field max 1.404869926007
+attr interpolationmode  none
+attr source  messageAge(rcvdPk)
+attr title  "end-to-end delay, histogram"
+attr unit  s
+bin	-INF	0
+bin	-0.687428106793	0
+bin	-0.594437083113	0
+bin	-0.501446059433	0
+bin	-0.408455035753	0
+bin	-0.315464012073	0
+bin	-0.222472988393	0
+bin	-0.129481964713	0
+bin	-0.036490941033	11
+bin	0.056500082647	16
+bin	0.149491106327	17
+bin	0.242482130007	12
+bin	0.335473153687	11
+bin	0.428464177367	15
+bin	0.521455201047	3
+bin	0.614446224727	5
+bin	0.707437248407	4
+bin	0.800428272087	0
+bin	0.893419295767	2
+bin	0.986410319447	1
+bin	1.079401343127	1
+bin	1.172392366807	1
+bin	1.265383390487	0
+bin	1.358374414167	1
+bin	1.451365437847	0
+bin	1.544356461527	0
+bin	1.637347485207	0
+bin	1.730338508887	0
+bin	1.823329532567	0
+bin	1.916320556247	0
+bin	2.009311579927	0
+bin	2.102302603607	0
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	sentPk:count 	0
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, count"
+scalar Net802154MultiGateway.host[0].wrappedHost.trafficgen 	sentPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, sum(packetBytes)"
+scalar Net802154MultiGateway.host[1].wrappedHost.lo[0].lo 	droppedPkBitError:count 	0
+attr interpolationmode  none
+attr source  dropPkBitError
+attr title  "packets dropped/bit error, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.lo[0].lo 	droppedPkBitError:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  dropPkBitError
+attr title  "packets dropped/bit error, sum(packetBytes)"
+scalar Net802154MultiGateway.host[1].wrappedHost.lo[0].lo 	rcvdPkFromHL:count 	0
+attr interpolationmode  none
+attr source  packetReceivedFromUpper
+attr title  "packets received from higher layer, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.lo[0].lo 	rcvdPkFromHL:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  packetReceivedFromUpper
+attr title  "packets received from higher layer, sum(packetBytes)"
+scalar Net802154MultiGateway.host[1].wrappedHost.lo[0].lo 	passedUpPk:count 	0
+attr interpolationmode  none
+attr source  packetSentToUpper
+attr title  "packets passed to higher layer, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.lo[0].lo 	passedUpPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  packetSentToUpper
+attr title  "packets passed to higher layer, sum(packetBytes)"
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	numUpperPacketsForCAP 	142
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	numUpperPacketsForGTS 	191
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	numUpperPacketsDroppedFullQueue 	0
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	macChannelOffset 	0
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	corruptedFrameReceived:count 	0
+attr interpolationmode  none
+attr source  corruptedFrameReceived
+attr title  "corrupted frame received, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	uncorruptedFrameReceived:count 	587
+attr interpolationmode  none
+attr source  uncorruptedFrameReceived
+attr title  "uncorrupted frame received, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	unicastDataSentDown:count 	191
+attr interpolationmode  none
+attr source  unicastDataSentDown
+attr title  "unicast packet sent down of type DATA, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac 	broadDataSentDown:count 	43
+attr interpolationmode  none
+attr source  broadcastDataSentDown
+attr title  "broadcast packet sent down of type DATA, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].radio 	transmissionState:count 	2332
+attr interpolationmode  sample-hold
+attr source  transmissionStateChanged
+attr title  "Radio transmission state, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].radio 	receptionState:count 	9471
+attr interpolationmode  sample-hold
+attr source  receptionStateChanged
+attr title  "Radio reception state, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.wlan[0].radio 	radioMode:count 	8298
+attr interpolationmode  sample-hold
+attr source  radioModeChanged
+attr title  "Radio mode, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.udp 	droppedPkBadChecksum:count 	0
+attr interpolationmode  none
+attr title  "packets dropped (checksum error), count"
+scalar Net802154MultiGateway.host[1].wrappedHost.udp 	droppedPkWrongPort:count 	0
+attr interpolationmode  none
+attr title  "packets dropped (wrong port), count"
+scalar Net802154MultiGateway.host[1].wrappedHost.udp 	passedUpPk:count 	0
+attr interpolationmode  none
+attr title  "packets passed up, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.udp 	rcvdPk:count 	0
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.udp 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, sum(packetBytes)"
+scalar Net802154MultiGateway.host[1].wrappedHost.udp 	sentPk:count 	0
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.udp 	sentPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, sum(packetBytes)"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	sentDummyPk:count 	91
+attr interpolationmode  none
+attr source  sentDummyPk
+attr title  "dummy packets sent, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	sinkRcvdPk:count 	100
+attr interpolationmode  none
+attr source  sinkRcvdPk
+attr title  "own packets received by sink, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	sinkRcvdPkDelay:mean 	0.34758307548132
+attr interpolationmode  none
+attr source  messageAge(sinkRcvdPk)
+attr title  "delay of own packets received by sink, mean"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	sinkRcvdPkDelay:max 	1.404869926007
+attr interpolationmode  none
+attr source  messageAge(sinkRcvdPk)
+attr title  "delay of own packets received by sink, max"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	PRR:last 	1
+attr interpolationmode  none
+attr source  count(sinkRcvdPk)/count(sentPk)
+attr title  "PRR, last"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	rcvdPk:count 	0
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	rcvdPk:sum(packetBytes) 	0
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, sum(packetBytes)"
+statistic Net802154MultiGateway.host[1].wrappedHost.trafficgen 	endToEndDelay:histogram
+field count 0
+field mean -nan
+field stddev -nan
+field sum 0
+field sqrsum 0
+field min -nan
+field max -nan
+attr interpolationmode  none
+attr source  messageAge(rcvdPk)
+attr title  "end-to-end delay, histogram"
+attr unit  s
+bin	-INF	0
+bin	-0.5	0
+bin	-0.46666666666667	0
+bin	-0.43333333333333	0
+bin	-0.4	0
+bin	-0.36666666666667	0
+bin	-0.33333333333333	0
+bin	-0.3	0
+bin	-0.26666666666667	0
+bin	-0.23333333333333	0
+bin	-0.2	0
+bin	-0.16666666666667	0
+bin	-0.13333333333333	0
+bin	-0.1	0
+bin	-0.066666666666667	0
+bin	-0.033333333333333	0
+bin	0	0
+bin	0.033333333333333	0
+bin	0.066666666666667	0
+bin	0.1	0
+bin	0.13333333333333	0
+bin	0.16666666666667	0
+bin	0.2	0
+bin	0.23333333333333	0
+bin	0.26666666666667	0
+bin	0.3	0
+bin	0.33333333333333	0
+bin	0.36666666666667	0
+bin	0.4	0
+bin	0.43333333333333	0
+bin	0.46666666666667	0
+bin	0.5	0
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	sentPk:count 	100
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, count"
+scalar Net802154MultiGateway.host[1].wrappedHost.trafficgen 	sentPk:sum(packetBytes) 	7600
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, sum(packetBytes)"
+scalar Net802154MultiGateway.radioMedium.propagation 	"Arrival computation count" 	1171
+scalar Net802154MultiGateway.radioMedium 	"transmission count" 	1171
+scalar Net802154MultiGateway.radioMedium 	"radio frame send count" 	1171
+scalar Net802154MultiGateway.radioMedium 	"reception computation count" 	1171
+scalar Net802154MultiGateway.radioMedium 	"interference computation count" 	11844
+scalar Net802154MultiGateway.radioMedium 	"reception decision computation count" 	1169
+scalar Net802154MultiGateway.radioMedium 	"listening decision computation count" 	9506
+scalar Net802154MultiGateway.radioMedium 	"reception cache hit" 	85.696836448027
+attr unit  %
+scalar Net802154MultiGateway.radioMedium 	"interference cache hit" 	66.666666666667
+attr unit  %
+scalar Net802154MultiGateway.radioMedium 	"noise cache hit" 	0
+attr unit  %
+scalar Net802154MultiGateway.radioMedium 	"snir cache hit" 	50
+attr unit  %
+scalar Net802154MultiGateway.radioMedium 	"reception decision cache hit" 	50
+attr unit  %
+scalar Net802154MultiGateway.radioMedium 	"reception result cache hit" 	0
+attr unit  %
