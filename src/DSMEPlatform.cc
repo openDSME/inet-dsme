@@ -210,7 +210,7 @@ void DSMEPlatform::initialize(int stage) {
         this->mac_pib.macMaxFrameRetries = par("macMaxFrameRetries");
 
         this->mac_pib.macDSMEGTSExpirationTime = par("macDSMEGTSExpirationTime");
-        this->mac_pib.macResponseWaitTime = 32;
+        this->mac_pib.macResponseWaitTime = par("macResponseWaitTime");
 
         this->mac_pib.macIsPANCoord = par("isPANCoordinator");
 

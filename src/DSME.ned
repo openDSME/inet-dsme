@@ -45,6 +45,7 @@ simple DSME extends MACProtocolBase like IMACProtocol
         double TPSalpha = default(0.1);
 
         int macDSMEGTSExpirationTime = default(7);
+        int macResponseWaitTime = default(32);
 
         string allocationScheme = default("next");	// ("random", "next")
 
