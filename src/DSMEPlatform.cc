@@ -139,7 +139,9 @@ void DSMEPlatform::initialize(int stage) {
             scheduling = new PIDScheduling(this->dsmeAdaptionLayer);
         }
         else if(!strcmp(schedulingSelection, "TPS")) {
-            scheduling = new TPS(this->dsmeAdaptionLayer);
+            TPS* tps = new TPS(this->dsmeAdaptionLayer);
+            tps->setAlpha(par("TPSalpha").doubleValue());
+            scheduling = tps;
         }
         else {
             ASSERT(false);

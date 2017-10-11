@@ -41,6 +41,9 @@ simple DSME extends MACProtocolBase like IMACProtocol
 
         string scheduling = default("TPS"); 
 
+        // EWMA factor for TPS
+        double TPSalpha = default(0.1);
+
         int macDSMEGTSExpirationTime = default(7);
 
         string allocationScheme = default("next");	// ("random", "next")
