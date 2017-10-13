@@ -1,0 +1,110 @@
+file 76928 1507897618                                           
+version 2
+run DSME-0-20171013-12:26:56-19243
+attr beaconInterval 10s
+attr configname DSME
+attr datetime 20171013-12:26:56
+attr experiment DSME
+attr inifile simulations/multi_gateway.ini
+attr iterationvars "$packetLength=76B, $sendInt=2, $beaconInterval=10s, $0=10s/2, $1=3 * 10s"
+attr iterationvars2 "$packetLength=76B, $sendInt=2, $beaconInterval=10s, $0=10s/2, $1=3 * 10s, $repetition=0"
+attr measurement "$packetLength=76B, $sendInt=2, $beaconInterval=10s, $0=10s/2, $1=3 * 10s"
+attr network multi_gateway.Net802154MultiGateway
+attr packetLength 76B
+attr processid 19243
+attr repetition 0
+attr replication #0
+attr resultdir ../results
+attr runnumber 0
+attr seedset 0
+attr sendInt 2
+param **.configurator.addStaticRoutes false
+param **.dumpRoutes false
+param **.dumpTopology false
+param **.host[*].**.gpsr.beaconInterval "${beaconInterval = 10s}"
+param **.host[*].**.gpsr.maxJitter ${$beaconInterval/2}
+param **.host[*].**.gpsr.neighborValidityInterval "${3 * $beaconInterval}"
+param **.host[*].**.gpsr.positionByteLength "2 B"
+param **.host[*].**.gpsr.routingStrategy "\"StraightestPath\""
+param **.host[*].**.trafficgen.continueSendingDummyPackets true
+param **.host[*].**.trafficgen.coolDownDuration 15s
+param **.host[*].**.trafficgen.destAddresses "\"host[0].wrappedHost(modulepath)\""
+param **.host[*].**.trafficgen.packetLength "${packetLength = 76B}"
+param **.host[*].**.trafficgen.sendInterval "exponential(${sendInt=1.0..2.5 step 0.25}s)"
+param **.host[*].**.trafficgen.startTime 30s
+param **.host[*].**.trafficgen.warmUpDuration 190s
+param **.host[*].**.wlan[*].mac.macCapReduction false
+param **.host[*].**.wlan[*].mac.macDSMEGTSExpirationTime 7
+param **.host[*].**.wlan[*].macType "\"DSME\""
+param **.host[*].**.wlan[*].radio.receiver.minInterferencePower "-100 dBm"
+param **.host[*].hostType "\"SimpleHost\""
+param **.host[*].mobilityType "\"StaticConcentricWrappingMobility\""
+param **.host[0].**.trafficgen.numPackets 0
+param **.host[0].**.wlan[*].mac.isPANCoordinator true
+param **.host[1..].**.trafficgen.numPackets 100
+param **.numHosts 2
+param **.radioMedium.rangeFilter "\"interferenceRange\""
+param **.routingTable.addressType "\"modulepath\""
+param **.routingTableType "\"GenericRoutingTable\""
+
+vector 35  Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac  uncorruptedFrameReceived:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  uncorruptedFrameReceived
+attr title  "uncorrupted frame received, vector(packetBytes)"
+vector 17  Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac  uncorruptedFrameReceived:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  uncorruptedFrameReceived
+attr title  "uncorrupted frame received, vector(packetBytes)"
+vector 33  Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac  broadDataSentDown:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  broadcastDataSentDown
+attr title  "broadcast packet sent down of type DATA, vector(packetBytes)"
+vector 15  Net802154MultiGateway.host[0].wrappedHost.wlan[0].mac  broadDataSentDown:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  broadcastDataSentDown
+attr title  "broadcast packet sent down of type DATA, vector(packetBytes)"
+vector 9  Net802154MultiGateway.host[0].wrappedHost.trafficgen  sentDummyPk:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  sentDummyPk
+attr title  "dummy packets sent, vector(packetBytes)"
+vector 27  Net802154MultiGateway.host[1].wrappedHost.trafficgen  sentDummyPk:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  sentDummyPk
+attr title  "dummy packets sent, vector(packetBytes)"
+vector 32  Net802154MultiGateway.host[1].wrappedHost.wlan[0].mac  unicastDataSentDown:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  unicastDataSentDown
+attr title  "unicast packet sent down of type DATA, vector(packetBytes)"
+vector 24  Net802154MultiGateway.host[1].wrappedHost.trafficgen  sentPk:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  sentPk
+attr title  "packets sent, vector(packetBytes)"
+vector 28  Net802154MultiGateway.host[1].wrappedHost.trafficgen  PRR:vector  ETV
+attr interpolationmode  none
+attr source  count(sinkRcvdPk)/count(sentPk)
+attr title  "PRR, vector"
+vector 26  Net802154MultiGateway.host[1].wrappedHost.trafficgen  sinkRcvdPk:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  sinkRcvdPk
+attr title  "own packets received by sink, vector(packetBytes)"
+vector 5  Net802154MultiGateway.host[0].wrappedHost.trafficgen  rcvdPk:vector(packetBytes)  ETV
+attr interpolationmode  none
+attr source  rcvdPk
+attr title  "packets received, vector(packetBytes)"
+vector 7  Net802154MultiGateway.host[0].wrappedHost.trafficgen  endToEndDelay:vector  ETV
+attr interpolationmode  none
+attr source  messageAge(rcvdPk)
+attr title  "end-to-end delay, vector"
+attr unit  s
+5	4864 2900 124772 246344 221.159312333564 436.076432333564 100 76 76 7600 577600
+7	7764 4086 124772 246344 221.159312333564 436.076432333564 100 0.01007318727 1.856792110255 37.256604118912 22.145658220797
+9	11850 5475 16381 254548 30 450.56779583169 194 76 76 14744 1120544
+15	17325 1023 6315 250167 11.59624 442.867968 44 29 29 1276 37004
+17	18348 18600 2137 254025 3.942848333564 449.619232333564 627 5 120 36957 3274183
+24	36948 2985 124533 246208 220.749722465908 435.860558199505 100 76 76 7600 577600
+26	39933 3000 124772 246344 221.159312333564 436.076432333564 100 76 76 7600 577600
+27	42933 2770 16382 253738 30 449.139343437545 96 76 76 7296 554496
+28	45703 7272 124533 246344 220.749722465908 436.076432333564 200 0.4 1 -nan -nan
+32	52975 4566 16465 253915 30.0672 449.45664 196 120 120 23520 2822400
+33	57541 1022 5492 249887 10.085248 442.378048 44 29 29 1276 37004
+35	58563 18365 1062 254364 1.967392333564 450.233632333564 633 5 35 14622 464084
