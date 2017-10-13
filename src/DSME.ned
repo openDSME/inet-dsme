@@ -33,21 +33,14 @@ simple DSME extends MACProtocolBase like IMACProtocol
 
         int finalCAPSlot = default(8);				// 4 bits
 
-        // Maximum number GTS which a Device is allowed to allocate per destination
-        // e.g. NumberOfGTSPerMultisuperframe / NumberOfNeighbors
-        int maxNumberGTSAllocPerDevice = default(7);
-        int maxNumberGTSAllocPerRequest = default(1); // also per superframe TODO ??
-        int maxGTSIdleCount = default(0);	// 0 => never deallocate idle GTS
-
+        // Scheduling
         string scheduling = default("TPS"); 
-
-        // EWMA factor for TPS
-        double TPSalpha = default(0.1);
+        double TPSalpha = default(0.1); // EWMA factor for TPS, ignored otherwise
 
         int macDSMEGTSExpirationTime = default(7);
         int macResponseWaitTime = default(32);
 
-        string allocationScheme = default("next");	// ("random", "next")
+        string allocationScheme = default("random");	// ("random", "next")
 
         int numChannels = default(16);
         int commonChannel = default(11);
