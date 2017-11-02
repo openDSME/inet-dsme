@@ -1,5 +1,6 @@
 //
 // Copyright (C) 2016 Florian Kauer <florian.meier@koalo.de>
+// Copyright (C) 2017 Maximilian Köstler <maximilian.koestler@tuhh.de>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -17,50 +18,46 @@
 
 package inet_dsme.simulations;
 
-import inet.applications.generic.PRRTrafGen;
 import inet.node.inet.WirelessHost;
 import inet.linklayer.ieee802154.Ieee802154NarrowbandNic;
-import inet_dsme.sp_gpsr.SP_GPSR;
+import inet.routing.gpsr.GPSR;
+
+import inet_dsme.applications.generic.PRRTrafGen;
 
 //
-// A wireless host containing an Ieee802154NarrowbandNic,
-// GPSR and a IPvXTrafGen.
+// A wireless host containing a WirelessNic, GPSR and a PRRTrafGen.
 //
 module IEEE802154ExampleHost extends WirelessHost
 {
     parameters:
-        hasIpv4 = false;
-        hasGn = true;
-        networkLayerType = "GenericNetworkLayer";
-        forwarding = default(true);
-
-        wlan[0].typename = default("WirelessNic");
-        wlan[0].radioType = default("Ieee802154NarrowbandScalarRadio");
-
-        trafficgen.protocol = 17;
-        trafficgen.packetLength = default(10B);
-
         @display("i=device/accesspoint;bgb=,-");
 
-        *.routingTableModule = "^.generic.routingTable";
-        *.networkProtocolModule = "^.generic.gnp";
-        gpsr.routingStrategy = "StraightestPath";
+        forwarding = default(true);
 
-        *.gnp.procDelay = default(2ms);
+        networkLayerType = "GenericNetworkLayer";
+        networkLayer.gnp.procDelay = default(2ms);
+
+        wlan[*].typename = default("WirelessNic");
+        wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
 
     submodules:
-        trafficgen: PRRTrafGen {
-            @display("p=188,287");
+        gpsr: GPSR {
+            parameters:
+                @display("p=739,339");
+                networkProtocolModule = "^.networkLayer.gnp";
         }
 
-        gpsr: SP_GPSR {
-            @display("p=739,339");
+        trafficgen: PRRTrafGen {
+            parameters:
+                @display("p=188,287");
+                protocol = 17;
+                packetLength = default(10B);
         }
 
     connections:
-        trafficgen.ipOut --> tn.upperLayerIn++;
-        trafficgen.ipIn <-- tn.upperLayerOut++;
+        trafficgen.ipOut --> networkLayer.transportIn++;
+        trafficgen.ipIn <-- networkLayer.transportOut++;
 
-        gpsr.ipOut --> tn.upperLayerIn++;
-        gpsr.ipIn <-- tn.upperLayerOut++;
+        gpsr.ipOut --> networkLayer.transportIn++;
+        gpsr.ipIn <-- networkLayer.transportOut++;
 }

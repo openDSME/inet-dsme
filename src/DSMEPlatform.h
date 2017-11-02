@@ -101,7 +101,7 @@ public:
     virtual void handleSelfMessage(cMessage*) override;
 
     /** @brief Handle control messages from lower layer */
-    virtual void receiveSignal(cComponent* source, simsignal_t signalID, long value DETAILS_ARG) override;
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) override;
 
     /****** IDSMERadio ******/
 

@@ -1,0 +1,49 @@
+//
+// Copyright (C) 2016 Florian Kauer <florian.kauer@koalo.de>
+// Copyright (C) 2000 Institut fuer Telematik, Universitaet Karlsruhe
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program; if not, see <http://www.gnu.org/licenses/>.
+//
+
+
+package inet_dsme.applications.generic;
+
+import inet.applications.generic.IPvXTrafGen;
+
+simple PRRTrafGen extends IPvXTrafGen
+{
+    parameters:
+        // After the startTime, the generator starts sending dummy packets that do
+        // not count to the numPackets and will not be counted at the receiver.
+        // After the warmUpTime, numPackets will be sent and counted.
+        // Afterwards, the generator will continue generating dummy packets,
+        // if continueSendingDummyPackets is set. If all traffic generators are finished,
+        // a timer of coolDownDuration is scheduled that will end the simulation.
+        double warmUpDuration @unit("s") = default(10s);
+        double coolDownDuration @unit("s") = default(10s);
+        bool continueSendingDummyPackets = default(true);
+        
+        @signal[sinkRcvdPk](type=cPacket);
+        @signal[sentDummyPk](type=cPacket);
+        @signal[rcvdPkFrom-*](type=cPacket);
+
+        @statisticTemplate[rcvdPkFrom](record=count);
+        @statistic[sinkRcvdPk](title="own packets received by sink"; source=sinkRcvdPk; record=count,vector(packetBytes); interpolationmode=none);
+        @statistic[sentDummyPk](title="dummy packets sent"; source=sentDummyPk; record=count,vector(packetBytes); interpolationmode=none);
+        @statistic[sinkRcvdPkDelay](title="delay of own packets received by sink"; source=messageAge(sinkRcvdPk); record=mean,max; interpolationmode=none);
+        @statistic[PRR](title="PRR"; source=count(sinkRcvdPk)/count(sentPk); record=last,vector; interpolationmode=none);
+
+        @class(PRRTrafGen);
+}
+

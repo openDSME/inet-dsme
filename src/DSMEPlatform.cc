@@ -264,7 +264,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
         DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
         dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
-        LOG_DEBUG("Missed frame " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
+        LOG_DEBUG("Missed frame " << macPkt->str() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
 
         releaseMessage(dsmemsg);
         return;
@@ -274,7 +274,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
         DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
         dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
-        LOG_DEBUG("Received corrupted frame " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ")");
+        LOG_DEBUG("Received corrupted frame " << macPkt->str() << "(" << getSequenceChartInfo(dsmemsg, false) << ")");
         emit(corruptedFrameReceived, macPkt);
 
         releaseMessage(dsmemsg);
@@ -290,7 +290,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     inet::physicallayer::ReceptionIndication* control = check_and_cast<inet::physicallayer::ReceptionIndication*>(macPkt->getControlInfo());
     dsmemsg->setLQI(PERtoLQI(control->getPacketErrorRate()));
 
-    LOG_DEBUG("Received valid frame     " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
+    LOG_DEBUG("Received valid frame     " << macPkt->str() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
 
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     dsmemsg->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - dsmemsg->getTotalSymbols() + 2 * 4 // Preamble
@@ -305,7 +305,6 @@ void DSMEPlatform::handleUpperPacket(cPacket* pkt) {
     LOG_INFO_PURE("Upper layer requests to send a message to ");
 
     DSMEFrame* macPkt = new DSMEFrame();
-    macPkt->setNetworkProtocol(cInfo->getNetworkProtocol());
     macPkt->encapsulate(pkt);
 
     DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
@@ -357,10 +356,10 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     }
 }
 
-void DSMEPlatform::receiveSignal(cComponent* source, simsignal_t signalID, long value DETAILS_ARG) {
+void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) {
     Enter_Method_Silent();
     if(signalID == IRadio::transmissionStateChangedSignal) {
-        IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(value);
+        IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(l);
         if(transmissionState == IRadio::TRANSMISSION_STATE_TRANSMITTING && newRadioTransmissionState == IRadio::TRANSMISSION_STATE_IDLE) {
             // LOG_INFO("Transmission ready")
             txEndCallback(true); // TODO could it be false?
@@ -368,7 +367,7 @@ void DSMEPlatform::receiveSignal(cComponent* source, simsignal_t signalID, long 
         }
         transmissionState = newRadioTransmissionState;
     } else if(signalID == IRadio::radioModeChangedSignal) {
-        IRadio::RadioMode newRadioMode = static_cast<IRadio::RadioMode>(value);
+        IRadio::RadioMode newRadioMode = static_cast<IRadio::RadioMode>(l);
         if(newRadioMode == IRadio::RADIO_MODE_TRANSMITTER) {
             // LOG_INFO("switched to transmit")
             if(pendingSendRequest) {
@@ -394,7 +393,7 @@ bool DSMEPlatform::setChannelNumber(uint8_t k) {
     DSME_ASSERT(k >= 11 && k <= 26);
 
     k -= 11;
-    auto r = check_and_cast<FlatRadioBase*>(radio);
+    auto r = check_and_cast<NarrowbandRadioBase*>(radio);
     r->setCarrierFrequency(MHz(2405 + 5 * k));
     return true;
 }
@@ -622,7 +621,6 @@ void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
     SimpleLinkLayerControlInfo* const controlInfo = new SimpleLinkLayerControlInfo();
     controlInfo->setSrc(macPkt->getSrcAddr());
     controlInfo->setInterfaceId(interfaceEntry->getInterfaceId());
-    controlInfo->setNetworkProtocol(macPkt->getNetworkProtocol());
     packet->setControlInfo(controlInfo);
 
     delete macPkt;
