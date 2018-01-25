@@ -218,12 +218,6 @@ void DSMEPlatform::initialize(int stage) {
 
         this->phy_pib.phyCurrentChannel = par("commonChannel");
 
-        if(strcmp(par("allocationScheme").stringValue(), "random") == 0) {
-            this->dsmeAdaptionLayer.settings.allocationScheme = DSMEAdaptionLayerSettings::ALLOC_RANDOM;
-        } else {
-            this->dsmeAdaptionLayer.settings.allocationScheme = DSMEAdaptionLayerSettings::ALLOC_CONTIGUOUS_SLOT;
-        }
-
         this->dsmeAdaptionLayer.setIndicationCallback(DELEGATE(&DSMEPlatform::handleIndicationFromMCPS, *this));
         this->dsmeAdaptionLayer.setConfirmCallback(DELEGATE(&DSMEPlatform::handleConfirmFromMCPS, *this));
 
@@ -264,7 +258,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
         DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
         dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
-        LOG_DEBUG("Missed frame " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
+        LOG_DEBUG("Missed frame " << macPkt->str() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
 
         releaseMessage(dsmemsg);
         return;
@@ -274,7 +268,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
         DSMEMessage* dsmemsg = getLoadedMessage(macPkt);
         dsmemsg->getHeader().decapsulateFrom(dsmemsg);
 
-        LOG_DEBUG("Received corrupted frame " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ")");
+        LOG_DEBUG("Received corrupted frame " << macPkt->str() << "(" << getSequenceChartInfo(dsmemsg, false) << ")");
         emit(corruptedFrameReceived, macPkt);
 
         releaseMessage(dsmemsg);
@@ -290,7 +284,7 @@ void DSMEPlatform::handleLowerPacket(cPacket* pkt) {
     inet::physicallayer::ReceptionIndication* control = check_and_cast<inet::physicallayer::ReceptionIndication*>(macPkt->getControlInfo());
     dsmemsg->setLQI(PERtoLQI(control->getPacketErrorRate()));
 
-    LOG_DEBUG("Received valid frame     " << macPkt->detailedInfo() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
+    LOG_DEBUG("Received valid frame     " << macPkt->str() << "(" << getSequenceChartInfo(dsmemsg, false) << ") [" << getErrorInfo(macPkt) << "]");
 
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
     dsmemsg->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - dsmemsg->getTotalSymbols() + 2 * 4 // Preamble
@@ -399,6 +393,16 @@ bool DSMEPlatform::setChannelNumber(uint8_t k) {
     return true;
 }
 
+std::string extract_type(std::string s) {
+    std::vector<std::string> out;
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, '|')) {
+        out.push_back(item);
+    }
+    return out[3];
+}
+
 bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> txEndCallback) {
     if(msg == nullptr) {
         return false;
@@ -407,12 +411,15 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
     DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
     DSME_ASSERT(dsmeMsg != nullptr);
 
-    LOG_DEBUG(getSequenceChartInfo(msg, true));
+    std::string printable_info = getSequenceChartInfo(msg, true);
+    LOG_DEBUG(printable_info);
 
     LOG_INFO("sendCopyNow " << (uint64_t)msg);
 
     this->txEndCallback = txEndCallback;
     DSMEFrame* frame = dsmeMsg->getSendableCopy();
+
+    frame->setName(extract_type(printable_info).c_str());
 
     switch(msg->getHeader().getFrameType()) {
         case IEEE802154eMACHeader::BEACON:
