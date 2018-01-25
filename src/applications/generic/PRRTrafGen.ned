@@ -19,9 +19,9 @@
 
 package inet_dsme.applications.generic;
 
-import inet.applications.generic.IPvXTrafGen;
+import inet.applications.generic.IpvxTrafGen;
 
-simple PRRTrafGen extends IPvXTrafGen
+simple PRRTrafGen extends IpvxTrafGen
 {
     parameters:
         // After the startTime, the generator starts sending dummy packets that do

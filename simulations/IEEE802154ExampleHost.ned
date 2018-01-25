@@ -19,8 +19,8 @@
 package inet_dsme.simulations;
 
 import inet.node.inet.WirelessHost;
-import inet.linklayer.ieee802154.Ieee802154NarrowbandNic;
-import inet.routing.gpsr.GPSR;
+import inet.linklayer.ieee802154.Ieee802154NarrowbandInterface;
+import inet.routing.gpsr.Gpsr;
 
 import inet_dsme.applications.generic.PRRTrafGen;
 
@@ -41,7 +41,7 @@ module IEEE802154ExampleHost extends WirelessHost
         wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
 
     submodules:
-        gpsr: GPSR {
+        gpsr: Gpsr {
             parameters:
                 @display("p=739,339");
                 networkProtocolModule = "^.networkLayer.gnp";
@@ -55,9 +55,9 @@ module IEEE802154ExampleHost extends WirelessHost
         }
 
     connections:
-        trafficgen.ipOut --> networkLayer.transportIn++;
-        trafficgen.ipIn <-- networkLayer.transportOut++;
+        trafficgen.ipOut --> nl.in++;
+        trafficgen.ipIn <-- nl.out++;
 
-        gpsr.ipOut --> networkLayer.transportIn++;
-        gpsr.ipIn <-- networkLayer.transportOut++;
+        gpsr.ipOut --> nl.in++;
+        gpsr.ipIn <-- nl.out++;
 }
