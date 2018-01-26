@@ -40,8 +40,6 @@ simple DSME extends MacProtocolBase like IMacProtocol
         int macDSMEGTSExpirationTime = default(7);
         int macResponseWaitTime = default(32);
 
-        string allocationScheme = default("random");	// ("random", "next")
-
         int numChannels = default(16);
         int commonChannel = default(11);
         int macPANId = default(10);

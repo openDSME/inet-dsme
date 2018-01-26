@@ -45,43 +45,106 @@
 
 namespace dsme {
 
-void DSMEMessage::prependFrom(DSMEMessageElement* me) {
-    // TODO better fill buffer from the end
-    uint8_t oldSize = this->frame->getData().size();
-    this->frame->getData().resize(oldSize + me->getSerializationLength());
-    memmove(this->frame->getData().data() + me->getSerializationLength(), this->frame->getData().data(), oldSize);
-    Serializer s(this->frame->getData().data(), SERIALIZATION);
-    me->serialize(s);
-    DSME_ASSERT(this->frame->getData().data() + me->getSerializationLength() == s.getData());
+void DSMEMessage::prependFrom(DSMEMessageElement* messageElement) {
+    std::vector<uint8_t> buffer(messageElement->getSerializationLength());
+    Serializer serializer(buffer.data(), SERIALIZATION);
+    messageElement->serialize(serializer);
+
+    auto chunk = inet::makeShared<inet::BytesChunk>(buffer);
+    packet->insertHeader(chunk);
 }
 
-void DSMEMessage::decapsulateTo(DSMEMessageElement* me) {
-    this->copyTo(me);
-    uint8_t newSize = this->frame->getData().size() - me->getSerializationLength();
-    memmove(this->frame->getData().data(), this->frame->getData().data() + me->getSerializationLength(), newSize);
-    this->frame->getData().resize(newSize);
+void DSMEMessage::decapsulateTo(DSMEMessageElement* messageElement) {
+    /*
+     * We can't just pop the chunk right away, since the SerializationLength of the
+     * element is only known after it is deserialized (depends on Frame Control).
+     */
+    std::vector<uint8_t> buffer(packet->peekAllBytes()->getBytes());
+    Serializer serializer(buffer.data(), DESERIALIZATION);
+    messageElement->serialize(serializer);
+
+    packet->removeHeader(inet::B(messageElement->getSerializationLength()));
 }
 
-void DSMEMessage::copyTo(DSMEMessageElement* me) {
-    Serializer s(this->frame->getData().data(), DESERIALIZATION);
-    me->serialize(s);
-    DSME_ASSERT(this->frame->getData().data() + me->getSerializationLength() == s.getData());
+inet::Packet* DSMEMessage::getSendableCopy() {
+    auto duplicate = DSMEMessage(packet->dup());
+    macHdr.prependTo(&duplicate);
+    return duplicate.decapsulatePacket();
 }
 
-DSMEFrame* DSMEMessage::getSendableCopy() {
-    DSMEMessage msg(frame->dup());
-
-    // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
-    // Preamble, sfd and phy header will be added by the lower layer (not actually, but for calculating the duration!)
-    // However, the FCS will not be added by the lower layer since it is the task of the MAC layer, so do not subtract it!
-    // By this it will be virtually added, though it is not part of the DSMEFrame itself.
-    auto symbolsPayload = getTotalSymbols() - 2 * 4 // Preamble
-                          - 2 * 1                   // SFD
-                          - 2 * 1;                  // PHY Header
-    msg.frame->setBitLength(symbolsPayload * 4);    // 4 bit per symbol
-    macHdr.prependTo(&msg);
-    DSMEFrame* f = msg.frame;
-    msg.frame = nullptr;
-    return f;
+bool DSMEMessage::hasPayload() {
+    return packet->getByteLength() > 0;
 }
+
+uint16_t DSMEMessage::getTotalSymbols() {
+    uint16_t bytes = macHdr.getSerializationLength() + packet->getByteLength()
+                     + 4  // Preamble
+                     + 1  // SFD
+                     + 1  // PHY Header
+                     + 2; // FCS
+    return bytes * 2; // 4 bit per symbol
+}
+
+uint32_t DSMEMessage::getStartOfFrameDelimiterSymbolCounter() {
+    return startOfFrameDelimiterSymbolCounter;
+}
+
+void DSMEMessage::setStartOfFrameDelimiterSymbolCounter(uint32_t value) {
+    startOfFrameDelimiterSymbolCounter = value;
+}
+
+IEEE802154eMACHeader& DSMEMessage::getHeader() {
+    return macHdr;
+}
+
+void DSMEMessage::setLQI(uint8_t lqi) {
+    this->lqi = lqi;
+}
+
+uint8_t DSMEMessage::getLQI() {
+    return lqi;
+}
+
+bool DSMEMessage::getReceivedViaMCPS() {
+    return this->receivedViaMCPS;
+}
+
+void DSMEMessage::setReceivedViaMCPS(bool receivedViaMCPS) {
+    this->receivedViaMCPS = receivedViaMCPS;
+}
+
+bool DSMEMessage::getCurrentlySending() {
+    return this->currentlySending;
+}
+
+void DSMEMessage::setCurrentlySending(bool currentlySending) {
+    this->currentlySending = currentlySending;
+}
+
+void DSMEMessage::increaseRetryCounter() {
+    retries++;
+}
+
+uint8_t DSMEMessage::getRetryCounter() {
+    return retries;
+}
+
+DSMEMessage::DSMEMessage() : packet(new inet::Packet{}) {
+}
+
+DSMEMessage::DSMEMessage(inet::Packet* packet) : packet{packet} {
+}
+
+DSMEMessage::~DSMEMessage() {
+    if(packet != nullptr) {
+        delete packet;
+    }
+}
+
+inet::Packet* DSMEMessage::decapsulatePacket() {
+    inet::Packet* temp_packet = packet;
+    packet = nullptr;
+    return temp_packet;
+}
+
 }

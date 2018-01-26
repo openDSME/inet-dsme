@@ -46,12 +46,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "inet/linklayer/base/MACProtocolBase.h"
-#include "inet/linklayer/contract/IMACProtocol.h"
+#include "inet/linklayer/base/MacProtocolBase.h"
+#include "inet/linklayer/contract/IMacProtocol.h"
 #include "inet/physicallayer/contract/packetlevel/IRadio.h"
 #include "omnetpp.h"
 
-#include "DSMEFrame_m.h"
 #include "DSMEMessage.h"
 #include "dsme_settings.h"
 #include "openDSME/dsmeAdaptionLayer/DSMEAdaptionLayer.h"
@@ -68,7 +67,7 @@ namespace dsme {
 class DSMELayer;
 class DSMEAdaptionLayer;
 
-class DSMEPlatform : public inet::MACProtocolBase, public inet::IMACProtocol, public IDSMEPlatform {
+class DSMEPlatform : public inet::MacProtocolBase, public inet::IMacProtocol, public IDSMEPlatform {
     using omnetpp::cIListener::finish;
     using omnetpp::cSimpleModule::send;
 
@@ -92,16 +91,16 @@ public:
     virtual void finish() override;
 
     /** @brief Handle messages from lower layer */
-    virtual void handleLowerPacket(cPacket*) override;
+    virtual void handleLowerPacket(inet::Packet*) override;
 
     /** @brief Handle messages from upper layer */
-    virtual void handleUpperPacket(cPacket*) override;
+    virtual void handleUpperPacket(inet::Packet*) override;
 
     /** @brief Handle self messages such as timers */
-    virtual void handleSelfMessage(cMessage*) override;
+    virtual void handleSelfMessage(omnetpp::cMessage*) override;
 
     /** @brief Handle control messages from lower layer */
-    virtual void receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) override;
+    virtual void receiveSignal(cComponent *source, omnetpp::simsignal_t signalID, long l, cObject *details) override;
 
     /****** IDSMERadio ******/
 
@@ -146,12 +145,12 @@ public:
     virtual uint8_t getMinCoordinatorLQI() override;
 
 private:
-    DSMEMessage* getLoadedMessage(DSMEFrame* frame);
+    DSMEMessage* getLoadedMessage(inet::Packet*);
 
     void handleIndicationFromMCPS(IDSMEMessage* msg);
     void handleConfirmFromMCPS(IDSMEMessage* msg, DataStatus::Data_Status status);
 
-    bool send(DSMEFrame* frame);
+    bool send(inet::Packet*);
 
     void signalNewMsg(DSMEMessage* msg);
 
@@ -172,11 +171,11 @@ private:
     std::map<DSMEMessage*, uint16_t> msgMap{};
     std::set<uint16_t> msgsActive{};
 
-    cMessage* timer{nullptr};
-    cMessage* ccaTimer{nullptr};
-    cMessage* cfpTimer{nullptr};
+    omnetpp::cMessage* timer{nullptr};
+    omnetpp::cMessage* ccaTimer{nullptr};
+    omnetpp::cMessage* cfpTimer{nullptr};
     Delegate<void(bool)> txEndCallback{};
-    DSMEFrame* pendingTxFrame{nullptr};
+    inet::Packet* pendingTxPacket{nullptr};
     bool pendingSendRequest{false};
 
     /** @brief The radio. */
@@ -186,7 +185,7 @@ private:
     /** @brief the bit rate at which we transmit */
     double bitrate{0};
 
-    inet::MACAddress addr{};
+    inet::MacAddress addr{};
     bool channelInactive{true};
 
     bool transceiverIsOn{false};
@@ -194,15 +193,15 @@ private:
     uint8_t minCoordinatorLQI{0};
 
 public:
-    SimTime symbolDuration;
+    omnetpp::SimTime symbolDuration;
 
-    static simsignal_t broadcastDataSentDown;
-    static simsignal_t unicastDataSentDown;
-    static simsignal_t ackSentDown;
-    static simsignal_t beaconSentDown;
-    static simsignal_t commandSentDown;
-    static simsignal_t uncorruptedFrameReceived;
-    static simsignal_t corruptedFrameReceived;
+    static omnetpp::simsignal_t broadcastDataSentDown;
+    static omnetpp::simsignal_t unicastDataSentDown;
+    static omnetpp::simsignal_t ackSentDown;
+    static omnetpp::simsignal_t beaconSentDown;
+    static omnetpp::simsignal_t commandSentDown;
+    static omnetpp::simsignal_t uncorruptedFrameReceived;
+    static omnetpp::simsignal_t corruptedFrameReceived;
 
 public:
     IEEE802154MacAddress& getAddress() {

@@ -44,12 +44,12 @@
 #define DSMEMESSAGE_H
 
 #include <stdint.h>
+#include "omnetpp.h"
+#include "inet/common/packet/Packet.h"
 
 #include "openDSME/dsmeLayer/messages/IEEE802154eMACHeader.h"
 #include "openDSME/interfaces/IDSMEMessage.h"
 #include "openDSME/mac_services/dataStructures/DSMEMessageElement.h"
-
-#include "DSMEFrame_m.h"
 
 namespace dsme {
 
@@ -60,114 +60,53 @@ class DSMEMessage : public omnetpp::cOwnedObject, public IDSMEMessage {
     friend class DSMEMessageElement;
 
 public:
-    void prependFrom(DSMEMessageElement* msg) override;
+    void prependFrom(DSMEMessageElement*) override;
 
-    void decapsulateTo(DSMEMessageElement* msg) override;
+    void decapsulateTo(DSMEMessageElement*) override;
 
-    void copyTo(DSMEMessageElement* msg) override;
+    bool hasPayload() override;
 
-    uint8_t getByte(uint8_t pos) override {
-        return frame->getData().at(pos);
-    }
+    uint16_t getTotalSymbols() override;
 
-    bool hasPayload() override {
-        return (frame->getData().size() > 0) || (frame->hasEncapsulatedPacket() && frame->getEncapsulatedPacket()->getByteLength() > 0);
-    }
+    uint32_t getStartOfFrameDelimiterSymbolCounter() override;
 
-    uint16_t getTotalSymbols() override {
-        uint16_t bytes = macHdr.getSerializationLength() + frame->getData().size() + 4 // Preamble
-                         + 1                                                           // SFD
-                         + 1                                                           // PHY Header
-                         + 2;                                                          // FCS
+    void setStartOfFrameDelimiterSymbolCounter(uint32_t) override;
 
-        if(frame->hasEncapsulatedPacket()) {
-            bytes += frame->getEncapsulatedPacket()->getByteLength();
-        }
+    IEEE802154eMACHeader& getHeader() override;
 
-        return bytes * 2; // 4 bit per symbol
-    }
+    uint8_t getLQI() override;
+    void setLQI(uint8_t);
 
-    uint32_t getStartOfFrameDelimiterSymbolCounter() override {
-        return startOfFrameDelimiterSymbolCounter;
-    }
+    bool getReceivedViaMCPS() override;
 
-    uint32_t getReceptionSymbolCounter() override {
-        return startOfFrameDelimiterSymbolCounter + 2 * (this->getHeader().getSerializationLength() + frame->getData().size()) + 2; // 2 Symbols for PHY header
-    }
+    void setReceivedViaMCPS(bool) override;
 
-    void setReceptionSymbolCounter(uint32_t counter) override {
-        startOfFrameDelimiterSymbolCounter = counter - (2 * (this->getHeader().getSerializationLength() + frame->getData().size()) + 2);
-    }
+    bool getCurrentlySending() override;
 
-    IEEE802154eMACHeader& getHeader() override {
-        return macHdr;
-    }
+    void setCurrentlySending(bool) override;
 
-    void setLQI(uint8_t lqi) {
-        this->lqi = lqi;
-    }
+    uint8_t getRetryCounter() override;
 
-    uint8_t getLQI() override {
-        return lqi;
-    }
-
-    bool getReceivedViaMCPS() override {
-        return this->receivedViaMCPS;
-    }
-
-    void setReceivedViaMCPS(bool receivedViaMCPS) override {
-        this->receivedViaMCPS = receivedViaMCPS;
-    }
-
-    bool getCurrentlySending() override {
-        return this->currentlySending;
-    }
-
-    void setCurrentlySending(bool currentlySending) override {
-        this->currentlySending = currentlySending;
-    }
-
-    void increaseRetryCounter() override {
-        retries++;
-    }
-
-    uint8_t getRetryCounter() override {
-        return retries;
-    }
+    void increaseRetryCounter() override;
 
 private:
+    DSMEMessage();
+    explicit DSMEMessage(inet::Packet*);
+    ~DSMEMessage();
+
+    inet::Packet* getSendableCopy();
+    inet::Packet* decapsulatePacket();
+
+    IEEE802154eMACHeader macHdr;
+    inet::Packet* packet{nullptr};
+
     bool receivedViaMCPS{false}; // TODO better handling?
     bool firstTry{false};
     bool currentlySending{false};
 
-    IEEE802154eMACHeader macHdr;
-
-    DSMEFrame* frame;
-
     uint8_t lqi{0};
     uint8_t retries{0};
-
-    DSMEMessage() : frame(new DSMEFrame()) {
-    }
-
-    DSMEMessage(DSMEFrame* frame) : frame(frame) {
-    }
-
-    ~DSMEMessage() {
-        if(frame != nullptr) {
-            delete frame;
-        }
-    }
-
     uint32_t startOfFrameDelimiterSymbolCounter{0};
-
-    DSMEFrame* getSendableCopy();
-
-    DSMEFrame* decapsulateFrame() {
-        DSMEFrame* f = frame;
-        frame = nullptr;
-        return f;
-    }
 };
 }
 
