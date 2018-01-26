@@ -4,7 +4,7 @@ typedef std::vector<uint8_t> DataVector;
 }}
 
 cplusplus {{
-    #include "inet/linklayer/base/MACFrameBase_m.h"
+    #include "inet/linklayer/base/MacFrameBase_m.h"
 }}
 
 namespace dsme;

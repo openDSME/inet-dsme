@@ -1,13 +1,13 @@
 package inet_dsme;
 
-import inet.linklayer.base.MACProtocolBase;
-import inet.linklayer.contract.IMACProtocol;
+import inet.linklayer.base.MacProtocolBase;
+import inet.linklayer.contract.IMacProtocol;
 
 //
 // IEEE802.15.4e
 // Deterministic and synchronous multi-channel extension
 //
-simple DSME extends MACProtocolBase like IMACProtocol
+simple DSME extends MacProtocolBase like IMacProtocol
 {
     parameters:
         string address = default("auto"); // MAC address as hex string (12 hex digits), or
