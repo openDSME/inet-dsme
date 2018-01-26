@@ -18,8 +18,10 @@
 
 package inet_dsme.simulations;
 
-import inet.node.inet.WirelessHost;
+
 import inet.linklayer.ieee802154.Ieee802154NarrowbandInterface;
+import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
+import inet.node.inet.WirelessHost;
 import inet.routing.gpsr.Gpsr;
 
 import inet_dsme.applications.generic.PRRTrafGen;
@@ -34,25 +36,39 @@ module IEEE802154ExampleHost extends WirelessHost
 
         forwarding = default(true);
 
-        networkLayerType = "GenericNetworkLayer";
-        networkLayer.gnp.procDelay = default(2ms);
+        hasIpv4 = default(true);
+        hasGn   = default(true);
 
-        wlan[*].typename = default("WirelessNic");
+        hasTcp  = default(false);
+
+        ipv4.configurator.networkConfiguratorModule = default("^.^.configurator");
+
+        networkLayerType = "GenericNetworkLayer";
+        generic.gnp.procDelay = default(2ms);
+
+        wlan[*].typename = default("WirelessInterface");
         wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
 
     submodules:
         gpsr: Gpsr {
             parameters:
                 @display("p=739,339");
-                networkProtocolModule = "^.networkLayer.gnp";
+                routingTableModule = "^.generic.routingTable";
+                networkProtocolModule = "^.generic.gnp";
         }
 
         trafficgen: PRRTrafGen {
             parameters:
                 @display("p=188,287");
-                protocol = 17;
+                protocol     = default(6); // TCP (was unused)
                 packetLength = default(10B);
         }
+
+        configurator: Ipv4NetworkConfigurator {
+            parameters:
+                @display("p=229,36");
+        }
+
 
     connections:
         trafficgen.ipOut --> nl.in++;
