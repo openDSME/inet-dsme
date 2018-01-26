@@ -146,7 +146,10 @@ void DSMEPlatform::initialize(int stage) {
         else {
             ASSERT(false);
         }
-        this->dsmeAdaptionLayer.initialize(scanChannels,scheduling);
+
+        uint8_t scanDuration = par("scanDuration").intValue();
+
+        this->dsmeAdaptionLayer.initialize(scanChannels,scanDuration,scheduling);
 
         /* Initialize Address */
         IEEE802154MacAddress address;
