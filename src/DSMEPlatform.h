@@ -46,10 +46,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "inet/linklayer/base/MacProtocolBase.h"
-#include "inet/linklayer/contract/IMacProtocol.h"
-#include "inet/physicallayer/contract/packetlevel/IRadio.h"
-#include "omnetpp.h"
+#include <omnetpp.h>
+
+#include <inet/linklayer/base/MacProtocolBase.h>
+#include <inet/linklayer/contract/IMacProtocol.h>
+#include <inet/physicallayer/contract/packetlevel/IRadio.h>
 
 #include "DSMEMessage.h"
 #include "dsme_settings.h"

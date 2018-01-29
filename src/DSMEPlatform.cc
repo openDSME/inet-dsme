@@ -2,20 +2,18 @@
 
 #include <iomanip>
 
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/FindModule.h"
-//#include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
-#include "inet/physicallayer/base/packetlevel/FlatRadioBase.h"
-#include "inet/physicallayer/contract/packetlevel/IRadio.h"
+#include <inet/common/ModuleAccess.h>
+#include <inet/linklayer/common/InterfaceTag_m.h>
+#include <inet/linklayer/common/MacAddressTag_m.h>
+#include <inet/physicallayer/base/packetlevel/FlatRadioBase.h>
+#include <inet/physicallayer/common/packetlevel/SignalTag_m.h>
+#include <inet/physicallayer/contract/packetlevel/IRadio.h>
+
 #include "openDSME/dsmeLayer/DSMELayer.h"
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/PIDScheduling.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/TPS.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
-
-#include "inet/physicallayer/common/packetlevel/SignalTag_m.h"
-#include "inet/linklayer/common/MacAddressTag_m.h"
-#include "inet/linklayer/common/InterfaceTag_m.h"
 
 // coverity[+kill]
 void _simulation_will_terminate(void) {

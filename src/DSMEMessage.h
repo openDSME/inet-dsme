@@ -44,8 +44,10 @@
 #define DSMEMESSAGE_H
 
 #include <stdint.h>
-#include "omnetpp.h"
-#include "inet/common/packet/Packet.h"
+
+#include <omnetpp.h>
+
+#include <inet/common/packet/Packet.h>
 
 #include "openDSME/dsmeLayer/messages/IEEE802154eMACHeader.h"
 #include "openDSME/interfaces/IDSMEMessage.h"

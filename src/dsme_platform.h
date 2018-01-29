@@ -43,7 +43,8 @@
 #ifndef PLATFORM_OMNETPP_H
 #define PLATFORM_OMNETPP_H
 
-#include "omnetpp.h"
+#include <omnetpp.h>
+
 using omnetpp::getThisPtr;
 
 #if 1
