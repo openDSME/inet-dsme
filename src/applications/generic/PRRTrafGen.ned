@@ -34,6 +34,8 @@ simple PRRTrafGen extends IpvxTrafGen
         double coolDownDuration @unit("s") = default(10s);
         bool continueSendingDummyPackets = default(true);
         
+        @signal[sentPk](type=inet::Packet);
+        @signal[rcvdPk](type=inet::Packet);
         @signal[sinkRcvdPk](type=inet::Packet);
         @signal[sentDummyPk](type=inet::Packet);
         @signal[rcvdPkFrom-*](type=inet::Packet);

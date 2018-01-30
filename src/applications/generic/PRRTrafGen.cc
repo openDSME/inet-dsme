@@ -137,14 +137,12 @@ void PRRTrafGen::sendPacket()
 std::string PRRTrafGen::extractHostName(const std::string& sourceName) {
     std::string signalName = "";
     std::size_t hostStart = sourceName.find("host[");
-    if (hostStart != std::string::npos) {
-        std::size_t hostEnd = sourceName.find("]", hostStart);
-        if (hostEnd != std::string::npos) {
-            std::stringstream s;
-            s << "rcvdPkFrom-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
-            signalName = s.str();
-        }
-    }
+    assert(hostStart != std::string::npos);
+    std::size_t hostEnd = sourceName.find("]", hostStart);
+    assert(hostEnd != std::string::npos);
+    std::stringstream s;
+    s << "rcvdPkFrom-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
+    signalName = s.str();
     return signalName;
 }
 
@@ -158,7 +156,7 @@ void PRRTrafGen::processPacket(inet::Packet *msg)
 
     auto tag = msg->findTag<inet::L3AddressInd>();
     if (tag != nullptr) {
-        auto sourceAddress = tag->getDestAddress();
+        auto sourceAddress = tag->getSrcAddress();
 
         auto it = rcvdPkFromSignals.find(sourceAddress);
         if(it == rcvdPkFromSignals.end()) {

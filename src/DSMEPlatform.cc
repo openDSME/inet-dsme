@@ -107,7 +107,7 @@ DSMEPlatform::~DSMEPlatform() {
 /****** INET ******/
 
 InterfaceEntry* DSMEPlatform::createInterfaceEntry() {
-    auto e = new inet::InterfaceEntry();
+    InterfaceEntry *e = getContainingNicModule(this);
 
     // data rate
     e->setDatarate(bitrate);
