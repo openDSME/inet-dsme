@@ -27,7 +27,7 @@ import inet.routing.gpsr.Gpsr;
 import inet_dsme.applications.generic.PRRTrafGen;
 
 //
-// A wireless host containing a WirelessNic, GPSR and a PRRTrafGen.
+// A wireless host containing a WirelessInterface, GPSR and a PRRTrafGen.
 //
 module IEEE802154ExampleHost extends WirelessHost
 {
@@ -44,10 +44,7 @@ module IEEE802154ExampleHost extends WirelessHost
         hasTcp = false;
         hasSctp = false;
 
-        ipv4.configurator.networkConfiguratorModule = default("^.^.configurator");
-
         networkLayerType = "GenericNetworkLayer";
-        //generic.gnp.procDelay = default(0ms); // Has to be 0 due to bug in GenericNetworkProtocol::handleMessage
 
         wlan[*].typename = default("WirelessInterface");
         wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
@@ -66,12 +63,6 @@ module IEEE802154ExampleHost extends WirelessHost
                 protocol     = default(6); // TCP (was unused)
                 packetLength = default(10B);
         }
-
-        configurator: Ipv4NetworkConfigurator {
-            parameters:
-                @display("p=229,36");
-        }
-
 
     connections:
         trafficgen.ipOut --> tn.in++;
