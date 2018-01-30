@@ -46,6 +46,8 @@ module IEEE802154ExampleHost extends WirelessHost
 
         networkLayerType = "GenericNetworkLayer";
 
+	generic.gnp.procDelay = default(2ms);
+
         wlan[*].typename = default("WirelessInterface");
         wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
 
