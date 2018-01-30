@@ -59,7 +59,9 @@ void DSMEMessage::decapsulateTo(DSMEMessageElement* messageElement) {
      * We can't just pop the chunk right away, since the SerializationLength of the
      * element is only known after it is deserialized (depends on Frame Control).
      */
-    std::vector<uint8_t> buffer(packet->peekAllBytes()->getBytes());
+    std::vector<uint8_t> buffer(packet->peekHeader<inet::BytesChunk>()->getBytes());
+
+    //std::vector<uint8_t> buffer(packet->peekAllBytes()->getBytes());
     Serializer serializer(buffer.data(), DESERIALIZATION);
     messageElement->serialize(serializer);
 

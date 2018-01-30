@@ -36,15 +36,18 @@ module IEEE802154ExampleHost extends WirelessHost
 
         forwarding = default(true);
 
-        hasIpv4 = default(true);
-        hasGn   = default(true);
+        hasIpv4 = false;
+        hasIpv6 = false;
+        hasGn   = true;
 
-        hasTcp  = default(false);
+        hasUdp = true;
+        hasTcp = false;
+        hasSctp = false;
 
         ipv4.configurator.networkConfiguratorModule = default("^.^.configurator");
 
         networkLayerType = "GenericNetworkLayer";
-        generic.gnp.procDelay = default(2ms);
+        //generic.gnp.procDelay = default(0ms); // Has to be 0 due to bug in GenericNetworkProtocol::handleMessage
 
         wlan[*].typename = default("WirelessInterface");
         wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
@@ -71,9 +74,9 @@ module IEEE802154ExampleHost extends WirelessHost
 
 
     connections:
-        trafficgen.ipOut --> nl.in++;
-        trafficgen.ipIn <-- nl.out++;
+        trafficgen.ipOut --> tn.in++;
+        trafficgen.ipIn <-- tn.out++;
 
-        gpsr.ipOut --> nl.in++;
-        gpsr.ipIn <-- nl.out++;
+        gpsr.ipOut --> tn.in++;
+        gpsr.ipIn <-- tn.out++;
 }

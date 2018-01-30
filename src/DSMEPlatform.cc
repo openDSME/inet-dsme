@@ -5,6 +5,8 @@
 #include <inet/common/ModuleAccess.h>
 #include <inet/linklayer/common/InterfaceTag_m.h>
 #include <inet/linklayer/common/MacAddressTag_m.h>
+#include <inet/common/ProtocolTag_m.h>
+#include <inet/common/ProtocolGroup.h>
 #include <inet/physicallayer/base/packetlevel/FlatRadioBase.h>
 #include <inet/physicallayer/common/packetlevel/SignalTag_m.h>
 #include <inet/physicallayer/contract/packetlevel/IRadio.h>
@@ -37,11 +39,21 @@ simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
-    // TODO correct translation
+    // TODO only handles short address
     if(from.isBroadcast()) {
         to = IEEE802154MacAddress(IEEE802154MacAddress::SHORT_BROADCAST_ADDRESS);
     } else {
         to.setShortAddress((from.getAddressByte(4) << 8) | from.getAddressByte(5));
+    }
+}
+
+static void translateMacAddress(IEEE802154MacAddress& from, MacAddress& to) {
+    if (from == IEEE802154MacAddress(IEEE802154MacAddress::SHORT_BROADCAST_ADDRESS)) {
+        to.setBroadcast();
+    } else {
+        to.setAddress("00 00 00 00 00 00");
+        to.setAddressByte(4, from.getShortAddress() >> 8);
+        to.setAddressByte(5, (from.getShortAddress() & 0xFF));
     }
 }
 
@@ -289,6 +301,13 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
 }
 
 void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
+    if (auto *tag = packet->findTag<inet::PacketProtocolTag>()) {
+        /* 'Smuggle' protocol information across lower layers via par() */
+        auto protocol = tag->getProtocol();
+        auto protocolId = inet::ProtocolGroup::ethertype.getProtocolNumber(protocol);
+        packet->addPar("networkProtocol").setLongValue(protocolId);
+    }
+
     LOG_INFO_PREFIX;
     LOG_INFO_PURE("Upper layer requests to send a message to ");
 
@@ -601,8 +620,7 @@ uint8_t DSMEPlatform::getMinCoordinatorLQI() {
 }
 
 void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
-    if(msg->getHeader().getDestAddr().isBroadcast()
-       && msg->getLQI() < minBroadcastLQI) {
+    if(msg->getHeader().getDestAddr().isBroadcast() && msg->getLQI() < minBroadcastLQI) {
         releaseMessage(msg);
         return;
     }
@@ -610,15 +628,21 @@ void DSMEPlatform::handleIndicationFromMCPS(IDSMEMessage* msg) {
     DSMEMessage* dsmeMessage = check_and_cast<DSMEMessage*>(msg);
 
     auto packet = dsmeMessage->decapsulatePacket();
+
+    inet::MacAddress address;
+    translateMacAddress(dsmeMessage->getHeader().getSrcAddr(), address);
+    packet->addTagIfAbsent<MacAddressInd>()->setSrcAddress(address);
+    packet->addTagIfAbsent<InterfaceInd>()->setInterfaceId(interfaceEntry->getInterfaceId());
+
     releaseMessage(msg);
 
-    // controlInfo->setSrc(macPkt->getSrcAddr());
-    //auto addressInd = packet->addTagIfAbsent<MacAddressInd>();
-    //addressInd->setSrcAddress(dsmeMessage->getHeader().getSrcAddr());
-    //addressInd->setDestAddress(macHeader->getReceiverAddress());
-
-    // controlInfo->setInterfaceId(interfaceEntry->getInterfaceId());
-    packet->addTagIfAbsent<InterfaceInd>()->setInterfaceId(interfaceEntry->getInterfaceId());
+    if (packet->hasPar("networkProtocol")) {
+        /* Reattach protocol information from par() */
+        auto protocolId = packet->par("networkProtocol").longValue();
+        auto protocol = inet::ProtocolGroup::ethertype.getProtocol(protocolId);
+        packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(protocol);
+        packet->addTagIfAbsent<inet::DispatchProtocolReq>()->setProtocol(protocol);
+    }
 
     sendUp(packet);
 }

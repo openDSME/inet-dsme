@@ -34,9 +34,9 @@ simple PRRTrafGen extends IpvxTrafGen
         double coolDownDuration @unit("s") = default(10s);
         bool continueSendingDummyPackets = default(true);
         
-        @signal[sinkRcvdPk](type=cPacket);
-        @signal[sentDummyPk](type=cPacket);
-        @signal[rcvdPkFrom-*](type=cPacket);
+        @signal[sinkRcvdPk](type=inet::Packet);
+        @signal[sentDummyPk](type=inet::Packet);
+        @signal[rcvdPkFrom-*](type=inet::Packet);
 
         @statisticTemplate[rcvdPkFrom](record=count);
         @statistic[sinkRcvdPk](title="own packets received by sink"; source=sinkRcvdPk; record=count,vector(packetBytes); interpolationmode=none);
