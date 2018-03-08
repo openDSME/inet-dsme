@@ -5,7 +5,7 @@ if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 mkdir -p omnetdownload
 export OMNETTAR=omnetdownload/omnetpp.tgz
 #export OMNETURL='https://omnetpp.org/omnetpp/send/30-omnet-releases/2305-omnetpp-50-linux'
-export OMNETURL='https://omnetpp.org/component/jdownloads/send/31-release-test-versions/2325-omnetpp-5-3p2-linux'
+export OMNETURL='https://omnetpp.org/component/jdownloads/send/31-release-test-versions/2325-omnetpp-5-3p3-linux'
 #export OMNETREF='https://omnetpp.org/omnetpp'
 export OMNETREF='https://omnetpp.org/component/jdownloads/category/31-release-test-versions'
 if test -e "$OMNETTAR";
@@ -19,7 +19,7 @@ fi
     
 # Compile OMNET++
 tar -xzf $OMNETTAR
-export OMNET_PATH=`pwd`/omnetpp-5.3p2
+export OMNET_PATH=`pwd`/omnetpp-5.3p3
 export PATH=$PATH:$OMNET_PATH/bin
 pushd $OMNET_PATH && sed -i 's/WITH_QTENV.*/WITH_QTENV=no/' configure.user && sed -i 's/WITH_TKENV.*/WITH_TKENV=no/' configure.user && ./configure && make -j2 && popd
 cp utils/opp_makedep_fix $OMNET_PATH/bin/opp_makedep
