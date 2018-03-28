@@ -395,10 +395,15 @@ bool DSMEPlatform::setChannelNumber(uint8_t k) {
     DSME_ASSERT(this->transceiverIsOn);
     DSME_ASSERT(k >= 11 && k <= 26);
 
-    k -= 11;
     auto r = check_and_cast<NarrowbandRadioBase*>(radio);
-    r->setCarrierFrequency(MHz(2405 + 5 * k));
+    r->setCarrierFrequency(MHz(2405 + 5 * (k-11)));
+    currentChannel = k;
     return true;
+}
+
+uint8_t DSMEPlatform::getChannelNumber() {
+    DSME_ASSERT(currentChannel >= 11 && currentChannel <= 26);
+    return currentChannel;
 }
 
 static std::string extract_type(std::string s) {

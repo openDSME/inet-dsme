@@ -45,6 +45,8 @@
 
 #include <stdint.h>
 
+#define STATISTICS_BEACONS
+
 namespace dsme {
 
 namespace const_redefines {

@@ -106,6 +106,7 @@ public:
     /****** IDSMERadio ******/
 
     virtual bool setChannelNumber(uint8_t k) override;
+    virtual uint8_t getChannelNumber() override;
 
     virtual bool prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> txEndCallback) override;
 
@@ -192,6 +193,7 @@ private:
     bool transceiverIsOn{false};
     uint8_t minBroadcastLQI{0};
     uint8_t minCoordinatorLQI{0};
+    uint8_t currentChannel{0};
 
 public:
     omnetpp::SimTime symbolDuration;
