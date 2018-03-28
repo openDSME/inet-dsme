@@ -18,7 +18,10 @@ else
 fi
     
 # Compile OMNET++
+echo $OMNETTAR
+ls
 tar -xzf $OMNETTAR
+ls
 export OMNET_PATH=`pwd`/omnetpp-5.3p3
 export PATH=$PATH:$OMNET_PATH/bin
 pushd $OMNET_PATH && sed -i 's/WITH_QTENV.*/WITH_QTENV=no/' configure.user && sed -i 's/WITH_TKENV.*/WITH_TKENV=no/' configure.user && sed -i 's/WITH_OSG.*/WITH_OSG=no/' configure.user && ./configure && make -j2 && popd
