@@ -113,7 +113,7 @@ InterfaceEntry* DSMEPlatform::createInterfaceEntry() {
     e->setDatarate(bitrate);
 
     // generate a link-layer address to be used as interface token for IPv6
-    e->setMACAddress(addr);
+    e->setMacAddress(addr);
     e->setInterfaceToken(addr.formInterfaceIdentifier());
 
     // capabilities
@@ -745,7 +745,7 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
             break;
         case IEEE802154eMACHeader::COMMAND: {
             //uint8_t cmd = dsmeMsg->frame->getData()[0];
-            uint8_t cmd = dsmeMsg->packet->peekDataBytes()->getByte(0);
+            uint8_t cmd = dsmeMsg->packet->peekDataAsBytes()->getByte(0);
 
             switch((CommandFrameIdentifier)cmd) {
                 case ASSOCIATION_REQUEST:
@@ -792,7 +792,7 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
                             GTSRequestCmd req;
                             req.decapsulateFrom(m);
                             //ss << getDSMEManagement(dsmeMsg->frame->getData()[1], req.getSABSpec(), cmdd.getCmdId());
-                            ss << getDSMEManagement(dsmeMsg->packet->peekDataBytes()->getByte(1), req.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->packet->peekDataAsBytes()->getByte(1), req.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         case DSME_GTS_REPLY: {
@@ -800,7 +800,7 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
                             GTSReplyNotifyCmd reply;
                             reply.decapsulateFrom(m);
                             //ss << getDSMEManagement(dsmeMsg->frame->getData()[1], reply.getSABSpec(), cmdd.getCmdId());
-                            ss << getDSMEManagement(dsmeMsg->packet->peekDataBytes()->getByte(1), reply.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->packet->peekDataAsBytes()->getByte(1), reply.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         case DSME_GTS_NOTIFY: {
@@ -808,7 +808,7 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
                             GTSReplyNotifyCmd notify;
                             notify.decapsulateFrom(m);
                             //ss << getDSMEManagement(dsmeMsg->frame->getData()[1], notify.getSABSpec(), cmdd.getCmdId());
-                            ss << getDSMEManagement(dsmeMsg->packet->peekDataBytes()->getByte(1), notify.getSABSpec(), cmdd.getCmdId());
+                            ss << getDSMEManagement(dsmeMsg->packet->peekDataAsBytes()->getByte(1), notify.getSABSpec(), cmdd.getCmdId());
                             break;
                         }
                         default:

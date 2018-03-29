@@ -51,7 +51,7 @@ void DSMEMessage::prependFrom(DSMEMessageElement* messageElement) {
     messageElement->serialize(serializer);
 
     auto chunk = inet::makeShared<inet::BytesChunk>(buffer);
-    packet->insertHeader(chunk);
+    packet->insertAtFront(chunk);
 }
 
 void DSMEMessage::decapsulateTo(DSMEMessageElement* messageElement) {
@@ -59,13 +59,13 @@ void DSMEMessage::decapsulateTo(DSMEMessageElement* messageElement) {
      * We can't just pop the chunk right away, since the SerializationLength of the
      * element is only known after it is deserialized (depends on Frame Control).
      */
-    std::vector<uint8_t> buffer(packet->peekHeader<inet::BytesChunk>()->getBytes());
+    std::vector<uint8_t> buffer(packet->peekAtFront<inet::BytesChunk>()->getBytes());
 
     //std::vector<uint8_t> buffer(packet->peekAllBytes()->getBytes());
     Serializer serializer(buffer.data(), DESERIALIZATION);
     messageElement->serialize(serializer);
 
-    packet->removeHeader(inet::B(messageElement->getSerializationLength()));
+    packet->removeAtFront(inet::B(messageElement->getSerializationLength()));
 }
 
 inet::Packet* DSMEMessage::getSendableCopy() {

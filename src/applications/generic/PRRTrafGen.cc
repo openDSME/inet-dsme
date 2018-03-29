@@ -110,7 +110,7 @@ void PRRTrafGen::sendPacket()
     auto now = omnetpp::simTime();
     bool dummy = now < startTime+warmUpDuration || (numPackets != -1 && numSent >= numPackets);
     packet->addPar("dummy") = dummy;
-    packet->insertAtEnd(payload);
+    packet->insertAtBack(payload);
 
     auto destAddr = chooseDestAddr();
 
@@ -122,7 +122,7 @@ void PRRTrafGen::sendPacket()
     if(!dummy) {
         EV_INFO << "Sending packet: ";
         printPacket(packet);
-        emit(inet::sentPkSignal, packet);
+        emit(inet::packetSentSignal, packet);
         send(packet, "ipOut");
         numSent++;
     }
