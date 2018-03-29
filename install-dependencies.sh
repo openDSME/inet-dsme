@@ -32,7 +32,8 @@ ls $OMNET_PATH
 
 # Checkout INET
 export INET=`pwd`/inet
-export BRANCH=integration
+#export BRANCH=integration
+export BRANCH=ieee802154_example
 if [ ! -d $INET/.git ];
 then
     rm -rf $INET;
