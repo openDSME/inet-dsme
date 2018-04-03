@@ -62,7 +62,7 @@ module IEEE802154ExampleHost extends WirelessHost
         trafficgen: PRRTrafGen {
             parameters:
                 @display("p=188,287");
-                protocol     = default(6); // TCP (was unused)
+                protocol     = default(150);
                 packetLength = default(10B);
         }
 
