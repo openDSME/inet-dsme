@@ -78,16 +78,42 @@ for i in range(1000):
 
 currentMatrixToAdd = currentAllocationMatrix.copy()
 allocationMatrixHistory.append((0, currentMatrixToAdd))
+addressToID = {}
+IDtoAddress = {}
+nextID = 0
+
+def get_address_from_ID(ID):
+    global nextID, addressToID, IDtoAddress
+    return IDtoAddress[ID]
+
+def get_ID_from_address(address):
+    global nextID, addressToID, IDtoAddress
+    if not address in addressToID:
+        addressToID[address] = nextID
+        IDtoAddress[nextID] = address
+        nextID += 1
+    return addressToID[address]
 
 for line in open(args.log):
-    m = re.search("^\[\w*\]\s*([0-9.]*)\s*[0-9]*: ((de)?)alloc ([0-9]+)(.)([0-9]+) ([0-9]+),([0-9]+),([0-9]+)", line)
+    m = re.search("(.*?)((de)?)alloc ([0-9]+)(.)([0-9]+) ([0-9]+),([0-9]+),([0-9]+)", line)
     if m:
         #print m.group(0)
         direction = ''
         if m.group(5) == '>':
-            source = int(m.group(4)) - 1
-            destination = int(m.group(6)) - 1
-            time = float(m.group(1))
+            source = get_ID_from_address(int(m.group(4)))
+            destination = get_ID_from_address(int(m.group(6)))
+            prefix = m.group(1)
+            n = re.search("^\[\w*\]\s*([0-9.]*)\s*[0-9]*:", prefix)
+            if n:
+                time = n.group(1)
+            else:
+                n = re.search("^([0-9.]*);", prefix)
+                if n:
+                    time = n.group(1)
+                else:
+                    assert(False)
+            time = float(time)
+
             if m.group(2) == 'de':
                 totalDealloc += 1
                 currentAllocationMatrix[source][destination] -= 1
@@ -170,6 +196,12 @@ def animate(i):
 final_time, unused =  allocationMatrixHistory[keys - 1]
 
 print("Data collection finished")
+for src in addressToID:
+    print("----")
+    print(str(src)+":")
+    for dst in addressToID:
+        print("-> "+str(dst)+" "+str(int(currentAllocationMatrix[get_ID_from_address(src)][get_ID_from_address(dst)])))
+exit(1)
 
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=int(final_time) + 10, interval=1, blit=True)
 

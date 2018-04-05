@@ -4,6 +4,7 @@ import argparse
 import re
 import numpy
 import subprocess
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description="Creates an animation from a log file to visualise the GTS allocation process.")
 parser.add_argument("-l", "--log", type=str, required=True, help="the log file to parse")
@@ -17,7 +18,7 @@ finalcapslot=8
 totalalloc = 0
 totaldealloc = 0
 
-pernode = [0]*64
+pernode = {}
 
 msf = []
 for j in range(0,channels):
@@ -38,6 +39,8 @@ tab.write("""
 \PreviewEnvironment{tikzpicture} 
 \\begin{document}""")
 
+times = []
+
 def printtable(time):
     tab.write("""\\begin{tikzpicture}
     \\node{
@@ -57,8 +60,7 @@ def printtable(time):
     \end{tikzpicture}""")
 
 for line in open(args.log):
-    m = re.search("^\[\w*\]\s*([0-9.]*)\s*[0-9]*: ((de)?)alloc ([0-9]+)(.)([0-9]+) ([0-9]+),([0-9]+),([0-9]+)", line)
-    #m = re.search("^([0-9.]*)\s*[0-9]*: ((de)?)alloc ([0-9]+)(.)([0-9]+) ([0-9]+),([0-9]+),([0-9]+)", line)
+    m = re.search("(.*?)((de)?)alloc ([0-9]+)(.)([0-9]+) ([0-9]+),([0-9]+),([0-9]+)", line)
     if m:
         print m.group(0)
         direction = ''
@@ -69,15 +71,29 @@ for line in open(args.log):
         #+"$\\to$"
         text = m.group(4)+direction+m.group(6)
         array = msf[int(m.group(9))][int(m.group(8))][int(m.group(7))-finalcapslot-1]
+        node = int(m.group(4))
+        if not node in pernode:
+            pernode[node] = 0
         if m.group(2) == 'de':
             totaldealloc += 1
-            pernode[int(m.group(4))] -= 1
+            pernode[node] -= 1
             array.remove(text)
         else:
             totalalloc += 1
-            pernode[int(m.group(4))] += 1
+            pernode[node] += 1
             array.append(text)
-        printtable(m.group(1))
+
+        prefix = m.group(1)
+        n = re.search("^\[\w*\]\s*([0-9.]*)\s*[0-9]*:", prefix)
+        if n:
+            time = n.group(1)
+        else:
+            n = re.search("^([0-9.]*);", prefix)
+            if n:
+                time = n.group(1)
+        if n:
+            printtable(time)
+            times.append(float(time))
 
 print msf
 
@@ -92,4 +108,7 @@ subprocess.call(['pdflatex', '-interaction=batchmode', 'table.tex'])
 print pernode
 
 print "Dealloc %i  Alloc %i\n"%(totaldealloc,totalalloc)
+
+plt.hist(times)
+plt.show()
 
