@@ -77,6 +77,7 @@ using omnetpp::getThisPtr;
 #define LOG_DEBUG(x) LOG_INFO(x)
 #define LOG_DEBUG_PURE(x) LOG_INFO_PURE(x)
 #define LOG_DEBUG_PREFIX LOG_INFO_PREFIX
+#define FLOAT_OUTPUT(x) (x)
 
 void _simulation_will_terminate(void);
 
