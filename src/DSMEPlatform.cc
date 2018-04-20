@@ -431,6 +431,7 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
     this->txEndCallback = txEndCallback;
     auto packet = message->getSendableCopy();
 
+    packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(0);
     packet->setName(extract_type(printable_info).c_str());
 
     switch(msg->getHeader().getFrameType()) {
