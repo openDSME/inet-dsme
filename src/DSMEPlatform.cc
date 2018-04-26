@@ -431,8 +431,11 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
     this->txEndCallback = txEndCallback;
     auto packet = message->getSendableCopy();
 
-    packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(0);
-    packet->setName(extract_type(printable_info).c_str());
+    packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(&Protocol::ieee802154);
+    if(!msg->getReceivedViaMCPS()) { // do not rewrite upper layer packet names
+        DSME_ASSERT(strlen(packet->getName()) == 0);
+        packet->setName(extract_type(printable_info).c_str());
+    }
 
     switch(msg->getHeader().getFrameType()) {
         case IEEE802154eMACHeader::BEACON:

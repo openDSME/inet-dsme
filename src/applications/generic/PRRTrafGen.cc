@@ -64,7 +64,7 @@ void PRRTrafGen::initialize(int stage)
 }
 
 void PRRTrafGen::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t signalID, omnetpp::cObject *obj, omnetpp::cObject *details) {
-    unsigned int num = atoi(((omnetpp::cPacket*)obj)->getName()+strlen("appData-"));
+    unsigned int num = atoi(((inet::Packet*)obj)->getName()+strlen("appData-"));
     if(packetReceived.size() < num+1) {
         packetReceived.resize(num+1,false);
     }
@@ -154,24 +154,24 @@ void PRRTrafGen::processPacket(inet::Packet *msg)
         return;
     }
 
-    auto tag = msg->findTag<inet::L3AddressInd>();
-    if (tag != nullptr) {
-        auto sourceAddress = tag->getSrcAddress();
+    auto tag = msg->getTag<inet::L3AddressInd>();
+    auto sourceAddress = tag->getSrcAddress();
 
-        auto it = rcvdPkFromSignals.find(sourceAddress);
-        if(it == rcvdPkFromSignals.end()) {
-            std::string signalName = extractHostName(sourceAddress.str());
-            auto signal = registerSignal(signalName.c_str());
+    auto it = rcvdPkFromSignals.find(sourceAddress);
+    if(it == rcvdPkFromSignals.end()) {
+        std::string signalName = extractHostName(sourceAddress.str());
 
-            omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "rcvdPkFrom");
-            getSimulation()->getActiveEnvir()->addResultRecorders(this, signal, signalName.c_str(), statisticTemplate);
+        auto signal = registerSignal(signalName.c_str());
 
-            rcvdPkFromSignals[sourceAddress] = signal;
-            it = rcvdPkFromSignals.find(sourceAddress);
-        }
+        omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "rcvdPkFrom");
+        getSimulation()->getActiveEnvir()->addResultRecorders(this, signal, signalName.c_str(), statisticTemplate);
 
-        emit(it->second, msg);
+        rcvdPkFromSignals[sourceAddress] = signal;
+        it = rcvdPkFromSignals.find(sourceAddress);
     }
+
+    emit(it->second, msg);
+
 
     IpvxTrafGen::processPacket(msg);
 }
