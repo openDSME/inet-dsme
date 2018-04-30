@@ -30,6 +30,7 @@ network Net802154
         host[numHosts]: IEEE802154ExampleHost {
             parameters:
                 @display("r=,,#707070;p=250,58;is=vs");
+                mobilityType = "StaticConcentricMobility";
         }
         
         radioMedium: Ieee802154NarrowbandScalarRadioMedium {

@@ -47,7 +47,7 @@ module IEEE802154ExampleHost extends WirelessHost
 
         networkLayerType = "GenericNetworkLayer";
 
-	generic.gnp.procDelay = default(2ms);
+	    generic.gnp.procDelay = default(2ms);
 
         wlan[*].typename = default("WirelessInterface");
         wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
@@ -58,6 +58,7 @@ module IEEE802154ExampleHost extends WirelessHost
                 @display("p=739,339");
                 routingTableModule = "^.generic.routingTable";
                 networkProtocolModule = "^.generic.gnp";
+				positionByteLength = 2 B; // assumes a 3D coordinate can be specified in 6 byte
         }
 
         trafficgen: PRRTrafGen {
