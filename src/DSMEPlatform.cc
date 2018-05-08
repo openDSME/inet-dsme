@@ -272,32 +272,32 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
     }
 
     if(packet->hasBitError()) {
-        DSMEMessage* messsage = getLoadedMessage(packet);
-        messsage->getHeader().decapsulateFrom(messsage);
+        DSMEMessage* message = getLoadedMessage(packet);
+        message->getHeader().decapsulateFrom(message);
 
-        LOG_DEBUG("Received corrupted frame " << packet->str() << "(" << getSequenceChartInfo(messsage, false) << ")");
+        LOG_DEBUG("Received corrupted frame " << packet->str() << "(" << getSequenceChartInfo(message, false) << ")");
         emit(corruptedFrameReceived, packet);
 
-        releaseMessage(messsage);
+        releaseMessage(message);
         return;
     }
 
     emit(uncorruptedFrameReceived, packet);
 
-    DSMEMessage* messsage = getLoadedMessage(packet);
-    messsage->getHeader().decapsulateFrom(messsage);
+    DSMEMessage* message = getLoadedMessage(packet);
+    message->getHeader().decapsulateFrom(message);
 
     // Get LQI
     auto errorRateInd = packet->getTag<inet::ErrorRateInd>();
-    messsage->setLQI(PERtoLQI(errorRateInd->getPacketErrorRate()));
+    message->setLQI(PERtoLQI(errorRateInd->getPacketErrorRate()));
 
-    LOG_DEBUG("Received valid frame     " << packet->str() << "(" << getSequenceChartInfo(messsage, false) << ") [" << getErrorInfo(packet) << "]");
+    LOG_DEBUG("Received valid frame     " << packet->str() << "(" << getSequenceChartInfo(message, false) << ") [" << getErrorInfo(packet) << "]");
 
     // Preamble (4) | SFD (1) | PHY Hdr (1) | MAC Payload | FCS (2)
-    messsage->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - messsage->getTotalSymbols() + 2 * 4 // Preamble
+    message->startOfFrameDelimiterSymbolCounter = getSymbolCounter() - message->getTotalSymbols() + 2 * 4 // Preamble
                                                   + 2 * 1;                                                // SFD
 
-    dsme->getAckLayer().receive(messsage);
+    dsme->getAckLayer().receive(message);
 }
 
 void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
