@@ -7,6 +7,7 @@
 #include <inet/linklayer/common/MacAddressTag_m.h>
 #include <inet/common/ProtocolTag_m.h>
 #include <inet/common/ProtocolGroup.h>
+#include <inet/common/packet/chunk/ByteCountChunk.h>
 #include <inet/physicallayer/base/packetlevel/FlatRadioBase.h>
 #include <inet/physicallayer/common/packetlevel/SignalTag_m.h>
 #include <inet/physicallayer/contract/packetlevel/IRadio.h>
@@ -284,6 +285,7 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
 
     emit(uncorruptedFrameReceived, packet);
 
+    auto fcs = packet->removeAtBack(B(2)); // FCS is not explicitly handled -> hasBitError is used instead
     DSMEMessage* message = getLoadedMessage(packet);
     message->getHeader().decapsulateFrom(message);
 
@@ -430,6 +432,9 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
 
     this->txEndCallback = txEndCallback;
     auto packet = message->getSendableCopy();
+
+    const auto& fcs = makeShared<ByteCountChunk>(B(2));
+    packet->insertAtBack(fcs);
 
     packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(&Protocol::ieee802154);
     if(!msg->getReceivedViaMCPS()) { // do not rewrite upper layer packet names
