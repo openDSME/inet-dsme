@@ -85,8 +85,9 @@ void _simulation_will_terminate(void);
     do {                                  \
         if(!(x)) {                        \
             _simulation_will_terminate(); \
-            LOG_WARN("ASSERT");           \
-            ASSERT(x);                    \
+            std::cout << "ASSERT: " << __FILE__ << " " << __LINE__ << std::endl;\
+            std::cerr << "ASSERT: " << __FILE__ << " " << __LINE__ << std::endl;\
+            exit(1);                      \
         }                                 \
     } while(0)
 #define DSME_SIM_ASSERT(x) DSME_ASSERT(x)
