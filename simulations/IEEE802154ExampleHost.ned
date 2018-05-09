@@ -59,6 +59,9 @@ module IEEE802154ExampleHost extends WirelessHost
                 routingTableModule = "^.generic.routingTable";
                 networkProtocolModule = "^.generic.gnp";
 				positionByteLength = 2 B; // assumes a 3D coordinate can be specified in 6 byte
+                beaconInterval = 10s;
+                maxJitter = 5s;
+                neighborValidityInterval = 300s;
         }
 
         trafficgen: PRRTrafGen {
