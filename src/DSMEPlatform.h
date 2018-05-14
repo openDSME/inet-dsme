@@ -146,6 +146,8 @@ public:
 
     virtual uint8_t getMinCoordinatorLQI() override;
 
+    virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -205,6 +207,7 @@ public:
     static omnetpp::simsignal_t commandSentDown;
     static omnetpp::simsignal_t uncorruptedFrameReceived;
     static omnetpp::simsignal_t corruptedFrameReceived;
+    static omnetpp::simsignal_t gtsChange;
 
 public:
     IEEE802154MacAddress& getAddress() {

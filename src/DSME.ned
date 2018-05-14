@@ -78,11 +78,13 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[ackSentDown](type=cPacket);
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
+        @signal[GTSChange](type=long);
 
-        @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count,vector(packetBytes); interpolationmode=none);
-        @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count,vector(packetBytes); interpolationmode=none);
-        @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count,vector(packetBytes); interpolationmode=none);
-        @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count,vector(packetBytes); interpolationmode=none);
+        @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
+        @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
+        @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
+        @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
+        @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=vector; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }

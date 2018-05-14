@@ -38,6 +38,7 @@ simsignal_t DSMEPlatform::beaconSentDown;
 simsignal_t DSMEPlatform::ackSentDown;
 simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
+simsignal_t DSMEPlatform::gtsChange;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -94,6 +95,7 @@ DSMEPlatform::DSMEPlatform()
     ackSentDown = registerSignal("ackSentDown");
     uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
+    gtsChange = registerSignal("GTSChange");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -843,4 +845,9 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
 
     return ss.str();
 }
+
+void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
+    emit(gtsChange, deallocation?-1:1);
+}
+
 }
