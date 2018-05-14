@@ -152,6 +152,7 @@ void DSMEPlatform::initialize(int stage) {
         else if(!strcmp(schedulingSelection, "TPS")) {
             TPS* tps = new TPS(this->dsmeAdaptionLayer);
             tps->setAlpha(par("TPSalpha").doubleValue());
+            tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
             scheduling = tps;
         }
         else {
