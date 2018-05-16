@@ -155,6 +155,7 @@ void DSMEPlatform::initialize(int stage) {
             TPS* tps = new TPS(this->dsmeAdaptionLayer);
             tps->setAlpha(par("TPSalpha").doubleValue());
             tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
+            tps->setUseHysteresis(par("useHysteresis").boolValue());
             scheduling = tps;
         }
         else {
