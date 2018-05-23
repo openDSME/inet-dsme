@@ -3,19 +3,27 @@ if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
 # Download OMNET++
 mkdir -p omnetdownload
-export OMNETTAR=omnetdownload/omnetpp.tgz
-#export OMNETURL='https://omnetpp.org/omnetpp/send/30-omnet-releases/2305-omnetpp-50-linux'
-export OMNETURL='https://omnetpp.org/component/jdownloads/send/31-release-test-versions/2325-omnetpp-5-3p4-linux'
-#export OMNETREF='https://omnetpp.org/omnetpp'
-export OMNETREF='https://omnetpp.org/component/jdownloads/category/31-release-test-versions'
-if test -e "$OMNETTAR";
-then 
-    echo curl -o "$OMNETTAR" -z "$OMNETTAR" -e $OMNETREF $OMNETURL;
-    curl -o "$OMNETTAR" -z "$OMNETTAR" -e $OMNETREF $OMNETURL;
-else
-    echo curl -o "$OMNETTAR" -e $OMNETREF $OMNETURL;
-    curl -o "$OMNETTAR" -e $OMNETREF $OMNETURL;
-fi
+export OMNETTAR=omnetdownload/omnetpp-5.3-src-linux.tgz
+#export OMNETURL='https://omnetpp.org/component/jdownloads/send/31-release-test-versions/2325-omnetpp-5-3p4-linux'
+#export OMNETREF='https://omnetpp.org/component/jdownloads/category/31-release-test-versions'
+#if test -e "$OMNETTAR";
+#then 
+#    echo curl -o "$OMNETTAR" -z "$OMNETTAR" -e $OMNETREF $OMNETURL;
+#    curl -o "$OMNETTAR" -z "$OMNETTAR" -e $OMNETREF $OMNETURL;
+#else
+#    echo curl -o "$OMNETTAR" -e $OMNETREF $OMNETURL;
+#    curl -o "$OMNETTAR" -e $OMNETREF $OMNETURL;
+#fi
+
+screen -dmS rtorrent rtorrent -d omnetdownload utils/omnetpp-5.3-src-linux.tgz.torrent
+
+while :
+do
+    if md5sum -c utils/omnet.md5; then
+	break
+    fi
+    sleep 5
+done
     
 # Compile OMNET++
 echo $OMNETTAR
