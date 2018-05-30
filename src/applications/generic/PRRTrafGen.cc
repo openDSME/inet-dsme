@@ -70,6 +70,9 @@ void PRRTrafGen::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t
     }
 
     if(!packetReceived[num]) {
+        auto tag = ((inet::Packet*)obj)->getTag<inet::L3AddressInd>();
+        auto sourceAddress = tag->getSrcAddress();
+        std::cout << sourceAddress << " " << num << std::endl;
         packetReceived[num] = true;
         emit(sinkRcvdPkSignal, obj);
     }
@@ -141,7 +144,7 @@ std::string PRRTrafGen::extractHostName(const std::string& sourceName) {
     std::size_t hostEnd = sourceName.find("]", hostStart);
     assert(hostEnd != std::string::npos);
     std::stringstream s;
-    s << "rcvdPkFrom-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
+    s << "rcvdPkFromWithDuplicates-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
     signalName = s.str();
     return signalName;
 }
@@ -157,17 +160,17 @@ void PRRTrafGen::processPacket(inet::Packet *msg)
     auto tag = msg->getTag<inet::L3AddressInd>();
     auto sourceAddress = tag->getSrcAddress();
 
-    auto it = rcvdPkFromSignals.find(sourceAddress);
-    if(it == rcvdPkFromSignals.end()) {
+    auto it = rcvdPkFromWithDuplicatesSignals.find(sourceAddress);
+    if(it == rcvdPkFromWithDuplicatesSignals.end()) {
         std::string signalName = extractHostName(sourceAddress.str());
 
         auto signal = registerSignal(signalName.c_str());
 
-        omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "rcvdPkFrom");
+        omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "rcvdPkFromWithDuplicates");
         getSimulation()->getActiveEnvir()->addResultRecorders(this, signal, signalName.c_str(), statisticTemplate);
 
-        rcvdPkFromSignals[sourceAddress] = signal;
-        it = rcvdPkFromSignals.find(sourceAddress);
+        rcvdPkFromWithDuplicatesSignals[sourceAddress] = signal;
+        it = rcvdPkFromWithDuplicatesSignals.find(sourceAddress);
     }
 
     emit(it->second, msg);

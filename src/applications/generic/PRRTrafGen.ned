@@ -38,9 +38,9 @@ simple PRRTrafGen extends IpvxTrafGen
         @signal[packetReceived](type=inet::Packet);
         @signal[sinkRcvdPk](type=inet::Packet);
         @signal[sentDummyPk](type=inet::Packet);
-        @signal[rcvdPkFrom-*](type=inet::Packet);
+        @signal[rcvdPkFromWithDuplicates-*](type=inet::Packet);
 
-        @statisticTemplate[rcvdPkFrom](record=count);
+        @statisticTemplate[rcvdPkFromWithDuplicates](record=count);
         @statistic[sinkRcvdPk](title="own packets received by sink"; source=sinkRcvdPk; record=count,vector(packetBytes); interpolationmode=none);
         @statistic[sentDummyPk](title="dummy packets sent"; source=sentDummyPk; record=count,vector(packetBytes); interpolationmode=none);
         @statistic[sinkRcvdPkDelay](title="delay of own packets received by sink"; source=messageAge(sinkRcvdPk); record=mean,max; interpolationmode=none);
