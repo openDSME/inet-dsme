@@ -72,7 +72,6 @@ void PRRTrafGen::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t
     if(!packetReceived[num]) {
         auto tag = ((inet::Packet*)obj)->getTag<inet::L3AddressInd>();
         auto sourceAddress = tag->getSrcAddress();
-        std::cout << sourceAddress << " " << num << std::endl;
         packetReceived[num] = true;
         emit(sinkRcvdPkSignal, obj);
     }
