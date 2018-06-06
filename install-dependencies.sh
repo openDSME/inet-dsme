@@ -30,7 +30,7 @@ echo $OMNETTAR
 ls
 tar -xzf $OMNETTAR
 ls
-export OMNET_PATH=`pwd`/omnetpp-5.3p4
+export OMNET_PATH=`pwd`/omnetpp-5.3
 export PATH=$PATH:$OMNET_PATH/bin
 pushd $OMNET_PATH && sed -i 's/WITH_QTENV.*/WITH_QTENV=no/' configure.user && sed -i 's/WITH_TKENV.*/WITH_TKENV=no/' configure.user && sed -i 's/WITH_OSG.*/WITH_OSG=no/' configure.user && ./configure && make -j2 && popd
 #cp utils/opp_makedep_fix $OMNET_PATH/bin/opp_makedep
