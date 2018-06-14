@@ -688,8 +688,6 @@ std::string DSMEPlatform::getDSMEManagement(uint8_t management, DSMESABSpecifica
     std::stringstream ss;
 
     uint8_t numChannels = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumChannels();
-    uint8_t numGTSlots = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumGTSlots(1);
-    uint8_t numSuperFramesPerMultiSuperframe = this->dsmeAdaptionLayer.getMAC_PIB().helper.getNumberSuperframesPerMultiSuperframe();
 
     ss << " ";
     uint8_t type = management & 0x7;
@@ -718,8 +716,8 @@ std::string DSMEPlatform::getDSMEManagement(uint8_t management, DSMESABSpecifica
 
     if(subBlock.getSubBlock().count(true) == 1) {
         for(DSMESABSpecification::SABSubBlock::iterator it = subBlock.getSubBlock().beginSetBits(); it != subBlock.getSubBlock().endSetBits(); it++) {
-            GTS gts = GTS::GTSfromAbsoluteIndex((*it) + subBlock.getSubBlockIndex() * numGTSlots * numChannels, numGTSlots, numChannels,
-                                                numSuperFramesPerMultiSuperframe);
+            // this calculation assumes there is always exactly one superframe in the subblock
+            GTS gts(subBlock.getSubBlockIndex(), (*it) / numChannels, (*it) % numChannels);
 
             ss << " " << gts.slotID << " " << gts.superframeID << " " << (uint16_t)gts.channel;
         }
