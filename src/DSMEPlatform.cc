@@ -432,7 +432,7 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
     std::string printable_info = getSequenceChartInfo(msg, true);
     LOG_DEBUG(printable_info);
 
-    LOG_INFO("sendCopyNow " << (uint64_t)msg);
+    LOG_INFO("sendCopyNow");
 
     this->txEndCallback = txEndCallback;
     auto packet = message->getSendableCopy();
