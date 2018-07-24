@@ -28,6 +28,10 @@ Define_Module(SP_GPSR);
 
 GpsrOption *SP_GPSR::createGpsrOption(L3Address destination)
 {
+    if(!par("straightPath")) {
+        return inet::Gpsr::createGpsrOption(destination);
+    }
+
     GpsrOption *gpsrOption = new GpsrOption();
     gpsrOption->setRoutingMode(GPSR_GREEDY_ROUTING);
     gpsrOption->setDestinationPosition(lookupPositionInGlobalRegistry(destination));
@@ -39,6 +43,10 @@ GpsrOption *SP_GPSR::createGpsrOption(L3Address destination)
 
 L3Address SP_GPSR::findGreedyRoutingNextHop(const Ptr<const NetworkHeaderBase>& networkHeader, const L3Address& destination)
 {
+    if(!par("straightPath")) {
+        return inet::Gpsr::findGreedyRoutingNextHop(networkHeader, destination);
+    }
+
     EV_DEBUG << "Finding next hop using greedy routing: destination = " << destination << endl;
     const GpsrOption *gpsrOption = getGpsrOptionFromNetworkDatagram(networkHeader);
     L3Address selfAddress = getSelfAddress();
@@ -93,6 +101,10 @@ L3Address SP_GPSR::findGreedyRoutingNextHop(const Ptr<const NetworkHeaderBase>& 
 
 L3Address SP_GPSR::findPerimeterRoutingNextHop(const Ptr<const NetworkHeaderBase>& networkHeader, const L3Address& destination)
 {
+    if(!par("straightPath")) {
+        return inet::Gpsr::findPerimeterRoutingNextHop(networkHeader, destination);
+    }
+
     EV_DEBUG << "Finding next hop using perimeter routing: destination = " << destination << endl;
     const GpsrOption *gpsrOption = getGpsrOptionFromNetworkDatagram(networkHeader);
     L3Address selfAddress = getSelfAddress();

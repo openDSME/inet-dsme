@@ -20,7 +20,6 @@ package inet_dsme.simulations;
 
 
 import inet.linklayer.ieee802154.Ieee802154NarrowbandInterface;
-import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.node.inet.WirelessHost;
 //import inet.routing.gpsr.Gpsr;
 
