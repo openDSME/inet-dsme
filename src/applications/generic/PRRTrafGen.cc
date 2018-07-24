@@ -69,9 +69,8 @@ void PRRTrafGen::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t
         packetReceived.resize(num+1,false);
     }
 
+    assert(!packetReceived[num]); // duplicates are already filtered in processPacket
     if(!packetReceived[num]) {
-        auto tag = ((inet::Packet*)obj)->getTag<inet::L3AddressInd>();
-        auto sourceAddress = tag->getSrcAddress();
         packetReceived[num] = true;
         emit(sinkRcvdPkSignal, obj);
     }
@@ -143,7 +142,7 @@ std::string PRRTrafGen::extractHostName(const std::string& sourceName) {
     std::size_t hostEnd = sourceName.find("]", hostStart);
     assert(hostEnd != std::string::npos);
     std::stringstream s;
-    s << "rcvdPkFromWithDuplicates-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
+    s << "rcvdPkFrom-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
     signalName = s.str();
     return signalName;
 }
@@ -159,17 +158,33 @@ void PRRTrafGen::processPacket(inet::Packet *msg)
     auto tag = msg->getTag<inet::L3AddressInd>();
     auto sourceAddress = tag->getSrcAddress();
 
-    auto it = rcvdPkFromWithDuplicatesSignals.find(sourceAddress);
-    if(it == rcvdPkFromWithDuplicatesSignals.end()) {
+    if(!packetReceivedFrom.count(sourceAddress)) {
+        packetReceivedFrom[sourceAddress] = std::vector<bool>();
+    }
+
+    unsigned int num = atoi(msg->getName()+strlen("appData-"));
+    if(packetReceivedFrom[sourceAddress].size() < num+1) {
+        packetReceivedFrom[sourceAddress].resize(num+1,false);
+    }
+
+    if(packetReceivedFrom[sourceAddress][num]) {
+        delete msg;
+        return;
+    }
+
+    packetReceivedFrom[sourceAddress][num] = true;
+
+    auto it = rcvdPkFromSignals.find(sourceAddress);
+    if(it == rcvdPkFromSignals.end()) {
         std::string signalName = extractHostName(sourceAddress.str());
 
         auto signal = registerSignal(signalName.c_str());
 
-        omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "rcvdPkFromWithDuplicates");
+        omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "rcvdPkFrom");
         getSimulation()->getActiveEnvir()->addResultRecorders(this, signal, signalName.c_str(), statisticTemplate);
 
-        rcvdPkFromWithDuplicatesSignals[sourceAddress] = signal;
-        it = rcvdPkFromWithDuplicatesSignals.find(sourceAddress);
+        rcvdPkFromSignals[sourceAddress] = signal;
+        it = rcvdPkFromSignals.find(sourceAddress);
     }
 
     emit(it->second, msg);

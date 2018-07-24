@@ -37,7 +37,7 @@ class PRRTrafGen : public inet::IpvxTrafGen, public omnetpp::cIListener
     // statistic
     static omnetpp::simsignal_t sinkRcvdPkSignal;
     static omnetpp::simsignal_t sentDummyPkSignal;
-    std::map<inet::L3Address, omnetpp::simsignal_t> rcvdPkFromWithDuplicatesSignals;
+    std::map<inet::L3Address, omnetpp::simsignal_t> rcvdPkFromSignals;
 
     static int initializedCount;
     static int finishedCount;
@@ -64,6 +64,7 @@ class PRRTrafGen : public inet::IpvxTrafGen, public omnetpp::cIListener
     virtual void receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t signalID, omnetpp::cObject *obj, omnetpp::cObject *details) override;
 
     std::vector<bool> packetReceived;
+    std::map<inet::L3Address,std::vector<bool>> packetReceivedFrom;
 
   public:
     PRRTrafGen();
