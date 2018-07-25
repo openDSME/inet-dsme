@@ -54,8 +54,10 @@ void PRRTrafGen::initialize(int stage)
         coolDownDuration = par("coolDownDuration");
         continueSendingDummyPackets = par("continueSendingDummyPackets");
 
-        // subscribe to sink signal
-        std::string signalName = extractHostName(this->getFullPath());
+        // subscribe to signals
+        std::string signalName = extractHostName("rcvdPkFrom",this->getFullPath());
+        getSimulation()->getSystemModule()->subscribe(signalName.c_str(), this);
+        signalName = extractHostName("sentPkTo",this->getFullPath());
         getSimulation()->getSystemModule()->subscribe(signalName.c_str(), this);
     }
     else if (stage == inet::INITSTAGE_APPLICATION_LAYER) {
@@ -135,16 +137,33 @@ void PRRTrafGen::sendPacket()
     }
 }
 
-std::string PRRTrafGen::extractHostName(const std::string& sourceName) {
+std::string PRRTrafGen::extractHostName(const std::string& signalPrefix, const std::string& sourceName) {
     std::string signalName = "";
     std::size_t hostStart = sourceName.find("host[");
     assert(hostStart != std::string::npos);
     std::size_t hostEnd = sourceName.find("]", hostStart);
     assert(hostEnd != std::string::npos);
     std::stringstream s;
-    s << "rcvdPkFrom-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
+    s << signalPrefix << "-host[" << sourceName.substr(hostStart + 5, hostEnd - hostStart - 5) << "]";
     signalName = s.str();
     return signalName;
+}
+
+void PRRTrafGen::addRecorderAndEmit(const std::string& signalPrefix, std::map<inet::L3Address, omnetpp::simsignal_t>& signals, inet::L3Address& address, inet::Packet *msg) {
+    auto it = signals.find(address);
+    if(it == signals.end()) {
+        std::string signalName = extractHostName(signalPrefix,address.str());
+
+        auto signal = registerSignal(signalName.c_str());
+
+        omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", signalPrefix.c_str());
+        getSimulation()->getActiveEnvir()->addResultRecorders(this, signal, signalName.c_str(), statisticTemplate);
+
+        signals[address] = signal;
+        it = signals.find(address);
+    }
+
+    emit(it->second, msg);
 }
 
 void PRRTrafGen::processPacket(inet::Packet *msg)
@@ -174,21 +193,7 @@ void PRRTrafGen::processPacket(inet::Packet *msg)
 
     packetReceivedFrom[sourceAddress][num] = true;
 
-    auto it = rcvdPkFromSignals.find(sourceAddress);
-    if(it == rcvdPkFromSignals.end()) {
-        std::string signalName = extractHostName(sourceAddress.str());
-
-        auto signal = registerSignal(signalName.c_str());
-
-        omnetpp::cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "rcvdPkFrom");
-        getSimulation()->getActiveEnvir()->addResultRecorders(this, signal, signalName.c_str(), statisticTemplate);
-
-        rcvdPkFromSignals[sourceAddress] = signal;
-        it = rcvdPkFromSignals.find(sourceAddress);
-    }
-
-    emit(it->second, msg);
-
+    addRecorderAndEmit("rcvdPkFrom",rcvdPkFromSignals,sourceAddress,msg);
 
     IpvxTrafGen::processPacket(msg);
 }

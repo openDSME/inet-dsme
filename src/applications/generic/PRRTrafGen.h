@@ -38,6 +38,7 @@ class PRRTrafGen : public inet::IpvxTrafGen, public omnetpp::cIListener
     static omnetpp::simsignal_t sinkRcvdPkSignal;
     static omnetpp::simsignal_t sentDummyPkSignal;
     std::map<inet::L3Address, omnetpp::simsignal_t> rcvdPkFromSignals;
+    std::map<inet::L3Address, omnetpp::simsignal_t> sentPkToSignals;
 
     static int initializedCount;
     static int finishedCount;
@@ -71,7 +72,8 @@ class PRRTrafGen : public inet::IpvxTrafGen, public omnetpp::cIListener
     virtual ~PRRTrafGen();
 
 private:
-    std::string extractHostName(const std::string& sourceName);
+    std::string extractHostName(const std::string& prefix, const std::string& sourceName);
+    void addRecorderAndEmit(const std::string& signalPrefix, std::map<inet::L3Address, omnetpp::simsignal_t>& signals, inet::L3Address& address, inet::Packet *msg);
 };
 
 } /* namespace inet_dsme */
