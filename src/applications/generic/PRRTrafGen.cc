@@ -16,6 +16,9 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
+// fire assert also in release mode
+#undef NDEBUG
+
 #include "PRRTrafGen.h"
 
 #include "inet/common/ProtocolTag_m.h"
@@ -31,9 +34,13 @@ namespace inet_dsme {
 Define_Module(PRRTrafGen);
 
 omnetpp::simsignal_t PRRTrafGen::sinkRcvdPkSignal = registerSignal("sinkRcvdPk");
+omnetpp::simsignal_t PRRTrafGen::sourceSentPkSignal = registerSignal("sourceSentPk");
 omnetpp::simsignal_t PRRTrafGen::sentDummyPkSignal = registerSignal("sentDummyPk");
 int PRRTrafGen::initializedCount = 0;
 int PRRTrafGen::finishedCount = 0;
+
+const std::string rcvdPkFrom = "rcvdPkFrom";
+const std::string sentPkTo = "sentPkTo";
 
 PRRTrafGen::PRRTrafGen()
 {
@@ -55,9 +62,9 @@ void PRRTrafGen::initialize(int stage)
         continueSendingDummyPackets = par("continueSendingDummyPackets");
 
         // subscribe to signals
-        std::string signalName = extractHostName("rcvdPkFrom",this->getFullPath());
+        std::string signalName = extractHostName(rcvdPkFrom,this->getFullPath());
         getSimulation()->getSystemModule()->subscribe(signalName.c_str(), this);
-        signalName = extractHostName("sentPkTo",this->getFullPath());
+        signalName = extractHostName(sentPkTo,this->getFullPath());
         getSimulation()->getSystemModule()->subscribe(signalName.c_str(), this);
     }
     else if (stage == inet::INITSTAGE_APPLICATION_LAYER) {
@@ -66,15 +73,24 @@ void PRRTrafGen::initialize(int stage)
 }
 
 void PRRTrafGen::receiveSignal(omnetpp::cComponent *source, omnetpp::simsignal_t signalID, omnetpp::cObject *obj, omnetpp::cObject *details) {
-    unsigned int num = atoi(((inet::Packet*)obj)->getName()+strlen("appData-"));
-    if(packetReceived.size() < num+1) {
-        packetReceived.resize(num+1,false);
-    }
+    inet::Packet* pkt = (inet::Packet*)obj;
+    auto signalName = getSignalName(signalID);
 
-    assert(!packetReceived[num]); // duplicates are already filtered in processPacket
-    if(!packetReceived[num]) {
+    if(strncmp(signalName, rcvdPkFrom.c_str(), rcvdPkFrom.size()) == 0) {
+        unsigned int num = atoi(pkt->getName()+strlen("appData-"));
+        if(packetReceived.size() < num+1) {
+            packetReceived.resize(num+1,false);
+        }
+
+        assert(!packetReceived[num]); // duplicates are already filtered in processPacket
         packetReceived[num] = true;
         emit(sinkRcvdPkSignal, obj);
+    }
+    else if(strncmp(signalName, sentPkTo.c_str(), sentPkTo.size()) == 0) {
+        emit(sourceSentPkSignal, obj);
+    }
+    else {
+        assert(false);
     }
 }
 
@@ -94,8 +110,35 @@ bool PRRTrafGen::isEnabled()
 
 void PRRTrafGen::handleMessage(omnetpp::cMessage *msg)
 {
+    const char *destAddrs = par("destAddresses");
     if(msg == shutdownTimer) {
         endSimulation();
+    }
+    else if (msg == timer && msg->getKind() == START
+            && strcmp(destAddrs,"*") == 0) {
+        destAddresses.clear();
+        inet::L3Address myAddress = inet::L3AddressResolver().addressOf(this->getParentModule(), inet::L3AddressResolver::ADDR_MODULEPATH);
+        cModule *sys = getSimulation()->getSystemModule();
+        for(cModule::SubmoduleIterator i(sys); !i.end(); i++) {
+            cModule *submod = *i;
+            if(submod->isVector()) {
+                inet::L3Address result = inet::L3AddressResolver().addressOf(submod, inet::L3AddressResolver::ADDR_MODULEPATH);
+                if(result == myAddress) {
+                    continue;
+                }
+                if(result.isUnspecified()) {
+                    EV_ERROR << "cannot resolve destination address for module " << submod->getFullPath() << inet::endl;
+                }
+                else {
+                    destAddresses.push_back(result);
+                }
+            }
+        }
+        if (!destAddresses.empty()) {
+            sendPacket();
+            if (isEnabled())
+                scheduleNextPacket(inet::simTime());
+        }
     }
     else {
         IpvxTrafGen::handleMessage(msg);
@@ -125,6 +168,7 @@ void PRRTrafGen::sendPacket()
     if(!dummy) {
         EV_INFO << "Sending packet: ";
         printPacket(packet);
+        addRecorderAndEmit(sentPkTo,sentPkToSignals,destAddr,packet);
         emit(inet::packetSentSignal, packet);
         send(packet, "ipOut");
         numSent++;
@@ -193,7 +237,7 @@ void PRRTrafGen::processPacket(inet::Packet *msg)
 
     packetReceivedFrom[sourceAddress][num] = true;
 
-    addRecorderAndEmit("rcvdPkFrom",rcvdPkFromSignals,sourceAddress,msg);
+    addRecorderAndEmit(rcvdPkFrom,rcvdPkFromSignals,sourceAddress,msg);
 
     IpvxTrafGen::processPacket(msg);
 }

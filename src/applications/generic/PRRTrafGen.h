@@ -36,6 +36,7 @@ class PRRTrafGen : public inet::IpvxTrafGen, public omnetpp::cIListener
   protected:
     // statistic
     static omnetpp::simsignal_t sinkRcvdPkSignal;
+    static omnetpp::simsignal_t sourceSentPkSignal;
     static omnetpp::simsignal_t sentDummyPkSignal;
     std::map<inet::L3Address, omnetpp::simsignal_t> rcvdPkFromSignals;
     std::map<inet::L3Address, omnetpp::simsignal_t> sentPkToSignals;
