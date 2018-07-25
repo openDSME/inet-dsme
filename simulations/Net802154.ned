@@ -36,4 +36,7 @@ network Net802154
             parameters:
                 @display("p=60,50");
         }
+
+	configurator: GenericNetworkConfigurator {
+	}
 }
