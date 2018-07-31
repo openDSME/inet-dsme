@@ -19,6 +19,7 @@ These instructions are also <a href="https://www.youtube.com/watch?v=8BVK7qDsatY
 
     ```
     git clone https://github.com/openDSME/inet.git --single-branch	
+    git submodule update --init
     ```
 
 4. Clone this repository and get the openDSME submodule
