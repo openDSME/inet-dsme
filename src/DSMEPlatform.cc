@@ -1,6 +1,9 @@
 #include "DSMEPlatform.h"
 
 #include <iomanip>
+#include <stdlib.h>
+
+#include "./StaticSchedule.h"
 
 #include <inet/common/ModuleAccess.h>
 #include <inet/linklayer/common/InterfaceTag_m.h>
@@ -16,6 +19,7 @@
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/PIDScheduling.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/TPS.h"
+#include "openDSME/dsmeAdaptionLayer/scheduling/StaticScheduling.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
 // coverity[+kill]
@@ -158,6 +162,9 @@ void DSMEPlatform::initialize(int stage) {
             tps->setUseHysteresis(par("useHysteresis").boolValue());
             scheduling = tps;
         }
+        else if(!strcmp(schedulingSelection, "STATIC")) {
+            scheduling = new StaticScheduling(this->dsmeAdaptionLayer); 
+        } 
         else {
             ASSERT(false);
         }
@@ -243,6 +250,15 @@ void DSMEPlatform::initialize(int stage) {
         this->minCoordinatorLQI = par("minCoordinatorLQI");
 
         this->dsme->initialize(this);
+
+        // static schedules need to be initialized after dsmeLayer
+        if(!strcmp(schedulingSelection, "STATIC")) {
+            cXMLElement *xmlFile = par("staticSchedule");
+            std::vector<StaticSlot> slots = StaticSchedule::loadSchedule(xmlFile, this->mac_pib.macShortAddress);  
+            for(auto &slot : slots) {
+                static_cast<StaticScheduling*>(scheduling)->allocateGTS(slot.superframeID, slot.slotID, slot.channelID, (Direction)slot.direction, slot.address); 
+            }
+        }    
     } else if(stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         dsme->start();
