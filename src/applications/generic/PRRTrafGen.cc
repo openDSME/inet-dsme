@@ -36,6 +36,7 @@ Define_Module(PRRTrafGen);
 omnetpp::simsignal_t PRRTrafGen::sinkRcvdPkSignal = registerSignal("sinkRcvdPk");
 omnetpp::simsignal_t PRRTrafGen::sourceSentPkSignal = registerSignal("sourceSentPk");
 omnetpp::simsignal_t PRRTrafGen::sentDummyPkSignal = registerSignal("sentDummyPk");
+omnetpp::simsignal_t PRRTrafGen::pktRcvdAfterWarmupSignal = registerSignal("pktRcvdAfterWarmup");
 int PRRTrafGen::initializedCount = 0;
 int PRRTrafGen::finishedCount = 0;
 
@@ -112,6 +113,7 @@ void PRRTrafGen::handleMessage(omnetpp::cMessage *msg)
 {
     const char *destAddrs = par("destAddresses");
     if(msg == shutdownTimer) {
+        recordScalar("runtimeSinceWarmup",omnetpp::simTime()-startTime-warmUpDuration);
         endSimulation();
     }
     else if (msg == timer && msg->getKind() == START
@@ -171,13 +173,16 @@ void PRRTrafGen::sendPacket()
         addRecorderAndEmit(sentPkTo,sentPkToSignals,destAddr,packet);
         emit(inet::packetSentSignal, packet);
         send(packet, "ipOut");
-        numSent++;
     }
     else {
         EV_INFO << "Sending dummy packet: ";
         printPacket(packet);
         emit(sentDummyPkSignal, packet);
         send(packet, "ipOut");
+    }
+
+    if(now >= startTime+warmUpDuration) {
+        numSent++;
     }
 }
 
@@ -212,14 +217,14 @@ void PRRTrafGen::addRecorderAndEmit(const std::string& signalPrefix, std::map<in
 
 void PRRTrafGen::processPacket(inet::Packet *msg)
 {
-    // Throw away dummy packets
-    if(msg->par("dummy")) {
-        delete msg;
-        return;
-    }
-
     auto tag = msg->getTag<inet::L3AddressInd>();
     auto sourceAddress = tag->getSrcAddress();
+    auto destinationAddress = tag->getDestAddress();
+
+    if(sourceAddress == destinationAddress) {
+        // filter locally delivered packets
+        return;
+    }
 
     if(!packetReceivedFrom.count(sourceAddress)) {
         packetReceivedFrom[sourceAddress] = std::vector<bool>();
@@ -231,6 +236,18 @@ void PRRTrafGen::processPacket(inet::Packet *msg)
     }
 
     if(packetReceivedFrom[sourceAddress][num]) {
+        delete msg;
+        return;
+    }
+
+    // signal packet receptions for throughput calculation
+    auto now = omnetpp::simTime();
+    if(now >= startTime+warmUpDuration) {
+        emit(pktRcvdAfterWarmupSignal, msg);
+    }
+
+    // Throw away dummy packets
+    if(msg->par("dummy")) {
         delete msg;
         return;
     }
