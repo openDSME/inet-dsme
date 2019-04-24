@@ -43,6 +43,16 @@ simsignal_t DSMEPlatform::ackSentDown;
 simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
+simsignal_t DSMEPlatform::gtsRequestsTotal;
+simsignal_t DSMEPlatform::gtsRequestsSuccess;
+simsignal_t DSMEPlatform::gtsRequestsFailed;
+simsignal_t DSMEPlatform::gtsRequestsFailedNoAck;
+simsignal_t DSMEPlatform::gtsRequestsFailedChannelAccess;
+simsignal_t DSMEPlatform::gtsRequestsFailedTransactionOverflow;
+simsignal_t DSMEPlatform::gtsRequestsFailedDenied;
+simsignal_t DSMEPlatform::gtsRequestsFailedTimeout;
+simsignal_t DSMEPlatform::gtsRequestsFailedQueue;
+simsignal_t DSMEPlatform::gtsRequestsFailedDeallocated;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -100,6 +110,17 @@ DSMEPlatform::DSMEPlatform()
     uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
+    
+    gtsRequestsTotal = registerSignal("GTSRequestsTotal");
+    gtsRequestsSuccess = registerSignal("GTSRequestsSuccess");
+    gtsRequestsFailed = registerSignal("GTSRequestsFailed");
+    gtsRequestsFailedNoAck = registerSignal("GTSRequestsFailedNoAck");
+    gtsRequestsFailedChannelAccess = registerSignal("GTSRequestsFailedChannelAccess");
+    gtsRequestsFailedTransactionOverflow = registerSignal("GTSRequestsFailedTransactionOverflow");
+    gtsRequestsFailedDenied = registerSignal("GTSRequestsFailedDenied");
+    gtsRequestsFailedTimeout = registerSignal("GTSRequestsFailedTimeout");
+    gtsRequestsFailedQueue = registerSignal("GTSRequestsFailedQueue");
+    gtsRequestsFailedDeallocated = registerSignal("GTSRequestsFailedDeallocated"); 
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -863,6 +884,46 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
 
 void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
     emit(gtsChange, deallocation?-1:1);
+}
+
+void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
+    emit(gtsRequestsTotal, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsSuccess(uint16_t allocations) {
+    emit(gtsRequestsSuccess, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailed(uint16_t allocations) {
+    emit(gtsRequestsFailed, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailedNoAck(uint16_t allocations) {
+    emit(gtsRequestsFailedNoAck, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailedChannelAccess(uint16_t allocations) {
+    emit(gtsRequestsFailedChannelAccess, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailedTransactionOverflow(uint16_t allocations) {
+    emit(gtsRequestsFailedTransactionOverflow, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailedDenied(uint16_t allocations) {
+    emit(gtsRequestsFailedDenied, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailedTimeout(uint16_t allocations) {
+    emit(gtsRequestsFailedTimeout, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailedQueue(uint16_t allocations) {
+    emit(gtsRequestsFailedQueue, allocations); 
+}
+
+void DSMEPlatform::signalGTSRequestsFailedDeallocated(uint16_t allocations) {
+    emit(gtsRequestsFailedDeallocated, allocations); 
 }
 
 }

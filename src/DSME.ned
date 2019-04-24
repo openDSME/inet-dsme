@@ -73,20 +73,42 @@ simple DSME extends MacProtocolBase like IMacProtocol
         int minBroadcastLQI = default(150);
         int minCoordinatorLQI = default(150);
 
-        @signal[unicastDataSentDown](type=cPacket);
-        @signal[broadcastDataSentDown](type=cPacket);
-        @signal[commandSentDown](type=cPacket);
-        @signal[beaconSentDown](type=cPacket);
-        @signal[ackSentDown](type=cPacket);
-        @signal[corruptedFrameReceived](type=cPacket);
-        @signal[uncorruptedFrameReceived](type=cPacket);
+        // @signal[unicastDataSentDown](type=cPacket);
+        // @signal[broadcastDataSentDown](type=cPacket);
+        // @signal[commandSentDown](type=cPacket);
+        // @signal[beaconSentDown](type=cPacket);
+        // @signal[ackSentDown](type=cPacket);
+        // @signal[corruptedFrameReceived](type=cPacket);
+        // @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
+        
+        @signal[GTSRequestsTotal](type=long);
+        @signal[GTSRequestsSuccess](type=long);
+        @signal[GTSRequestsFailed](type=long);
+        @signal[GTSRequestsFailedNoAck](type=long);
+        @signal[GTSRequestsFailedChannelAccess](type=long);
+        @signal[GTSRequestsFailedTransactionOverflow](type=long);
+        @signal[GTSRequestsFailedDenied](type=long);
+        @signal[GTSRequestsFailedTimeout](type=long);
+        @signal[GTSRequestsFailedQueue](type=long);
+        @signal[GTSRequestsFailedDeallocated](type=long);
 
-        @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
-        @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
-        @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
-        @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
+        // @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
+        // @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
+        // @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
+        // @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=vector; interpolationmode=none);
+        
+        @statistic[GTSRequestsTotal](title="Requests per MSF"; source=GTSRequestsTotal; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsSuccess](title="Sucessful requests per MSF"; source=GTSRequestsSuccess; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailed](title="Failed requests per MSF"; source=GTSRequestsFailed; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailedNoAck](title="Failed requests per MSF"; source=GTSRequestsFailedNoAck; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailedChannelAccess](title="Failed requests per MSF"; source=GTSRequestsFailedChannelAccess; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailedDenied](title="Failed requests per MSF"; source=GTSRequestsFailedDenied; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailedTimeout](title="Failed requests per MSF"; source=GTSRequestsFailedTimeout; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailedTransactionOverflow](title="Failed requests per MSF"; source=GTSRequestsFailedTransactionOverflow; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailedQueue](title="Failed requests per MSF due to queue"; source=GTSRequestsFailedQueue; record=vector; interpolationmode=none);
+        @statistic[GTSRequestsFailedDeallocated](title="Failed requests per MSF due to queue"; source=GTSRequestsFailedDeallocated; record=vector; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }

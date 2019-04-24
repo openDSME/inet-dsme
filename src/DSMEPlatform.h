@@ -148,6 +148,26 @@ public:
 
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
 
+    virtual void signalGTSRequestsTotal(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsSuccess(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsFailed(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsFailedNoAck(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsFailedChannelAccess(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsFailedTransactionOverflow(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsFailedTimeout(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsFailedDenied(uint16_t allocations) override; 
+    
+    virtual void signalGTSRequestsFailedQueue(uint16_t allocations) override; 
+
+    virtual void signalGTSRequestsFailedDeallocated(uint16_t allocations) override; 
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -208,6 +228,16 @@ public:
     static omnetpp::simsignal_t uncorruptedFrameReceived;
     static omnetpp::simsignal_t corruptedFrameReceived;
     static omnetpp::simsignal_t gtsChange;
+    static omnetpp::simsignal_t gtsRequestsTotal; 
+    static omnetpp::simsignal_t gtsRequestsSuccess; 
+    static omnetpp::simsignal_t gtsRequestsFailed; 
+    static omnetpp::simsignal_t gtsRequestsFailedNoAck; 
+    static omnetpp::simsignal_t gtsRequestsFailedChannelAccess; 
+    static omnetpp::simsignal_t gtsRequestsFailedTransactionOverflow; 
+    static omnetpp::simsignal_t gtsRequestsFailedDenied; 
+    static omnetpp::simsignal_t gtsRequestsFailedTimeout; 
+    static omnetpp::simsignal_t gtsRequestsFailedQueue; 
+    static omnetpp::simsignal_t gtsRequestsFailedDeallocated; 
 
 public:
     IEEE802154MacAddress& getAddress() {
