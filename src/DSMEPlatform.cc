@@ -19,6 +19,7 @@
 #include "openDSME/dsmeLayer/messages/MACCommand.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/PIDScheduling.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/TPS.h"
+#include "openDSME/dsmeAdaptionLayer/scheduling/TPSFuture.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/StaticScheduling.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
@@ -181,6 +182,14 @@ void DSMEPlatform::initialize(int stage) {
             tps->setAlpha(par("TPSalpha").doubleValue());
             tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
             tps->setUseHysteresis(par("useHysteresis").boolValue());
+            scheduling = tps;
+        }
+        else if(!strcmp(schedulingSelection, "TPSFUTURE")) {
+            TPSFuture* tps = new TPSFuture(this->dsmeAdaptionLayer); 
+            tps->setAlpha(par("TPSalpha").doubleValue());
+            tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
+            tps->setUseHysteresis(par("useHysteresis").boolValue());
+            tps->setFutureLength(par("futureLength").intValue()); 
             scheduling = tps;
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
