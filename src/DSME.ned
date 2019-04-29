@@ -37,6 +37,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         string scheduling = default("TPS"); 
         double TPSalpha = default(0.1); // EWMA factor for TPS, ignored otherwise
         bool useHysteresis = default(true);
+        int futureLength = default(5);  
         xml staticSchedule = default(xml("<root/>")); 
 
         int macDSMEGTSExpirationTime = default(7);
