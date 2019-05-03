@@ -36,6 +36,57 @@ Define_Module(dsme::DSMEPlatform);
 
 namespace dsme {
 
+// TIMING    
+simsignal_t DSMEPlatform::statStartOfCFP;    
+simsignal_t DSMEPlatform::statStartOfSF;     
+simsignal_t DSMEPlatform::statStartOfMSF;    
+// REQUEST
+simsignal_t DSMEPlatform::statRequestInitialized;
+simsignal_t DSMEPlatform::statRequestBackoffs;
+simsignal_t DSMEPlatform::statRequestSendSuccess;
+simsignal_t DSMEPlatform::statRequestSendFailedNoAck;
+simsignal_t DSMEPlatform::statRequestSendFailedChannelAccess;
+simsignal_t DSMEPlatform::statRequestSendFailedTransactionOverflow;
+simsignal_t DSMEPlatform::statRequestSendFailedQueue;
+// RESPONSE
+simsignal_t DSMEPlatform::statResponseReceiveSuccess;
+simsignal_t DSMEPlatform::statResponseReceiveFailedTimeout;
+simsignal_t DSMEPlatform::statResponseReceiveFailedDenied;
+// NOTIFIY 
+simsignal_t DSMEPlatform::statNotifyInitialized;
+simsignal_t DSMEPlatform::statNotifyBackoffs;
+simsignal_t DSMEPlatform::statNotifySendSuccess;
+simsignal_t DSMEPlatform::statNotifySendFailedNoAck;
+simsignal_t DSMEPlatform::statNotifySendFailedChannelAccess;
+simsignal_t DSMEPlatform::statNotifySendFailedTransactionOverflow;
+simsignal_t DSMEPlatform::statNotifySendFailedQueue;
+// DEALLOCATION 
+simsignal_t DSMEPlatform::statDeallocationScheduler;
+simsignal_t DSMEPlatform::statDeallocationInvalid;
+simsignal_t DSMEPlatform::statDeallocationUnconfirmed;
+simsignal_t DSMEPlatform::statDeallocationExpiration;
+// DEALLOCATION REQUEST
+simsignal_t DSMEPlatform::statDeallocationRequestInitialized;
+simsignal_t DSMEPlatform::statDeallocationRequestBackoffs;
+simsignal_t DSMEPlatform::statDeallocationRequestSendSuccess;
+simsignal_t DSMEPlatform::statDeallocationRequestSendFailedNoAck;
+simsignal_t DSMEPlatform::statDeallocationRequestSendFailedChannelAccess;
+simsignal_t DSMEPlatform::statDeallocationRequestSendFailedTransactionOverflow;
+simsignal_t DSMEPlatform::statDeallocationRequestSendFailedQueue;
+// DEALLOCATION RESPONSE
+simsignal_t DSMEPlatform::statDeallocationResponseReceiveSuccess;
+simsignal_t DSMEPlatform::statDeallocationResponseReceiveFailedTimeout;
+simsignal_t DSMEPlatform::statDeallocationResponseReceiveFailedDenied;
+// DEALLOCATION NOTIFY  
+simsignal_t DSMEPlatform::statDeallocationNotifyInitialized;
+simsignal_t DSMEPlatform::statDeallocationNotifyBackoffs;
+simsignal_t DSMEPlatform::statDeallocationNotifySendSuccess;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedNoAck;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedChannelAccess;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedTransactionOverflow;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedQueue;
+
+
 simsignal_t DSMEPlatform::broadcastDataSentDown;
 simsignal_t DSMEPlatform::unicastDataSentDown;
 simsignal_t DSMEPlatform::commandSentDown;
@@ -111,7 +162,58 @@ DSMEPlatform::DSMEPlatform()
     uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
+   
+    // TIMING    
+    statStartOfCFP = registerSignal("statStartOfCFP");    
+    statStartOfSF = registerSignal("startStartOfSF");     
+    statStartOfMSF = registerSignal("statStartOfMSF");    
+    // REQUEST
+    statRequestInitialized = registerSignal("statRequestInitialized");
+    statRequestBackoffs = registerSignal("statRequestBackoffs");
+    statRequestSendSuccess = registerSignal("statRequestSendSuccess");
+    statRequestSendFailedNoAck = registerSignal("statRequestSendFailedNoAck");
+    statRequestSendFailedChannelAccess = registerSignal("statRequestSendFailedChannelAccess");
+    statRequestSendFailedTransactionOverflow = registerSignal("statRequestSendFailedTransactionOverflow");
+    statRequestSendFailedQueue = registerSignal("statRequestSendFailedQueue");
+    // RESPONSE
+    statResponseReceiveSuccess = registerSignal("statResponseReceiveSuccess");
+    statResponseReceiveFailedTimeout = registerSignal("statResponseReceiveFailedTimeout");
+    statResponseReceiveFailedDenied = registerSignal("statResponseReceiveFailedDenied");
+    // NOTIFIY 
+    statNotifyInitialized = registerSignal("statNotifyInitialized");
+    statNotifyBackoffs = registerSignal("statNotifyBackoffs");
+    statNotifySendSuccess = registerSignal("statNotifySendSuccess");
+    statNotifySendFailedNoAck = registerSignal("statNotifySendFailedNoAck");
+    statNotifySendFailedChannelAccess = registerSignal("statNotifySendFailedChannelAccess");
+    statNotifySendFailedTransactionOverflow = registerSignal("statNotifySendFailedTransactionOverflow");
+    statNotifySendFailedQueue = registerSignal("statNotifySendFailedQueue");
+    // DEALLOCATION 
+    statDeallocationScheduler = registerSignal("statDeallocationScheduler");
+    statDeallocationInvalid = registerSignal("statDeallocationInvalid");
+    statDeallocationUnconfirmed = registerSignal("statDeallocationUnconfirmed");
+    statDeallocationExpiration = registerSignal("statDeallocationExpiration");
+    // DEALLOCATION REQUEST
+    statDeallocationRequestInitialized = registerSignal("statDeallocationRequestInitialized");
+    statDeallocationRequestBackoffs = registerSignal("statDeallocationRequestBackoffs");
+    statDeallocationRequestSendSuccess = registerSignal("statDeallocationRequestSendSuccess");
+    statDeallocationRequestSendFailedNoAck = registerSignal("statDeallocationRequestSendFailedNoAck");
+    statDeallocationRequestSendFailedChannelAccess = registerSignal("statDeallocationRequestSendFailedChannelAccess");
+    statDeallocationRequestSendFailedTransactionOverflow = registerSignal("statDeallocationRequestSendFailedTransactionOverflow");
+    statDeallocationRequestSendFailedQueue = registerSignal("statDeallocationRequestSendFailedQueue");
+    // DEALLOCATION RESPONSE
+    statDeallocationResponseReceiveSuccess = registerSignal("statDeallocationResponseReceiveSuccess");
+    statDeallocationResponseReceiveFailedTimeout = registerSignal("statDeallocationResponseReceiveFailedTimeout");
+    statDeallocationResponseReceiveFailedDenied = registerSignal("statDeallocationResponseReceiveFailedDenied");
+    // DEALLOCATION NOTIFY  
+    statDeallocationNotifyInitialized = registerSignal("statDeallocationNotifyInitialized");
+    statDeallocationNotifyBackoffs = registerSignal("statDeallocationNotifyBackoffs");
+    statDeallocationNotifySendSuccess = registerSignal("statDeallocationNotifySendSuccess");
+    statDeallocationNotifySendFailedNoAck = registerSignal("statDeallocationNotifySendFailedNoAck");
+    statDeallocationNotifySendFailedChannelAccess = registerSignal("statDeallocationNotifySendFailedChannelAccess");
+    statDeallocationNotifySendFailedTransactionOverflow = registerSignal("statDeallocationNotifySendFailedTransactionOverflow");
+    statDeallocationNotifySendFailedQueue = registerSignal("statDeallocationNotifySendFailedQueue");
     
+ 
     gtsRequestsTotal = registerSignal("GTSRequestsTotal");
     gtsRequestsSuccess = registerSignal("GTSRequestsSuccess");
     gtsRequestsFailed = registerSignal("GTSRequestsFailed");
@@ -895,6 +997,126 @@ void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress count
     emit(gtsChange, deallocation?-1:1);
 }
 
+
+// TIMING    
+void DSMEPlatform::signalStartOfCFP() {   //DONE 
+    emit(statStartOfCFP,1);
+}
+void DSMEPlatform::signalStartOfSF() {    //DONE 
+    emit(statStartOfSF,1);
+}
+void DSMEPlatform::signalStartOfMSF() {   //DONE 
+    emit(statStartOfMSF,1);
+}     
+// REQUEST
+void DSMEPlatform::signalRequestInitialized() {
+    emit(statRequestInitialized,1);
+}
+void DSMEPlatform::signalRequestBackoffs(uint8_t backoffs) {
+    emit(statRequestBackoffs,backoffs);
+}
+void DSMEPlatform::signalRequestSendSuccess() {
+    emit(statRequestSendSuccess,1);
+}
+void DSMEPlatform::signalRequestSendFailedNoAck() {
+    emit(statRequestSendFailedNoAck,1);
+}
+void DSMEPlatform::signalRequestSendFailedChannelAccess() {
+    emit(statRequestSendFailedChannelAccess,1);
+}
+void DSMEPlatform::signalRequestSendFailedTransactionOverflow() {
+    emit(statRequestSendFailedTransactionOverflow,1);
+}
+// RESPONSE
+void DSMEPlatform::signalResponseReceiveSuccess() {
+    emit(statResponseReceiveSuccess,1);
+}
+void DSMEPlatform::signalResponseReceiveFailedTimeout() {
+    emit(statResponseReceiveFailedTimeout,1);
+}
+void DSMEPlatform::signalResponseReceiveFailedDenied() {
+    emit(statResponseReceiveFailedDenied,1);
+}
+// NOTIFIY 
+void DSMEPlatform::signalNotifyInitialized() {
+    emit(statNotifyInitialized,1);
+}
+void DSMEPlatform::signalNotifyBackoffs(uint8_t backoffs) {
+    emit(statNotifyBackoffs,backoffs);
+}
+void DSMEPlatform::signalNotifySendSuccess() {
+    emit(statNotifySendSuccess,1);
+}
+void DSMEPlatform::signalNotifySendFailedChannelAccess() {
+    emit(statNotifySendFailedChannelAccess,1);
+}
+void DSMEPlatform::signalNotifySendFailedTransactionOverflow() {
+    emit(statNotifySendFailedTransactionOverflow,1);
+}
+// DEALLOCATION 
+void DSMEPlatform::signalDeallocationScheduler() {
+    emit(statDeallocationScheduler,1);
+}
+void DSMEPlatform::signalDeallocationInvalid() {
+    emit(statDeallocationInvalid,1);
+}
+void DSMEPlatform::signalDeallocationUnconfirmed() {
+    emit(statDeallocationUnconfirmed,1);
+}
+void DSMEPlatform::signalDeallocationExpiration() {
+    emit(statDeallocationExpiration,1);
+}
+// DEALLOCATION REQUEST
+void DSMEPlatform::signalDeallocationRequestInitialized() {
+    emit(statDeallocationRequestInitialized,1);
+}
+void DSMEPlatform::signalDeallocationRequestBackoffs(uint8_t backoffs) {
+    emit(statDeallocationRequestBackoffs,backoffs);
+}
+void DSMEPlatform::signalDeallocationRequestSendSuccess() {
+    emit(statDeallocationRequestSendSuccess,1);
+}
+void DSMEPlatform::signalDeallocationRequestSendFailedNoAck() {
+    emit(statDeallocationRequestSendFailedNoAck,1);
+}
+void DSMEPlatform::signalDeallocationRequestSendFailedChannelAccess() {
+    emit(statDeallocationRequestSendFailedChannelAccess,1);
+}
+void DSMEPlatform::signalDeallocationRequestSendFailedTransactionOverflow() {
+    emit(statDeallocationRequestSendFailedTransactionOverflow,1);
+}
+void DSMEPlatform::signalDeallocationResponseReceiveSuccess() {
+    emit(statDeallocationResponseReceiveSuccess,1);
+}
+void DSMEPlatform::signalDeallocationResponseReceiveFailedTimeout() {
+    emit(statDeallocationResponseReceiveFailedTimeout,1);
+}
+void DSMEPlatform::signalDeallocationResponseReceiveFailedDenied() {
+    emit(statDeallocationResponseReceiveFailedDenied,1);
+}
+// DEALLOCATION NOTIFY  
+void DSMEPlatform::signalDeallocationNotifyInitialized() {
+    emit(statDeallocationNotifyInitialized,1);
+}
+void DSMEPlatform::signalDeallocationNotifyBackoffs(uint8_t backoffs) {
+    emit(statDeallocationNotifyBackoffs,backoffs);
+}
+void DSMEPlatform::signalDeallocationNotifySendSuccess() {
+    emit(statDeallocationNotifySendSuccess,1);
+}
+void DSMEPlatform::signalDeallocationNotifySendFailedChannelAccess() {
+    emit(statDeallocationNotifySendFailedChannelAccess,1);
+}
+void DSMEPlatform::signalDeallocationNotifySendFailedTransactionOverflow() {
+    emit(statDeallocationNotifySendFailedTransactionOverflow,1);
+}
+
+
+
+
+
+
+// PER MSF
 void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
     emit(gtsRequestsTotal, allocations);
 }
