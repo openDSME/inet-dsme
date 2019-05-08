@@ -149,9 +149,10 @@ void PRRTrafGen::handleMessage(omnetpp::cMessage *msg)
 }
 
 
-void PRRTrafGen::sendPacket()
+void PRRTrafGen::sendPacket() 
 {
-    for(int i=0; i<burstPackets; i++) {
+    for(int i=0; i<burstPackets; i++)
+    {    
         char msgName[32];
         sprintf(msgName, "appData-%d", numSent);
 
@@ -182,11 +183,11 @@ void PRRTrafGen::sendPacket()
             emit(sentDummyPkSignal, packet);
             send(packet, "ipOut");
         }
-    
+        
 
         if(now >= startTime+warmUpDuration) {
             numSent += 1;
-        }
+        } 
     }
 }
 
