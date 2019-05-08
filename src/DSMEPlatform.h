@@ -190,6 +190,8 @@ public:
     virtual void signalDeallocationNotifySendSuccess() override;
     virtual void signalDeallocationNotifySendFailedChannelAccess() override;
     virtual void signalDeallocationNotifySendFailedTransactionOverflow() override;
+    // MESSAGES 
+    virtual void signalMessageTransmissionStarted() override;
 
     // PER MSF
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
@@ -305,7 +307,8 @@ public:
     static omnetpp::simsignal_t statDeallocationNotifySendFailedChannelAccess;
     static omnetpp::simsignal_t statDeallocationNotifySendFailedTransactionOverflow;
     static omnetpp::simsignal_t statDeallocationNotifySendFailedQueue;
-    
+    // MESSAGES
+    static omnetpp::simsignal_t statMessageTransmissionStarted; 
 
     static omnetpp::simsignal_t broadcastDataSentDown;
     static omnetpp::simsignal_t unicastDataSentDown;

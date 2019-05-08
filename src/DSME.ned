@@ -118,7 +118,9 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[statDeallocationNotifySendSuccess](type=long);
         @signal[statDeallocationNotifySendFailedChannelAccess](type=long);
         @signal[statDeallocationNotifySendFailedTransactionOverflow](type=long);
-         
+        @signal[statMessageTransmissionStarted](type=long);
+                
+ 
         @signal[GTSRequestsTotal](type=long);
         @signal[GTSRequestsSuccess](type=long);
         @signal[GTSRequestsFailed](type=long);
@@ -172,6 +174,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[statDeallocationNotifySendSuccess](title="NAN"; source=statDeallocationNotifySendSuccess ; record=vector; interpolationmode=none);
         @statistic[statDeallocationNotifySendFailedChannelAccess](title="NAN"; source=statDeallocationNotifySendFailedChannelAccess ; record=vector; interpolationmode=none);
         @statistic[statDeallocationNotifySendFailedTransactionOverflow](title="NAN"; source=statDeallocationNotifySendFailedTransactionOverflow ; record=vector; interpolationmode=none);
+        @statistic[statMessageTransmissionStarted](title="NAN"; source=statMessageTransmissionStarted ; record=vector; interpolationmode=none);
  
         @statistic[GTSRequestsTotal](title="Requests per MSF"; source=GTSRequestsTotal; record=vector; interpolationmode=none);
         @statistic[GTSRequestsSuccess](title="Sucessful requests per MSF"; source=GTSRequestsSuccess; record=vector; interpolationmode=none);

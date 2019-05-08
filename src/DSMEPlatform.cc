@@ -85,6 +85,8 @@ simsignal_t DSMEPlatform::statDeallocationNotifySendFailedNoAck;
 simsignal_t DSMEPlatform::statDeallocationNotifySendFailedChannelAccess;
 simsignal_t DSMEPlatform::statDeallocationNotifySendFailedTransactionOverflow;
 simsignal_t DSMEPlatform::statDeallocationNotifySendFailedQueue;
+// MESSAGES
+simsignal_t DSMEPlatform::statMessageTransmissionStarted;
 
 
 simsignal_t DSMEPlatform::broadcastDataSentDown;
@@ -212,7 +214,8 @@ DSMEPlatform::DSMEPlatform()
     statDeallocationNotifySendFailedChannelAccess = registerSignal("statDeallocationNotifySendFailedChannelAccess");
     statDeallocationNotifySendFailedTransactionOverflow = registerSignal("statDeallocationNotifySendFailedTransactionOverflow");
     statDeallocationNotifySendFailedQueue = registerSignal("statDeallocationNotifySendFailedQueue");
-    
+    // MESSAGES
+    statMessageTransmissionStarted = registerSignal("statMessageTransmissionStarted");   
  
     gtsRequestsTotal = registerSignal("GTSRequestsTotal");
     gtsRequestsSuccess = registerSignal("GTSRequestsSuccess");
@@ -1110,8 +1113,10 @@ void DSMEPlatform::signalDeallocationNotifySendFailedChannelAccess() {
 void DSMEPlatform::signalDeallocationNotifySendFailedTransactionOverflow() {
     emit(statDeallocationNotifySendFailedTransactionOverflow,1);
 }
-
-
+// MESSAGES 
+void DSMEPlatform::signalMessageTransmissionStarted() {
+    emit(statMessageTransmissionStarted, 1);
+}
 
 
 
