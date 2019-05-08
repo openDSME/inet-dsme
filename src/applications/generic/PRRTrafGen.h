@@ -49,6 +49,7 @@ class PRRTrafGen : public inet::IpvxTrafGen, public omnetpp::cIListener
     omnetpp::simtime_t warmUpDuration;
     omnetpp::simtime_t coolDownDuration;
     bool continueSendingDummyPackets;
+    int burstPackets;
     omnetpp::cMessage *shutdownTimer = nullptr;
 
   protected:
