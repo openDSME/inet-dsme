@@ -60,7 +60,8 @@ class DSMEPlatform;
 class DSMEMessage : public omnetpp::cOwnedObject, public IDSMEMessage {
     friend class DSMEPlatform;
     friend class DSMEMessageElement;
-
+    friend class CAPLayer;
+    
 public:
     void prependFrom(DSMEMessageElement*) override;
 
