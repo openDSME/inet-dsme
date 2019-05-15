@@ -33,7 +33,7 @@ simple PRRTrafGen extends IpvxTrafGen
         double warmUpDuration @unit("s") = default(10s);
         double coolDownDuration @unit("s") = default(10s);
         bool continueSendingDummyPackets = default(true);
-        int burstPackets = default(1);       
+        volatile int burstPackets = default(1);       
  
         @signal[packetSent](type=inet::Packet);
         @signal[packetReceived](type=inet::Packet);

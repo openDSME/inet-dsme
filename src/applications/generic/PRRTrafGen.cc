@@ -151,6 +151,7 @@ void PRRTrafGen::handleMessage(omnetpp::cMessage *msg)
 
 void PRRTrafGen::sendPacket() 
 {
+    burstPackets = par("burstPackets");
     for(int i=0; i<burstPackets; i++)
     {    
         char msgName[32];
