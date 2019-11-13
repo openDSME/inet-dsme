@@ -163,8 +163,8 @@ void DSMEPlatform::initialize(int stage) {
             scheduling = tps;
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
-            scheduling = new StaticScheduling(this->dsmeAdaptionLayer); 
-        } 
+            scheduling = new StaticScheduling(this->dsmeAdaptionLayer);
+        }
         else {
             ASSERT(false);
         }
@@ -254,11 +254,11 @@ void DSMEPlatform::initialize(int stage) {
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
             cXMLElement *xmlFile = par("staticSchedule");
-            std::vector<StaticSlot> slots = StaticSchedule::loadSchedule(xmlFile, this->mac_pib.macShortAddress);  
+            std::vector<StaticSlot> slots = StaticSchedule::loadSchedule(xmlFile, this->mac_pib.macShortAddress);
             for(auto &slot : slots) {
-                static_cast<StaticScheduling*>(scheduling)->allocateGTS(slot.superframeID, slot.slotID, slot.channelID, (Direction)slot.direction, slot.address); 
+                static_cast<StaticScheduling*>(scheduling)->allocateGTS(slot.superframeID, slot.slotID, slot.channelID, (Direction)slot.direction, slot.address);
             }
-        }    
+        }
     } else if(stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         dsme->start();
