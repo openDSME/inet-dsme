@@ -87,6 +87,20 @@ uint16_t DSMEMessage::getTotalSymbols() {
     return bytes * 2; // 4 bit per symbol
 }
 
+/**
+     * Retrieves the MPDU length of a message in symbols
+     *
+     * @return MPDUSymbols number of symbols that are contained in the MPDU
+     */
+uint8_t DSMEMessage::getMPDUSymbols(){
+    uint8_t MPDUBytes = macHdr.getSerializationLength() + //MAC header
+            packet->getByteLength() // MAC Payload
+            + 2; // FCS
+    uint8_t MPDUSymbols = MPDUBytes *2;
+    return MPDUSymbols;
+}
+
+
 uint32_t DSMEMessage::getStartOfFrameDelimiterSymbolCounter() {
     return startOfFrameDelimiterSymbolCounter;
 }
