@@ -70,6 +70,8 @@ public:
 
     uint16_t getTotalSymbols() override;
 
+    uint8_t getMPDUSymbols() override;
+
     uint32_t getStartOfFrameDelimiterSymbolCounter() override;
 
     void setStartOfFrameDelimiterSymbolCounter(uint32_t) override;
