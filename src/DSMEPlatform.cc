@@ -35,6 +35,44 @@ Define_Module(dsme::DSMEPlatform);
 
 namespace dsme {
 
+//GTS ALLOCATIONS
+// NOTIFIY
+/*simsignal_t DSMEPlatform::statNotifyInitialized;
+
+simsignal_t DSMEPlatform::statNotifyBackoffs;
+simsignal_t DSMEPlatform::statNotifySendSuccess;
+simsignal_t DSMEPlatform::statNotifySendFailedNoAck;
+simsignal_t DSMEPlatform::statNotifySendFailedChannelAccess;
+simsignal_t DSMEPlatform::statNotifySendFailedTransactionOverflow;
+simsignal_t DSMEPlatform::statNotifySendFailedQueue;
+*/
+
+//GTS DEALLOCATIONS
+// DEALLOCATION NOTIFY
+/*simsignal_t DSMEPlatform::statDeallocationNotifyInitialized;
+simsignal_t DSMEPlatform::statDeallocationNotifyBackoffs;
+simsignal_t DSMEPlatform::statDeallocationNotifySendSuccess;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedNoAck;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedChannelAccess;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedTransactionOverflow;
+simsignal_t DSMEPlatform::statDeallocationNotifySendFailedQueue;*/
+
+// STATS PER MSF
+
+/*simsignal_t DSMEPlatform::gtsRequestsTotal;
+simsignal_t DSMEPlatform::gtsRequestsSuccess;
+simsignal_t DSMEPlatform::gtsRequestsFailed;
+simsignal_t DSMEPlatform::gtsRequestsFailedNoAck;
+simsignal_t DSMEPlatform::gtsRequestsFailedChannelAccess;
+simsignal_t DSMEPlatform::gtsRequestsFailedTransactionOverflow;
+simsignal_t DSMEPlatform::gtsRequestsFailedDenied;
+simsignal_t DSMEPlatform::gtsRequestsFailedTimeout;
+simsignal_t DSMEPlatform::gtsRequestsFailedQueue;
+simsignal_t DSMEPlatform::gtsRequestsFailedDeallocated;*/
+
+// QUEUE LEVEL
+//simsignal_t DSMEPlatform::gtsQueueLevel;
+
 simsignal_t DSMEPlatform::broadcastDataSentDown;
 simsignal_t DSMEPlatform::unicastDataSentDown;
 simsignal_t DSMEPlatform::commandSentDown;
@@ -92,6 +130,45 @@ DSMEPlatform::DSMEPlatform()
       mcps_sap(*dsme),
       mlme_sap(*dsme),
       dsmeAdaptionLayer(*dsme) {
+
+    //ALLOCATIONS
+
+    // NOTIFIY
+/*    statNotifyInitialized = registerSignal("statNotifyInitialized");
+    statNotifyBackoffs = registerSignal("statNotifyBackoffs");
+    statNotifySendSuccess = registerSignal("statNotifySendSuccess");
+    statNotifySendFailedNoAck = registerSignal("statNotifySendFailedNoAck");
+    statNotifySendFailedChannelAccess = registerSignal("statNotifySendFailedChannelAccess");
+    statNotifySendFailedTransactionOverflow = registerSignal("statNotifySendFailedTransactionOverflow");
+    statNotifySendFailedQueue = registerSignal("statNotifySendFailedQueue");*/
+
+    //DEALLOCATIONS
+
+    // DEALLOCATION NOTIFY
+ /*   statDeallocationNotifyInitialized = registerSignal("statDeallocationNotifyInitialized");
+    statDeallocationNotifyBackoffs = registerSignal("statDeallocationNotifyBackoffs");
+    statDeallocationNotifySendSuccess = registerSignal("statDeallocationNotifySendSuccess");
+    statDeallocationNotifySendFailedNoAck = registerSignal("statDeallocationNotifySendFailedNoAck");
+    statDeallocationNotifySendFailedChannelAccess = registerSignal("statDeallocationNotifySendFailedChannelAccess");
+    statDeallocationNotifySendFailedTransactionOverflow = registerSignal("statDeallocationNotifySendFailedTransactionOverflow");
+    statDeallocationNotifySendFailedQueue = registerSignal("statDeallocationNotifySendFailedQueue");*/
+
+    // STATS PER MSF
+
+/*    gtsRequestsTotal = registerSignal("GTSRequestsTotal");
+    gtsRequestsSuccess = registerSignal("GTSRequestsSuccess");
+    gtsRequestsFailed = registerSignal("GTSRequestsFailed");
+    gtsRequestsFailedNoAck = registerSignal("GTSRequestsFailedNoAck");
+    gtsRequestsFailedChannelAccess = registerSignal("GTSRequestsFailedChannelAccess");
+    gtsRequestsFailedTransactionOverflow = registerSignal("GTSRequestsFailedTransactionOverflow");
+    gtsRequestsFailedDenied = registerSignal("GTSRequestsFailedDenied");
+    gtsRequestsFailedTimeout = registerSignal("GTSRequestsFailedTimeout");
+    gtsRequestsFailedQueue = registerSignal("GTSRequestsFailedQueue");
+    gtsRequestsFailedDeallocated = registerSignal("GTSRequestsFailedDeallocated"); */
+
+    // QUEUE LEVEL
+    //gtsQueueLevel = registerSignal("GTSQueueLevel");
+
     broadcastDataSentDown = registerSignal("broadcastDataSentDown");
     unicastDataSentDown = registerSignal("unicastDataSentDown");
     commandSentDown = registerSignal("commandSentDown");
@@ -864,5 +941,94 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
 void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
     emit(gtsChange, deallocation?-1:1);
 }
+
+//ALLOCATIONS
+
+// NOTIFIY
+/*void DSMEPlatform::signalNotifyInitialized() {
+    emit(statNotifyInitialized,1);
+}
+void DSMEPlatform::signalNotifyBackoffs(uint8_t backoffs) {
+    emit(statNotifyBackoffs,backoffs);
+}
+void DSMEPlatform::signalNotifySendSuccess() {
+    emit(statNotifySendSuccess,1);
+}
+void DSMEPlatform::signalNotifySendFailedChannelAccess() {
+    emit(statNotifySendFailedChannelAccess,1);
+}
+void DSMEPlatform::signalNotifySendFailedTransactionOverflow() {
+    emit(statNotifySendFailedTransactionOverflow,1);
+}*/
+
+//DEALLOCATIONS
+
+// DEALLOCATION NOTIFY
+/*void DSMEPlatform::signalDeallocationNotifyInitialized() {
+    emit(statDeallocationNotifyInitialized,1);
+}
+void DSMEPlatform::signalDeallocationNotifyBackoffs(uint8_t backoffs) {
+    emit(statDeallocationNotifyBackoffs,backoffs);
+}
+void DSMEPlatform::signalDeallocationNotifySendSuccess() {
+    emit(statDeallocationNotifySendSuccess,1);
+}
+void DSMEPlatform::signalDeallocationNotifySendFailedChannelAccess() {
+    emit(statDeallocationNotifySendFailedChannelAccess,1);
+}
+void DSMEPlatform::signalDeallocationNotifySendFailedTransactionOverflow() {
+    emit(statDeallocationNotifySendFailedTransactionOverflow,1);
+}*/
+
+
+// STATS PER MSF
+/*void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
+    emit(gtsRequestsTotal, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsSuccess(uint16_t allocations) {
+    emit(gtsRequestsSuccess, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailed(uint16_t allocations) {
+    emit(gtsRequestsFailed, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailedNoAck(uint16_t allocations) {
+    emit(gtsRequestsFailedNoAck, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailedChannelAccess(uint16_t allocations) {
+    emit(gtsRequestsFailedChannelAccess, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailedTransactionOverflow(uint16_t allocations) {
+    emit(gtsRequestsFailedTransactionOverflow, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailedDenied(uint16_t allocations) {
+    emit(gtsRequestsFailedDenied, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailedTimeout(uint16_t allocations) {
+    emit(gtsRequestsFailedTimeout, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailedQueue(uint16_t allocations) {
+    emit(gtsRequestsFailedQueue, allocations);
+}
+
+void DSMEPlatform::signalGTSRequestsFailedDeallocated(uint16_t allocations) {
+    emit(gtsRequestsFailedDeallocated, allocations);
+}*/
+
+
+// QUEUE LEVEL
+/*
+void DSMEPlatform::signalGTSQueueLevel(bool push){
+    emit(gtsQueueLevel,push ? -1:1);
+}
+*/
+
 
 }

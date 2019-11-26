@@ -148,6 +148,41 @@ public:
 
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
 
+    //ALLOCATIONS
+
+    // NOTIFIY
+    /*virtual void signalNotifyInitialized() override;
+    virtual void signalNotifyBackoffs(uint8_t backoffs) override;
+    virtual void signalNotifySendSuccess() override;
+    virtual void signalNotifySendFailedChannelAccess() override;
+    virtual void signalNotifySendFailedTransactionOverflow() override;*/
+
+    // DEALLOCATION NOTIFY
+/*  virtual void signalDeallocationNotifyInitialized() override;
+    virtual void signalDeallocationNotifyBackoffs(uint8_t backoffs) override;
+    virtual void signalDeallocationNotifySendSuccess() override;
+    virtual void signalDeallocationNotifySendFailedChannelAccess() override;
+    virtual void signalDeallocationNotifySendFailedTransactionOverflow() override;  */
+
+    // PER MSF
+
+/*    virtual void signalGTSRequestsTotal(uint16_t allocations) override;
+    virtual void signalGTSRequestsSuccess(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailed(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailedNoAck(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailedChannelAccess(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailedTransactionOverflow(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailedTimeout(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailedDenied(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailedQueue(uint16_t allocations) override;
+    virtual void signalGTSRequestsFailedDeallocated(uint16_t allocations) override;     */
+
+    // QUEUE LEVEL
+    /*
+    virtual void signalGTSQueueLevel(bool push) override;
+    */
+
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -199,6 +234,44 @@ private:
 
 public:
     omnetpp::SimTime symbolDuration;
+
+    //ALLOCATIONS
+    // NOTIFIY
+/*    static omnetpp::simsignal_t statNotifyInitialized;
+    static omnetpp::simsignal_t statNotifyBackoffs;
+    static omnetpp::simsignal_t statNotifySendSuccess;
+    static omnetpp::simsignal_t statNotifySendFailedNoAck;
+    static omnetpp::simsignal_t statNotifySendFailedChannelAccess;
+    static omnetpp::simsignal_t statNotifySendFailedTransactionOverflow;
+    static omnetpp::simsignal_t statNotifySendFailedQueue;*/
+
+    // DEALLOCATION NOTIFY
+/*    static omnetpp::simsignal_t statDeallocationNotifyInitialized;
+    static omnetpp::simsignal_t statDeallocationNotifyBackoffs;
+    static omnetpp::simsignal_t statDeallocationNotifySendSuccess;
+    static omnetpp::simsignal_t statDeallocationNotifySendFailedNoAck;
+    static omnetpp::simsignal_t statDeallocationNotifySendFailedChannelAccess;
+    static omnetpp::simsignal_t statDeallocationNotifySendFailedTransactionOverflow;
+    static omnetpp::simsignal_t statDeallocationNotifySendFailedQueue;
+    */
+
+    //PER MSF
+
+/*    static omnetpp::simsignal_t gtsRequestsTotal;
+    static omnetpp::simsignal_t gtsRequestsSuccess;
+    static omnetpp::simsignal_t gtsRequestsFailed;
+    static omnetpp::simsignal_t gtsRequestsFailedNoAck;
+    static omnetpp::simsignal_t gtsRequestsFailedChannelAccess;
+    static omnetpp::simsignal_t gtsRequestsFailedTransactionOverflow;
+    static omnetpp::simsignal_t gtsRequestsFailedDenied;
+    static omnetpp::simsignal_t gtsRequestsFailedTimeout;
+    static omnetpp::simsignal_t gtsRequestsFailedQueue;
+    static omnetpp::simsignal_t gtsRequestsFailedDeallocated;*/
+
+    // QUEUE LEVEL
+    /*
+    static omnetpp::simsignal_t gtsQueueLevel;
+    */
 
     static omnetpp::simsignal_t broadcastDataSentDown;
     static omnetpp::simsignal_t unicastDataSentDown;
