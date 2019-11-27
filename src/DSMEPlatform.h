@@ -164,11 +164,11 @@ public:
     virtual void signalDeallocationNotifySendFailedChannelAccess() override;
     virtual void signalDeallocationNotifySendFailedTransactionOverflow() override;  */
 
-    // PER MSF
-
-/*    virtual void signalGTSRequestsTotal(uint16_t allocations) override;
-    virtual void signalGTSRequestsSuccess(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailed(uint16_t allocations) override;
+    // PER SF
+    virtual void signalSuperframe(uint8_t limits) override;
+    virtual void signalGTSRequestsTotal(uint16_t allocations) override;
+    virtual void signalGTSNotifySuccess(uint16_t allocations) override;
+/*    virtual void signalGTSRequestsFailed(uint16_t allocations) override;
     virtual void signalGTSRequestsFailedNoAck(uint16_t allocations) override;
     virtual void signalGTSRequestsFailedChannelAccess(uint16_t allocations) override;
     virtual void signalGTSRequestsFailedTransactionOverflow(uint16_t allocations) override;
@@ -258,11 +258,11 @@ public:
     static omnetpp::simsignal_t statDeallocationNotifySendFailedQueue;
     */
 
-    //PER MSF
-
-/*    static omnetpp::simsignal_t gtsRequestsTotal;
-    static omnetpp::simsignal_t gtsRequestsSuccess;
-    static omnetpp::simsignal_t gtsRequestsFailed;
+    //PER SF
+    static omnetpp::simsignal_t superframeLimits;
+    static omnetpp::simsignal_t gtsRequestsTotal;
+    static omnetpp::simsignal_t gtsNotifySuccess;
+/*    static omnetpp::simsignal_t gtsRequestsFailed;
     static omnetpp::simsignal_t gtsRequestsFailedNoAck;
     static omnetpp::simsignal_t gtsRequestsFailedChannelAccess;
     static omnetpp::simsignal_t gtsRequestsFailedTransactionOverflow;

@@ -57,11 +57,12 @@ simsignal_t DSMEPlatform::statDeallocationNotifySendFailedChannelAccess;
 simsignal_t DSMEPlatform::statDeallocationNotifySendFailedTransactionOverflow;
 simsignal_t DSMEPlatform::statDeallocationNotifySendFailedQueue;*/
 
-// STATS PER MSF
+// STATS PER SF
+simsignal_t DSMEPlatform::superframeLimits;
+simsignal_t DSMEPlatform::gtsRequestsTotal;
+simsignal_t DSMEPlatform::gtsNotifySuccess;
 
-/*simsignal_t DSMEPlatform::gtsRequestsTotal;
-simsignal_t DSMEPlatform::gtsRequestsSuccess;
-simsignal_t DSMEPlatform::gtsRequestsFailed;
+/*simsignal_t DSMEPlatform::gtsRequestsFailed;
 simsignal_t DSMEPlatform::gtsRequestsFailedNoAck;
 simsignal_t DSMEPlatform::gtsRequestsFailedChannelAccess;
 simsignal_t DSMEPlatform::gtsRequestsFailedTransactionOverflow;
@@ -156,11 +157,11 @@ DSMEPlatform::DSMEPlatform()
     statDeallocationNotifySendFailedTransactionOverflow = registerSignal("statDeallocationNotifySendFailedTransactionOverflow");
     statDeallocationNotifySendFailedQueue = registerSignal("statDeallocationNotifySendFailedQueue");*/
 
-    // STATS PER MSF
-
-/*    gtsRequestsTotal = registerSignal("GTSRequestsTotal");
-    gtsRequestsSuccess = registerSignal("GTSRequestsSuccess");
-    gtsRequestsFailed = registerSignal("GTSRequestsFailed");
+    // STATS PER SF
+    superframeLimits = registerSignal("SuperframeLimits");
+    gtsRequestsTotal = registerSignal("GTSRequestsTotal");
+    gtsNotifySuccess = registerSignal("GTSNotifySuccess");
+/*  gtsRequestsFailed = registerSignal("GTSRequestsFailed");
     gtsRequestsFailedNoAck = registerSignal("GTSRequestsFailedNoAck");
     gtsRequestsFailedChannelAccess = registerSignal("GTSRequestsFailedChannelAccess");
     gtsRequestsFailedTransactionOverflow = registerSignal("GTSRequestsFailedTransactionOverflow");
@@ -987,16 +988,21 @@ void DSMEPlatform::signalDeallocationNotifySendFailedTransactionOverflow() {
 }*/
 
 
-// STATS PER MSF
-/*void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
+// STATS PER SF
+
+void DSMEPlatform::signalSuperframe(uint8_t limits){
+    emit(superframeLimits, limits);
+}
+
+void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
     emit(gtsRequestsTotal, allocations);
 }
 
-void DSMEPlatform::signalGTSRequestsSuccess(uint16_t allocations) {
-    emit(gtsRequestsSuccess, allocations);
+void DSMEPlatform::signalGTSNotifySuccess(uint16_t allocations) {
+    emit(gtsNotifySuccess, allocations);
 }
 
-void DSMEPlatform::signalGTSRequestsFailed(uint16_t allocations) {
+/*void DSMEPlatform::signalGTSRequestsFailed(uint16_t allocations) {
     emit(gtsRequestsFailed, allocations);
 }
 
