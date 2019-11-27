@@ -178,9 +178,12 @@ public:
     virtual void signalGTSRequestsFailedDeallocated(uint16_t allocations) override;     */
 
     // QUEUE LEVEL
-    /*
+
     virtual void signalGTSQueueLevel(bool push) override;
-    */
+
+    // QUEUE LEVEL PER MSF
+    virtual void signalGTSQueueLevelMSF(uint8_t queueLevel) override;
+
 
 
 private:
@@ -269,9 +272,12 @@ public:
     static omnetpp::simsignal_t gtsRequestsFailedDeallocated;*/
 
     // QUEUE LEVEL
-    /*
+
     static omnetpp::simsignal_t gtsQueueLevel;
-    */
+
+    // QUEUE LEVEL MSF
+
+    static omnetpp::simsignal_t gtsQueueLevelMSF;
 
     static omnetpp::simsignal_t broadcastDataSentDown;
     static omnetpp::simsignal_t unicastDataSentDown;

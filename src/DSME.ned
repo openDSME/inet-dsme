@@ -111,7 +111,11 @@ simple DSME extends MacProtocolBase like IMacProtocol
 //        @signal[GTSRequestsFailedDeallocated](type=long);		
 		
 		// QUEUE LEVEL
-//		@signal[GTSQueueLevel](type=long);
+		@signal[GTSQueueLevel](type=long);
+		// QUEUE LEVEL PER MSF
+		@signal[GTSQueueLevelMSF](type=long);
+
+		
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
@@ -152,9 +156,9 @@ simple DSME extends MacProtocolBase like IMacProtocol
 //		
 
 		//QUEUE LEVEL
-//        @statistic[GTSQueueLevel](title="GTS queue level"; source=GTSQueueLevel; record=vector; interpolationmode=none);
-
-
+        @statistic[GTSQueueLevel](title="GTS queue level"; source=GTSQueueLevel; record=vector; interpolationmode=none);
+		//QUEUE LEVEL MSF
+		@statistic[GTSQueueLevelMSF](title="GTS queue level per MSF"; source=GTSQueueLevelMSF; record=vector; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }

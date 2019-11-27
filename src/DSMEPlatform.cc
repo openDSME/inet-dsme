@@ -71,7 +71,10 @@ simsignal_t DSMEPlatform::gtsRequestsFailedQueue;
 simsignal_t DSMEPlatform::gtsRequestsFailedDeallocated;*/
 
 // QUEUE LEVEL
-//simsignal_t DSMEPlatform::gtsQueueLevel;
+simsignal_t DSMEPlatform::gtsQueueLevel;
+
+// QUEUE LEVEL PER MSF
+simsignal_t DSMEPlatform::gtsQueueLevelMSF;
 
 simsignal_t DSMEPlatform::broadcastDataSentDown;
 simsignal_t DSMEPlatform::unicastDataSentDown;
@@ -167,7 +170,10 @@ DSMEPlatform::DSMEPlatform()
     gtsRequestsFailedDeallocated = registerSignal("GTSRequestsFailedDeallocated"); */
 
     // QUEUE LEVEL
-    //gtsQueueLevel = registerSignal("GTSQueueLevel");
+    gtsQueueLevel = registerSignal("GTSQueueLevel");
+
+    // QUEUE LEVEL PER MSF
+    gtsQueueLevelMSF = registerSignal("GTSQueueLevelMSF");
 
     broadcastDataSentDown = registerSignal("broadcastDataSentDown");
     unicastDataSentDown = registerSignal("unicastDataSentDown");
@@ -1024,11 +1030,14 @@ void DSMEPlatform::signalGTSRequestsFailedDeallocated(uint16_t allocations) {
 
 
 // QUEUE LEVEL
-/*
+
 void DSMEPlatform::signalGTSQueueLevel(bool push){
     emit(gtsQueueLevel,push ? -1:1);
 }
-*/
+// QUEUE LEVEL PER MSF
+void DSMEPlatform::signalGTSQueueLevelMSF(uint8_t queueLevel){
+    emit(gtsQueueLevelMSF, queueLevel);
+}
 
 
 }
