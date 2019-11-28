@@ -990,8 +990,8 @@ void DSMEPlatform::signalDeallocationNotifySendFailedTransactionOverflow() {
 
 // STATS PER SF
 
-void DSMEPlatform::signalSuperframe(uint8_t limits){
-    emit(superframeLimits, limits);
+void DSMEPlatform::signalSuperframe(bool limits){
+    emit(superframeLimits, limits ? 2:-2);
 }
 
 void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
@@ -1001,8 +1001,8 @@ void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
 void DSMEPlatform::signalGTSNotifySuccess(uint16_t allocations) {
     emit(gtsNotifySuccess, allocations);
 }
-
-/*void DSMEPlatform::signalGTSRequestsFailed(uint16_t allocations) {
+/*
+void DSMEPlatform::signalGTSRequestsFailed(uint16_t allocations) {
     emit(gtsRequestsFailed, allocations);
 }
 

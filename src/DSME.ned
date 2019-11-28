@@ -98,9 +98,11 @@ simple DSME extends MacProtocolBase like IMacProtocol
 //        @signal[statDeallocationNotifySendFailedChannelAccess](type=long);
 //        @signal[statDeallocationNotifySendFailedTransactionOverflow](type=long);        
         
-		//PER MSF
-//        @signal[GTSRequestsTotal](type=long);
-//        @signal[GTSRequestsSuccess](type=long);
+		//PER SF
+		
+		@signal[SuperframeLimits](type=long);
+		@signal[GTSRequestsTotal](type=long);
+        @signal[signalGTSNotifySuccess](type=long);
 //        @signal[GTSRequestsFailed](type=long);
 //        @signal[GTSRequestsFailedNoAck](type=long);
 //        @signal[GTSRequestsFailedChannelAccess](type=long);
@@ -142,9 +144,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
 //  		
 		
 		//PER MSF
-		
-//        @statistic[GTSRequestsTotal](title="Requests per MSF"; source=GTSRequestsTotal; record=count,vector; interpolationmode=none);
-//        @statistic[GTSRequestsSuccess](title="Sucessful requests per MSF"; source=GTSRequestsSuccess; record=count,vector; interpolationmode=none);
+
+       @statistic[SuperframeLimits](title="limits of superframe in MAC dataframe structure"; source=SuperframeLimits; record=count,vector; interpolationmode=none);		
+       @statistic[GTSRequestsTotal](title="Requests per MSF"; source=GTSRequestsTotal; record=count,vector; interpolationmode=none);
+       @statistic[signalGTSNotifySuccess](title="Sucessful requests per MSF"; source=GTSRequestsSuccess; record=count,vector; interpolationmode=none);
 //        @statistic[GTSRequestsFailed](title="Failed requests per MSF"; source=GTSRequestsFailed; record=vector; interpolationmode=none);
 //        @statistic[GTSRequestsFailedNoAck](title="Failed requests per MSF"; source=GTSRequestsFailedNoAck; record=vector; interpolationmode=none);
 //        @statistic[GTSRequestsFailedChannelAccess](title="Failed requests per MSF"; source=GTSRequestsFailedChannelAccess; record=vector; interpolationmode=none);

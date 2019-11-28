@@ -165,7 +165,7 @@ public:
     virtual void signalDeallocationNotifySendFailedTransactionOverflow() override;  */
 
     // PER SF
-    virtual void signalSuperframe(uint8_t limits) override;
+    virtual void signalSuperframe(bool limits) override;
     virtual void signalGTSRequestsTotal(uint16_t allocations) override;
     virtual void signalGTSNotifySuccess(uint16_t allocations) override;
 /*    virtual void signalGTSRequestsFailed(uint16_t allocations) override;
