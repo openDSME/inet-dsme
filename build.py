@@ -12,7 +12,7 @@ def build(inet_path,jobs):
     inetfeatures = os.path.join(inet_path,'.oppfeaturestate')
     if not os.path.isfile(inetfeatures) or not filecmp.cmp(myfeatures,inetfeatures):
         shutil.copyfile(myfeatures,inetfeatures)
-    subprocess.check_call(["./inet_featuretool","repair"], cwd=inet_path)
+    #subprocess.check_call(["./inet_featuretool","repair"], cwd=inet_path)
 
     # Build INET
     subprocess.check_call(["make","makefiles"], cwd=inet_path)

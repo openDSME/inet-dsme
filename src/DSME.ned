@@ -12,9 +12,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
     parameters:
         string address = default("auto"); // MAC address as hex string (12 hex digits), or
                                           // "auto". "auto" values will be replaced by
-                                          // a generated MAC address in init stage 0. 
+                                          // a generated MAC address in init stage 0.
 
         bool macCapReduction = default(false);
+        bool sendMultiplePacketsPerGTS = default(true);
 
         bool isPANCoordinator = default(false);
         bool isCoordinator = default(false);
@@ -34,10 +35,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
         int finalCAPSlot = default(8);				// 4 bits
 
         // Scheduling
-        string scheduling = default("TPS"); 
+        string scheduling = default("TPS");
         double TPSalpha = default(0.1); // EWMA factor for TPS, ignored otherwise
         bool useHysteresis = default(true);
-        xml staticSchedule = default(xml("<root/>")); 
+        xml staticSchedule = default(xml("<root/>"));
 
         int macDSMEGTSExpirationTime = default(7);
         int macResponseWaitTime = default(32);
@@ -81,13 +82,18 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
+        @signal[queueLength](type=long);
+        @signal[packetsTXPerSlot](type=long);
+        @signal[packetsRXPerSlot](type=long);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
         @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
-        @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=vector; interpolationmode=none);
+        @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
+        @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
+        @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
-

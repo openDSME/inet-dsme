@@ -21,6 +21,7 @@ package inet_dsme.simulations;
 
 import inet.linklayer.ieee802154.Ieee802154NarrowbandInterface;
 import inet.node.inet.WirelessHost;
+import inet.physicallayer.ieee802154.packetlevel.Ieee802154NarrowbandScalarRadio;
 
 import inet_dsme.applications.generic.PRRTrafGen;
 import inet_dsme.routing.gpsr.SP_GPSR;
@@ -43,20 +44,21 @@ module IEEE802154ExampleHost extends WirelessHost
         hasTcp = false;
         hasSctp = false;
 
-	bool hasGpsr = default(true);
+	    bool hasGpsr = default(true);
 
-        networkLayerType = "GenericNetworkLayer";
+        //networkLayerType = "GenericNetworkLayer";
+        generic.typename = "NextHopNetworkLayer";
 
         generic.gnp.procDelay = default(2ms);
 
         wlan[*].typename = default("WirelessInterface");
-        wlan[*].radioType = default("Ieee802154NarrowbandScalarRadio");
+        wlan[*].radio.typename = default("Ieee802154NarrowbandScalarRadio");
 
     submodules:
         gpsr: SP_GPSR if hasGpsr {
             parameters:
                 @display("p=739,339");
-                routingTableModule = "^.generic.routingTable";
+                routingTableModule = "^.generic.nextHopRoutingTable";
                 networkProtocolModule = "^.generic.gnp";
 				positionByteLength = 2 B; // assumes a 3D coordinate can be specified in 6 byte
                 beaconInterval = 10s;

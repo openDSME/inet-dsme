@@ -41,14 +41,14 @@ GpsrOption *SP_GPSR::createGpsrOption(L3Address destination)
     return gpsrOption;
 }
 
-L3Address SP_GPSR::findGreedyRoutingNextHop(const Ptr<const NetworkHeaderBase>& networkHeader, const L3Address& destination)
+L3Address SP_GPSR::findGreedyRoutingNextHop(const L3Address& destination, GpsrOption *gpsrOption)
 {
     if(!par("straightPath")) {
-        return inet::Gpsr::findGreedyRoutingNextHop(networkHeader, destination);
+        return inet::Gpsr::findGreedyRoutingNextHop(destination, gpsrOption);
     }
 
     EV_DEBUG << "Finding next hop using greedy routing: destination = " << destination << endl;
-    const GpsrOption *gpsrOption = getGpsrOptionFromNetworkDatagram(networkHeader);
+    //const GpsrOption *gpsrOption = getGpsrOptionFromNetworkDatagram(networkHeader);
     L3Address selfAddress = getSelfAddress();
     Coord selfPosition = mobility->getCurrentPosition();
     Coord destinationPosition = gpsrOption->getDestinationPosition();
@@ -93,20 +93,20 @@ L3Address SP_GPSR::findGreedyRoutingNextHop(const Ptr<const NetworkHeaderBase>& 
         const_cast<GpsrOption *>(gpsrOption)->setPerimeterRoutingForwardPosition(selfPosition);
         const_cast<GpsrOption *>(gpsrOption)->setCurrentFaceFirstSenderAddress(selfAddress);
         const_cast<GpsrOption *>(gpsrOption)->setCurrentFaceFirstReceiverAddress(L3Address());
-        return findPerimeterRoutingNextHop(networkHeader, destination);
+        return findPerimeterRoutingNextHop(destination, gpsrOption);
     }
     else
         return bestNeighbor;
 }
 
-L3Address SP_GPSR::findPerimeterRoutingNextHop(const Ptr<const NetworkHeaderBase>& networkHeader, const L3Address& destination)
+L3Address SP_GPSR::findPerimeterRoutingNextHop(const L3Address& destination, GpsrOption *gpsrOption)
 {
     if(!par("straightPath")) {
-        return inet::Gpsr::findPerimeterRoutingNextHop(networkHeader, destination);
+        return inet::Gpsr::findPerimeterRoutingNextHop(destination, gpsrOption);
     }
 
     EV_DEBUG << "Finding next hop using perimeter routing: destination = " << destination << endl;
-    const GpsrOption *gpsrOption = getGpsrOptionFromNetworkDatagram(networkHeader);
+    //const GpsrOption *gpsrOption = getGpsrOptionFromNetworkDatagram(networkHeader);
     L3Address selfAddress = getSelfAddress();
     Coord selfPosition = mobility->getCurrentPosition();
     Coord perimeterRoutingStartPosition = gpsrOption->getPerimeterRoutingStartPosition();
@@ -121,12 +121,12 @@ L3Address SP_GPSR::findPerimeterRoutingNextHop(const Ptr<const NetworkHeaderBase
         const_cast<GpsrOption *>(gpsrOption)->setPerimeterRoutingForwardPosition(Coord());
         const_cast<GpsrOption *>(gpsrOption)->setCurrentFaceFirstSenderAddress(L3Address());
         const_cast<GpsrOption *>(gpsrOption)->setCurrentFaceFirstReceiverAddress(L3Address());
-        return findGreedyRoutingNextHop(networkHeader, destination);
+        return findGreedyRoutingNextHop(destination, gpsrOption);
     }
     else {
         const L3Address& firstSenderAddress = gpsrOption->getCurrentFaceFirstSenderAddress();
         const L3Address& firstReceiverAddress = gpsrOption->getCurrentFaceFirstReceiverAddress();
-        auto senderNeighborAddress = getSenderNeighborAddress(networkHeader);
+        auto senderNeighborAddress = gpsrOption->getSenderAddress();
         auto neighborAngle = senderNeighborAddress.isUnspecified() ? getVectorAngle(destinationPosition - mobility->getCurrentPosition()) : getNeighborAngle(senderNeighborAddress);
         L3Address selectedNeighborAddress;
         std::vector<L3Address> neighborAddresses = getPlanarNeighborsCounterClockwise(neighborAngle);
@@ -163,4 +163,3 @@ L3Address SP_GPSR::findPerimeterRoutingNextHop(const Ptr<const NetworkHeaderBase
 }
 
 } // namespace inet
-

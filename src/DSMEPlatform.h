@@ -81,7 +81,7 @@ public:
 
     /****** INET ******/
 
-    virtual inet::InterfaceEntry* createInterfaceEntry() override;
+    virtual void configureInterfaceEntry() override;
 
     /****** OMNeT++ ******/
 
@@ -148,6 +148,12 @@ public:
 
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
 
+    virtual void signalQueueLength(uint32_t length) override;
+
+    virtual void signalPacketsTXPerSlot(uint32_t packets) override;
+
+    virtual void signalPacketsRXPerSlot(uint32_t packets) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -197,6 +203,8 @@ private:
     uint8_t minCoordinatorLQI{0};
     uint8_t currentChannel{0};
 
+    int slots{0};
+
 public:
     omnetpp::SimTime symbolDuration;
 
@@ -208,6 +216,9 @@ public:
     static omnetpp::simsignal_t uncorruptedFrameReceived;
     static omnetpp::simsignal_t corruptedFrameReceived;
     static omnetpp::simsignal_t gtsChange;
+    static omnetpp::simsignal_t queueLength;
+    static omnetpp::simsignal_t packetsTXPerSlot;
+    static omnetpp::simsignal_t packetsRXPerSlot;
 
 public:
     IEEE802154MacAddress& getAddress() {

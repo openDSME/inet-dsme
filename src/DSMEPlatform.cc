@@ -12,7 +12,7 @@
 #include <inet/common/ProtocolGroup.h>
 #include <inet/common/packet/chunk/ByteCountChunk.h>
 #include <inet/physicallayer/base/packetlevel/FlatRadioBase.h>
-#include <inet/physicallayer/common/packetlevel/SignalTag_m.h>
+#include <inet/physicallayer/contract/packetlevel/SignalTag_m.h>
 #include <inet/physicallayer/contract/packetlevel/IRadio.h>
 
 #include "openDSME/dsmeLayer/DSMELayer.h"
@@ -43,6 +43,9 @@ simsignal_t DSMEPlatform::ackSentDown;
 simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
+simsignal_t DSMEPlatform::queueLength;
+simsignal_t DSMEPlatform::packetsTXPerSlot;
+simsignal_t DSMEPlatform::packetsRXPerSlot;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -100,6 +103,9 @@ DSMEPlatform::DSMEPlatform()
     uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
+    queueLength = registerSignal("queueLength");
+    packetsTXPerSlot = registerSignal("packetsTXPerSlot");
+    packetsRXPerSlot = registerSignal("packetsRXPerSlot");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -113,7 +119,7 @@ DSMEPlatform::~DSMEPlatform() {
 
 /****** INET ******/
 
-InterfaceEntry* DSMEPlatform::createInterfaceEntry() {
+void DSMEPlatform::configureInterfaceEntry() {
     InterfaceEntry *e = getContainingNicModule(this);
 
     // data rate
@@ -127,8 +133,6 @@ InterfaceEntry* DSMEPlatform::createInterfaceEntry() {
     e->setMtu(par("mtu").intValue());
     e->setMulticast(true);
     e->setBroadcast(true);
-
-    return e;
 }
 
 /****** OMNeT++ ******/
@@ -160,6 +164,7 @@ void DSMEPlatform::initialize(int stage) {
             tps->setAlpha(par("TPSalpha").doubleValue());
             tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
             tps->setUseHysteresis(par("useHysteresis").boolValue());
+            tps->setUseMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
             scheduling = tps;
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
@@ -251,6 +256,8 @@ void DSMEPlatform::initialize(int stage) {
 
         this->dsme->initialize(this);
 
+        this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
+
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
             cXMLElement *xmlFile = par("staticSchedule");
@@ -279,6 +286,8 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsForGTS", dsme->getMessageDispatcher().getNumUpperPacketsForGTS());
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
     recordScalar("macChannelOffset", dsme->getMAC_PIB().macChannelOffset);
+    recordScalar("numUnusedTxGTS", dsme->getMessageDispatcher().getNumUnusedTxGTS());
+    recordScalar("numGTSMessages", dsme->getGTSManager().numGTSMessages);
 }
 
 void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
@@ -418,7 +427,7 @@ bool DSMEPlatform::setChannelNumber(uint8_t k) {
     DSME_ASSERT(k >= 11 && k <= 26);
 
     auto r = check_and_cast<NarrowbandRadioBase*>(radio);
-    r->setCarrierFrequency(MHz(2405 + 5 * (k-11)));
+    r->setCenterFrequency(MHz(2405 + 5 * (k-11)));
     currentChannel = k;
     return true;
 }
@@ -862,7 +871,21 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
 }
 
 void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
-    emit(gtsChange, deallocation?-1:1);
+    if(deallocation) slots--;
+    else slots++;
+    emit(gtsChange, slots);
+}
+
+void DSMEPlatform::signalQueueLength(uint32_t length) {
+    emit(queueLength, length);
+}
+
+void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {
+    emit(packetsTXPerSlot, packets);
+}
+
+void DSMEPlatform::signalPacketsRXPerSlot(uint32_t packets) {
+    emit(packetsRXPerSlot, packets);
 }
 
 }
