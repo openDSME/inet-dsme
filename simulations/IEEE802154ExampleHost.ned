@@ -49,7 +49,7 @@ module IEEE802154ExampleHost extends WirelessHost
         //networkLayerType = "GenericNetworkLayer";
         generic.typename = "NextHopNetworkLayer";
 
-        generic.gnp.procDelay = default(2ms);
+   //     generic.gnp.procDelay = default(2ms);
 
         wlan[*].typename = default("WirelessInterface");
         wlan[*].radio.typename = default("Ieee802154NarrowbandScalarRadio");
@@ -58,8 +58,8 @@ module IEEE802154ExampleHost extends WirelessHost
         gpsr: SP_GPSR if hasGpsr {
             parameters:
                 @display("p=739,339");
-                routingTableModule = "^.generic.nextHopRoutingTable";
-                networkProtocolModule = "^.generic.gnp";
+                routingTableModule = "^.generic.routingTable";
+                networkProtocolModule = "^.generic.nextHop";
 				positionByteLength = 2 B; // assumes a 3D coordinate can be specified in 6 byte
                 beaconInterval = 10s;
                 maxJitter = 5s;
