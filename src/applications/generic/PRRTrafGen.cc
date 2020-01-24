@@ -189,7 +189,7 @@ void PRRTrafGen::sendPacket()
             numSent += 1;
         }
     }
-
+}
 
 std::string PRRTrafGen::extractHostName(const std::string& signalPrefix, const std::string& sourceName) {
     std::string signalName = "";
