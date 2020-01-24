@@ -150,41 +150,46 @@ void PRRTrafGen::handleMessage(omnetpp::cMessage *msg)
 
 void PRRTrafGen::sendPacket()
 {
-    char msgName[32];
-    sprintf(msgName, "appData-%d", numSent);
+    burstPackets = par("burstPackets");
+    for(int i=0; i<burstPackets; i++)
+    {
+        char msgName[32];
+        sprintf(msgName, "appData-%d", numSent);
 
-    auto packet = new inet::Packet(msgName);
-    const auto& payload = inet::makeShared<inet::ByteCountChunk>(inet::B(*packetLengthPar));
-    auto now = omnetpp::simTime();
-    bool dummy = now < startTime+warmUpDuration || (numPackets != -1 && numSent >= numPackets);
-    packet->addPar("dummy") = dummy;
-    packet->insertAtBack(payload);
+        auto packet = new inet::Packet(msgName);
+        const auto& payload = inet::makeShared<inet::ByteCountChunk>(inet::B(*packetLengthPar));
+        auto now = omnetpp::simTime();
+        bool dummy = now < startTime+warmUpDuration || (numPackets != -1 && numSent >= numPackets);
+        packet->addPar("dummy") = dummy;
+        packet->insertAtBack(payload);
 
-    auto destAddr = chooseDestAddr();
+        auto destAddr = chooseDestAddr();
 
-    auto addressType = destAddr.getAddressType();
-    packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(protocol);
-    packet->addTagIfAbsent<inet::DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
-    packet->addTagIfAbsent<inet::L3AddressReq>()->setDestAddress(destAddr);
+        auto addressType = destAddr.getAddressType();
+        packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(protocol);
+        packet->addTagIfAbsent<inet::DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
+        packet->addTagIfAbsent<inet::L3AddressReq>()->setDestAddress(destAddr);
 
-    if(!dummy) {
-        EV_INFO << "Sending packet: ";
-        printPacket(packet);
-        addRecorderAndEmit(sentPkTo,sentPkToSignals,destAddr,packet);
-        emit(inet::packetSentSignal, packet);
-        send(packet, "ipOut");
+        if(!dummy) {
+            EV_INFO << "Sending packet: ";
+            printPacket(packet);
+            addRecorderAndEmit(sentPkTo,sentPkToSignals,destAddr,packet);
+            emit(inet::packetSentSignal, packet);
+            send(packet, "ipOut");
+        }
+        else {
+            EV_INFO << "Sending dummy packet: ";
+            printPacket(packet);
+            emit(sentDummyPkSignal, packet);
+            send(packet, "ipOut");
+        }
+
+
+        if(now >= startTime+warmUpDuration) {
+            numSent += 1;
+        }
     }
-    else {
-        EV_INFO << "Sending dummy packet: ";
-        printPacket(packet);
-        emit(sentDummyPkSignal, packet);
-        send(packet, "ipOut");
-    }
 
-    if(now >= startTime+warmUpDuration) {
-        numSent++;
-    }
-}
 
 std::string PRRTrafGen::extractHostName(const std::string& signalPrefix, const std::string& sourceName) {
     std::string signalName = "";
