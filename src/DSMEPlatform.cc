@@ -193,7 +193,7 @@ void DSMEPlatform::initialize(int stage) {
         }
 
         translateMacAddress(addr, this->mac_pib.macExtendedAddress);
-        registerInterface();
+        //registerInterface();
 
         /* Find Radio Module */
         cModule* radioModule = getModuleFromPar<cModule>(par("radioModule"), this);

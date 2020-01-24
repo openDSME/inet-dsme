@@ -46,11 +46,7 @@ module IEEE802154ExampleHost extends WirelessHost
 
 	    bool hasGpsr = default(true);
 
-        //networkLayerType = "GenericNetworkLayer";
         generic.typename = "NextHopNetworkLayer";
-
-   //     generic.gnp.procDelay = default(2ms);
-
         wlan[*].typename = default("WirelessInterface");
         wlan[*].radio.typename = default("Ieee802154NarrowbandScalarRadio");
 

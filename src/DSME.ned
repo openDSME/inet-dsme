@@ -13,6 +13,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
         string address = default("auto"); // MAC address as hex string (12 hex digits), or
                                           // "auto". "auto" values will be replaced by
                                           // a generated MAC address in init stage 0.
+        string radioModule = default("^.radio");   // The path to the Radio module  //FIXME remove default value
+                                          
 
         bool macCapReduction = default(false);
         bool sendMultiplePacketsPerGTS = default(true);
@@ -48,7 +50,6 @@ simple DSME extends MacProtocolBase like IMacProtocol
         int scanDuration = default(6);
         int macPANId = default(10);
 
-        string radioModule = default("^.radio");   // The path to the Radio module  //FIXME remove default value
 
         // bit rate
         double bitrate @unit(bps) = default(250000 bps);
