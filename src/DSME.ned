@@ -35,10 +35,12 @@ simple DSME extends MacProtocolBase like IMacProtocol
 
         // Scheduling
         string scheduling = default("TPS"); 
-        double TPSalpha = default(0.1); // EWMA factor for TPS, ignored otherwise
+        double TPSalpha = default(0.7); // EWMA factor for TPS, ignored otherwise
         bool useHysteresis = default(true);
-        xml staticSchedule = default(xml("<root/>")); 
-
+        bool useMultiplePacketsPerGTS = default(false); //use by TPS to configure how many packets are tx per GTS slot
+        xml staticSchedule = default(xml("<root/>"));
+         
+		bool multiplePacketsPerGTS = default(false); // use in the message dispatcher in order to control # of packets delivered per GTS
         int macDSMEGTSExpirationTime = default(7);
         int macResponseWaitTime = default(32);
 
