@@ -165,9 +165,9 @@ public:
     virtual void signalDeallocationNotifySendFailedTransactionOverflow() override;  */
 
     // PER SF
-    virtual void signalSuperframe(bool limits) override;
-    virtual void signalGTSRequestsTotal(uint16_t allocations) override;
-    virtual void signalGTSNotifySuccess(uint16_t allocations) override;
+    //virtual void signalSuperframe(bool limits) override;
+    //virtual void signalGTSRequestsTotal(uint16_t allocations) override;
+    //virtual void signalGTSNotifySuccess(uint16_t allocations) override;
 /*    virtual void signalGTSRequestsFailed(uint16_t allocations) override;
     virtual void signalGTSRequestsFailedNoAck(uint16_t allocations) override;
     virtual void signalGTSRequestsFailedChannelAccess(uint16_t allocations) override;
@@ -179,10 +179,10 @@ public:
 
     // QUEUE LEVEL
 
-    virtual void signalGTSQueueLevel(bool push) override;
+    //virtual void signalGTSQueueLevel(bool push) override;
 
     // QUEUE LEVEL PER MSF
-    virtual void signalGTSQueueLevelMSF(uint8_t queueLevel) override;
+    //virtual void signalGTSQueueLevelMSF(uint8_t queueLevel) override;
 
 
 
