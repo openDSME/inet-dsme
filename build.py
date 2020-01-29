@@ -15,6 +15,7 @@ def build(inet_path,jobs):
     #subprocess.check_call(["./inet_featuretool","repair"], cwd=inet_path)
 
     # Build INET
+    subprocess.check_call(["make","MODE=debug"], cwd=inet_path)
     subprocess.check_call(["make","makefiles"], cwd=inet_path)
     subprocess.check_call(["make","-j",str(jobs)], cwd=inet_path)
 
