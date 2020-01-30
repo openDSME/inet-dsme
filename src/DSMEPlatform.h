@@ -234,6 +234,9 @@ private:
     uint8_t minBroadcastLQI{0};
     uint8_t minCoordinatorLQI{0};
     uint8_t currentChannel{0};
+    //IAMG
+    //proof of concept funneling variant
+    //uint8_t globalSlotCounter{0}; // global slot counter that will determine a dynamic slot length in a DSME dataframe structure
 
 public:
     omnetpp::SimTime symbolDuration;
@@ -292,6 +295,7 @@ public:
     IEEE802154MacAddress& getAddress() {
         return this->mac_pib.macExtendedAddress;
     }
+
 
 private:
     GTSScheduling* scheduling = nullptr;
