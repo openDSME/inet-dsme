@@ -144,6 +144,13 @@ public:
 
     virtual void scheduleStartOfCFP() override;
 
+    //proof of concept
+    //IAMG
+    /*
+     * Allows the platform to inform the DSME-layer about the start of a BI (beacon interval) while decoupling from the ISR control flow
+     */
+    virtual void scheduleStartOfBI() override;
+
     virtual uint8_t getMinCoordinatorLQI() override;
 
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
@@ -216,6 +223,10 @@ private:
     omnetpp::cMessage* timer{nullptr};
     omnetpp::cMessage* ccaTimer{nullptr};
     omnetpp::cMessage* cfpTimer{nullptr};
+
+    //IAMG proof of concept
+    omnetpp::cMessage* biTimer{nullptr};
+
     Delegate<void(bool)> txEndCallback{};
     inet::Packet* pendingTxPacket{nullptr};
     bool pendingSendRequest{false};
@@ -237,7 +248,7 @@ private:
     //IAMG
     //proof of concept funneling variant
     //uint8_t globalSlotCounter{0}; // global slot counter that will determine a dynamic slot length in a DSME dataframe structure
-
+    bool switchCap {false};
 public:
     omnetpp::SimTime symbolDuration;
 
