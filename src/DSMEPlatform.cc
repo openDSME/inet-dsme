@@ -194,7 +194,7 @@ DSMEPlatform::~DSMEPlatform() {
     cancelAndDelete(cfpTimer);
 
     //IAMG proof of concept
-    cancelAndDelete(biTimer);
+    //cancelAndDelete(biTimer);
 
     cancelAndDelete(timer);
 }
@@ -248,7 +248,7 @@ void DSMEPlatform::initialize(int stage) {
             tps->setAlpha(par("TPSalpha").doubleValue());
             tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
             tps->setUseHysteresis(par("useHysteresis").boolValue());
-            tps->setUseMultiplePacketsPerGTS(par("useMultiplePacketsPerGTS").boolValue());
+            //tps->setUseMultiplePacketsPerGTS(par("useMultiplePacketsPerGTS").boolValue());
             scheduling = tps;
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
@@ -291,7 +291,7 @@ void DSMEPlatform::initialize(int stage) {
         cfpTimer = new cMessage();
 
         //IAMG proof of concept
-        biTimer = new cMessage();
+        //biTimer = new cMessage();
 
         ccaTimer = new cMessage();
 
@@ -345,7 +345,7 @@ void DSMEPlatform::initialize(int stage) {
         this->dsme->initialize(this);
         
         //The message dispatcher has a declaration for a default instance of the class in the constructor (explicit atribute)
-        this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("multiplePacketsPerGTS").boolValue());
+        //this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("multiplePacketsPerGTS").boolValue());
 
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
@@ -463,9 +463,9 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     }
 
     //IAMG proof of concept
-    else if(msg == biTimer) {
-        dsme->handleStartOfBI();
-    }
+//    else if(msg == biTimer) {
+//        dsme->handleStartOfBI();
+//    }
 
 
         else if(strcmp(msg->getName(), "acktimer") == 0) {
@@ -758,9 +758,9 @@ void DSMEPlatform::scheduleStartOfCFP() {
 /*
  * Allows the platform to inform the DSME-layer about the start of a BI (beacon interval) while decoupling from the ISR control flow
  */
-void DSMEPlatform::scheduleStartOfBI(){
-    scheduleAt(simTime(),biTimer); //TODO change the cfpTimer to a BI timmer
-}
+//void DSMEPlatform::scheduleStartOfBI(){
+//    scheduleAt(simTime(),biTimer); //TODO change the cfpTimer to a BI timmer
+//}
 
 uint8_t DSMEPlatform::getMinCoordinatorLQI() {
     return minCoordinatorLQI;

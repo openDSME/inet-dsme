@@ -208,6 +208,7 @@ private:
 
     PHY_PIB phy_pib;
     MAC_PIB mac_pib;
+
     DSMELayer* dsme;
     mcps_sap::MCPS_SAP mcps_sap;
     mlme_sap::MLME_SAP mlme_sap;
@@ -224,8 +225,6 @@ private:
     omnetpp::cMessage* ccaTimer{nullptr};
     omnetpp::cMessage* cfpTimer{nullptr};
 
-    //IAMG proof of concept
-    omnetpp::cMessage* biTimer{nullptr};
 
     Delegate<void(bool)> txEndCallback{};
     inet::Packet* pendingTxPacket{nullptr};
@@ -245,10 +244,7 @@ private:
     uint8_t minBroadcastLQI{0};
     uint8_t minCoordinatorLQI{0};
     uint8_t currentChannel{0};
-    //IAMG
-    //proof of concept funneling variant
-    //uint8_t globalSlotCounter{0}; // global slot counter that will determine a dynamic slot length in a DSME dataframe structure
-    bool switchCap {false};
+
 public:
     omnetpp::SimTime symbolDuration;
 
