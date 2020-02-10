@@ -101,7 +101,7 @@ public:
     virtual void handleSelfMessage(omnetpp::cMessage*) override;
 
     /** @brief Handle control messages from lower layer */
-    virtual void receiveSignal(cComponent *source, omnetpp::simsignal_t signalID, long l, cObject *details) override;
+    virtual void receiveSignal(cComponent *source, omnetpp::simsignal_t signalID, intval_t l, cObject *details) override;
 
     /****** IDSMERadio ******/
 
