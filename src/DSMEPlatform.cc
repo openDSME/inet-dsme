@@ -390,7 +390,7 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     }
 }
 
-void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) {
+void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, intval_t l, cObject *details) {
     Enter_Method_Silent();
     if(signalID == IRadio::transmissionStateChangedSignal) {
         IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(l);
