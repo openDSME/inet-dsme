@@ -144,16 +144,10 @@ public:
 
     virtual void scheduleStartOfCFP() override;
 
-    //proof of concept
-    //IAMG
-    /*
-     * Allows the platform to inform the DSME-layer about the start of a BI (beacon interval) while decoupling from the ISR control flow
-     */
-    //virtual void scheduleStartOfBI() override;
-
     virtual uint8_t getMinCoordinatorLQI() override;
 
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
+
 
     //ALLOCATIONS
 
@@ -187,6 +181,7 @@ public:
     // QUEUE LEVEL
 
     //virtual void signalGTSQueueLevel(bool push) override;
+    virtual void signalQueueLength(uint32_t length) override;
 
     // QUEUE LEVEL PER MSF
     //virtual void signalGTSQueueLevelMSF(uint8_t queueLevel) override;
@@ -245,6 +240,8 @@ private:
     uint8_t minCoordinatorLQI{0};
     uint8_t currentChannel{0};
 
+    int slots{0};
+
 public:
     omnetpp::SimTime symbolDuration;
 
@@ -284,6 +281,7 @@ public:
     // QUEUE LEVEL
 
     static omnetpp::simsignal_t gtsQueueLevel;
+    static omnetpp::simsignal_t queueLength;
 
     // QUEUE LEVEL MSF
 

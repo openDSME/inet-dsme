@@ -73,6 +73,7 @@ simsignal_t DSMEPlatform::gtsRequestsFailedDeallocated;*/
 
 // QUEUE LEVEL
 simsignal_t DSMEPlatform::gtsQueueLevel;
+simsignal_t DSMEPlatform::queueLength;
 
 // QUEUE LEVEL PER MSF
 simsignal_t DSMEPlatform::gtsQueueLevelMSF;
@@ -172,6 +173,7 @@ DSMEPlatform::DSMEPlatform()
 
     // QUEUE LEVEL
     gtsQueueLevel = registerSignal("GTSQueueLevel");
+    queueLength = registerSignal("queueLength");
 
     // QUEUE LEVEL PER MSF
     gtsQueueLevelMSF = registerSignal("GTSQueueLevelMSF");
@@ -184,6 +186,7 @@ DSMEPlatform::DSMEPlatform()
     uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
+
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -192,10 +195,6 @@ DSMEPlatform::~DSMEPlatform() {
 
     cancelAndDelete(ccaTimer);
     cancelAndDelete(cfpTimer);
-
-    //IAMG proof of concept
-    //cancelAndDelete(biTimer);
-
     cancelAndDelete(timer);
 }
 
@@ -249,6 +248,7 @@ void DSMEPlatform::initialize(int stage) {
             tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
             tps->setUseHysteresis(par("useHysteresis").boolValue());
             tps->setUseMultiplePacketsPerGTS(par("useMultiplePacketsPerGTS").boolValue());
+            tps->setUseQueueManagement(par("useQueueManagement").boolValue());
             scheduling = tps;
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
@@ -289,10 +289,6 @@ void DSMEPlatform::initialize(int stage) {
         symbolDuration = SimTime(16, SIMTIME_US);
         timer = new cMessage();
         cfpTimer = new cMessage();
-
-        //IAMG proof of concept
-        //biTimer = new cMessage();
-
         ccaTimer = new cMessage();
 
         // check parameters for consistency
@@ -346,6 +342,9 @@ void DSMEPlatform::initialize(int stage) {
         
         //The message dispatcher has a declaration for a default instance of the class in the constructor (explicit atribute)
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("multiplePacketsPerGTS").boolValue());
+
+        //IAMG-> setUseMultipleGTSDEallocation
+ //       this->dsmeAdaptionLayer.getGTSHelper().setUseMultipleGTSDeallocation(par("useMultipleGTSDeallocation").boolValue());
 
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
@@ -753,15 +752,6 @@ void DSMEPlatform::scheduleStartOfCFP() {
     scheduleAt(simTime(), cfpTimer);
 }
 
-//proof of concept
-//IAMG
-/*
- * Allows the platform to inform the DSME-layer about the start of a BI (beacon interval) while decoupling from the ISR control flow
- */
-//void DSMEPlatform::scheduleStartOfBI(){
-//    scheduleAt(simTime(),biTimer); //TODO change the cfpTimer to a BI timmer
-//}
-
 uint8_t DSMEPlatform::getMinCoordinatorLQI() {
     return minCoordinatorLQI;
 }
@@ -975,9 +965,10 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
 }
 
 void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
-    emit(gtsChange, deallocation?-1:1);
+    if(deallocation) slots--;
+    else slots++;
+    emit(gtsChange, slots);
 }
-
 //ALLOCATIONS
 
 // NOTIFIY
@@ -1069,6 +1060,11 @@ void DSMEPlatform::signalGTSRequestsFailedDeallocated(uint16_t allocations) {
 //void DSMEPlatform::signalGTSQueueLevel(bool push){
 //    emit(gtsQueueLevel,push ? -1:1);
 //}
+
+void DSMEPlatform::signalQueueLength(uint32_t length) {
+    emit(queueLength, length);
+}
+
 //// QUEUE LEVEL PER MSF
 //void DSMEPlatform::signalGTSQueueLevelMSF(uint8_t queueLevel){
 //    emit(gtsQueueLevelMSF, queueLevel);

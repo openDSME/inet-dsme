@@ -38,6 +38,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
         double TPSalpha = default(0.7); // EWMA factor for TPS, ignored otherwise
         bool useHysteresis = default(true);
         bool useMultiplePacketsPerGTS = default(false); //use by TPS to configure how many packets are tx per GTS slot
+        bool useQueueManagement = default(false); //use by TPS to define if slots are kept to manage the queue        
+        bool useMultipleGTSDeallocation = default(false); //use by TPS to define if slots are kept to manage the queue
         xml staticSchedule = default(xml("<root/>"));
          
 		bool multiplePacketsPerGTS = default(false); // use in the message dispatcher in order to control # of packets delivered per GTS
@@ -116,6 +118,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
 		
 		// QUEUE LEVEL
 		@signal[GTSQueueLevel](type=long);
+		@signal[queueLength](type=long);
+		
 		// QUEUE LEVEL PER MSF
 		@signal[GTSQueueLevelMSF](type=long);
 
@@ -125,7 +129,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
         @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
-        @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=vector; interpolationmode=none);
+        @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
+
 
 
 		//GTS ALLOCATIONS
@@ -162,6 +167,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
 
 		//QUEUE LEVEL
         @statistic[GTSQueueLevel](title="GTS queue level"; source=GTSQueueLevel; record=vector; interpolationmode=none);
+        @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
+        
 		//QUEUE LEVEL MSF
 		@statistic[GTSQueueLevelMSF](title="GTS queue level per MSF"; source=GTSQueueLevelMSF; record=vector; interpolationmode=none);
 
