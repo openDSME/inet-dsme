@@ -391,7 +391,7 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     }
 }
 
-void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) {
+void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, intval_t l, cObject *details) {
     Enter_Method_Silent();
     if(signalID == IRadio::transmissionStateChangedSignal) {
         IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(l);
@@ -567,8 +567,8 @@ bool DSMEPlatform::startCCA() {
 
 void DSMEPlatform::turnTransceiverOn() {
     if(!this->transceiverIsOn) {
-        this->transceiverIsOn = true;
-        this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
+	this->transceiverIsOn = true;
+    	this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
     }
 }
 
