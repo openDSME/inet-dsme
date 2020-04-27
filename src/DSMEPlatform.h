@@ -219,6 +219,7 @@ public:
     static omnetpp::simsignal_t queueLength;
     static omnetpp::simsignal_t packetsTXPerSlot;
     static omnetpp::simsignal_t packetsRXPerSlot;
+    static omnetpp::simsignal_t commandFrameDwellTime;
 
 public:
     IEEE802154MacAddress& getAddress() {

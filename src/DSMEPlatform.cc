@@ -46,6 +46,7 @@ simsignal_t DSMEPlatform::gtsChange;
 simsignal_t DSMEPlatform::queueLength;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
+simsignal_t DSMEPlatform::commandFrameDwellTime;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -106,6 +107,7 @@ DSMEPlatform::DSMEPlatform()
     queueLength = registerSignal("queueLength");
     packetsTXPerSlot = registerSignal("packetsTXPerSlot");
     packetsRXPerSlot = registerSignal("packetsRXPerSlot");
+    commandFrameDwellTime = registerSignal("commandFrameDwellTime");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -287,7 +289,6 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
     recordScalar("macChannelOffset", dsme->getMAC_PIB().macChannelOffset);
     recordScalar("numUnusedTxGTS", dsme->getMessageDispatcher().getNumUnusedTxGTS());
-    recordScalar("numGTSMessages", dsme->getGTSManager().numGTSMessages);
 }
 
 void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
@@ -565,8 +566,10 @@ bool DSMEPlatform::startCCA() {
 }
 
 void DSMEPlatform::turnTransceiverOn() {
-    this->transceiverIsOn = true;
-    this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
+    if(!this->transceiverIsOn) {
+        this->transceiverIsOn = true;
+        this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
+    }
 }
 
 void DSMEPlatform::turnTransceiverOff(){

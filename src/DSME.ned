@@ -14,7 +14,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
                                           // "auto". "auto" values will be replaced by
                                           // a generated MAC address in init stage 0.
         string radioModule = default("^.radio");   // The path to the Radio module  //FIXME remove default value
-                                          
+
 
         bool macCapReduction = default(false);
         bool sendMultiplePacketsPerGTS = default(true);
@@ -86,6 +86,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[queueLength](type=long);
         @signal[packetsTXPerSlot](type=long);
         @signal[packetsRXPerSlot](type=long);
+        @signal[commandFrameDwellTime](time=long);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
@@ -95,6 +96,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
         @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
