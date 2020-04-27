@@ -343,9 +343,6 @@ void DSMEPlatform::initialize(int stage) {
         //The message dispatcher has a declaration for a default instance of the class in the constructor (explicit atribute)
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("multiplePacketsPerGTS").boolValue());
 
-        //IAMG-> setUseMultipleGTSDEallocation
- //       this->dsmeAdaptionLayer.getGTSHelper().setUseMultipleGTSDeallocation(par("useMultipleGTSDeallocation").boolValue());
-
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
             cXMLElement *xmlFile = par("staticSchedule");
