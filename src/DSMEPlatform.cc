@@ -461,12 +461,6 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
         dsme->handleStartOfCFP();
     }
 
-    //IAMG proof of concept
-//    else if(msg == biTimer) {
-//        dsme->handleStartOfBI();
-//    }
-
-
         else if(strcmp(msg->getName(), "acktimer") == 0) {
         // LOG_INFO("send ACK")
         bool result = prepareSendingCopy((DSMEMessage*)msg->getParList().get(0), txEndCallback);
