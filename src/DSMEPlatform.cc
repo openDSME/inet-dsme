@@ -486,9 +486,15 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
         case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
             emit(ackSentDown, packet);
             break;
-        case IEEE802154eMACHeader::COMMAND:
+        case IEEE802154eMACHeader::COMMAND: {
+            CommandFrameIdentifier cmd = (CommandFrameIdentifier)message->packet->peekDataAsBytes()->getByte(0);
+            if(cmd == CommandFrameIdentifier::DSME_GTS_REQUEST || cmd == CommandFrameIdentifier::DSME_GTS_REPLY || cmd == CommandFrameIdentifier::DSME_GTS_NOTIFY) {
+                LOG_INFO("Command frame transmitted with creation time " << (long)msg->getHeader().getCreationTime() << " and dwell time " << (long)(getSymbolCounter() - msg->getHeader().getCreationTime()));
+                emit(commandFrameDwellTime, getSymbolCounter() - msg->getHeader().getCreationTime());
+                DSME_ASSERT(msg->getHeader().getCreationTime() > 0);
+            }
             emit(commandSentDown, packet);
-            break;
+            break; }
         default:
             DSME_ASSERT(false);
     }
@@ -511,6 +517,21 @@ bool DSMEPlatform::sendNow() {
     DSME_ASSERT(!pendingSendRequest);
 
     if(this->radio->getRadioMode() == IRadio::RADIO_MODE_TRANSMITTER) {
+        /*inet::Packet *p = pendingTxPacket->dup();
+        p->removeAtBack(B(2));
+        DSMEMessage* msg = getLoadedMessage(p);
+        msg->getHeader().decapsulateFrom(msg);
+
+        if(msg->getHeader().getFrameType() == IEEE802154eMACHeader::COMMAND) {
+            CommandFrameIdentifier cmd = (CommandFrameIdentifier)msg->packet->peekDataAsBytes()->getByte(0);
+            if(cmd == CommandFrameIdentifier::DSME_GTS_REQUEST || cmd == CommandFrameIdentifier::DSME_GTS_REPLY || cmd == CommandFrameIdentifier::DSME_GTS_NOTIFY) {
+                LOG_INFO("Command frame transmitted with creation time " << (long)msg->getHeader().getCreationTime() << " and dwell time " << (long)(getSymbolCounter() - msg->getHeader().getCreationTime()));
+                emit(commandFrameDwellTime, getSymbolCounter() - msg->getHeader().getCreationTime());
+                DSME_ASSERT(msg->getHeader().getCreationTime() > 0);
+            }
+        }
+        releaseMessage(msg); */
+
         // can be sent direct
         sendDown(pendingTxPacket);
         pendingTxPacket = nullptr;
