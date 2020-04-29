@@ -247,7 +247,7 @@ void DSMEPlatform::initialize(int stage) {
             tps->setAlpha(par("TPSalpha").doubleValue());
             tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
             tps->setUseHysteresis(par("useHysteresis").boolValue());
-            tps->setUseMultiplePacketsPerGTS(par("useMultiplePacketsPerGTS").boolValue());
+            tps->setUseMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
             tps->setUseQueueManagement(par("useQueueManagement").boolValue());
             scheduling = tps;
         }
@@ -341,7 +341,7 @@ void DSMEPlatform::initialize(int stage) {
         this->dsme->initialize(this);
         
         //The message dispatcher has a declaration for a default instance of the class in the constructor (explicit atribute)
-        this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("multiplePacketsPerGTS").boolValue());
+        this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
 
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {

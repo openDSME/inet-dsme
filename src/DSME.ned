@@ -15,7 +15,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
                                           // a generated MAC address in init stage 0. 
 
         bool macCapReduction = default(false);
-
+		bool sendMultiplePacketsPerGTS = default(false);
         bool isPANCoordinator = default(false);
         bool isCoordinator = default(false);
         double isCoordinatorProbability = default(0.5);
