@@ -12,7 +12,7 @@
 #include <inet/common/ProtocolGroup.h>
 #include <inet/common/packet/chunk/ByteCountChunk.h>
 #include <inet/physicallayer/base/packetlevel/FlatRadioBase.h>
-#include <inet/physicallayer/common/packetlevel/SignalTag_m.h>
+#include <inet/physicallayer/contract/packetlevel/SignalTag_m.h>
 #include <inet/physicallayer/contract/packetlevel/IRadio.h>
 
 #include "openDSME/dsmeLayer/DSMELayer.h"
@@ -27,12 +27,12 @@ namespace dsme {
 
 std::vector<StaticSlot> StaticSchedule::loadSchedule(omnetpp::cXMLElement *xmlFile, uint16_t address) {
     char idString[5];
-    sprintf(idString, "%d", address);  
+    sprintf(idString, "%d", address);
     omnetpp::cXMLElement *node = xmlFile->getFirstChildWithAttribute("node", "id", idString);
-  
- 
-    std::vector<StaticSlot> slots; 
-    omnetpp::cXMLElementList slotList = node->getChildrenByTagName("slot");    
+
+
+    std::vector<StaticSlot> slots;
+    omnetpp::cXMLElementList slotList = node->getChildrenByTagName("slot");
     for(auto &slot : slotList) {
         StaticSlot s;
         s.slotID = atoi(slot->getAttribute("slotID"));
@@ -41,7 +41,7 @@ std::vector<StaticSlot> StaticSchedule::loadSchedule(omnetpp::cXMLElement *xmlFi
         s.direction = atoi(slot->getAttribute("direction"));
         s.address = atoi(slot->getAttribute("address"));
 
-        slots.push_back(s);      
+        slots.push_back(s);
     }
 
     return slots;

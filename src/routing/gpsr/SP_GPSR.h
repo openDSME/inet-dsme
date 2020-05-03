@@ -21,18 +21,17 @@
 #ifndef __INET_DSME_GPSR_H
 #define __INET_DSME_GPSR_H
 
-#include "inet/routing/gpsr/Gpsr.h"
+#include <inet/routing/gpsr/Gpsr.h>
 
 namespace inet_dsme {
 
 class SP_GPSR : public inet::Gpsr
 {
-    virtual inet::GpsrOption *createGpsrOption(inet::L3Address destination);
-    virtual inet::L3Address findGreedyRoutingNextHop(const inet::Ptr<const inet::NetworkHeaderBase>& networkHeader, const inet::L3Address& destination);
-    virtual inet::L3Address findPerimeterRoutingNextHop(const inet::Ptr<const inet::NetworkHeaderBase>& networkHeader, const inet::L3Address& destination);
+    virtual inet::GpsrOption *createGpsrOption(inet::L3Address destination) override;
+    virtual inet::L3Address findGreedyRoutingNextHop(const inet::L3Address& destination, inet::GpsrOption *gpsrOption) override;
+    virtual inet::L3Address findPerimeterRoutingNextHop(const inet::L3Address& destination, inet::GpsrOption *gpsrOption) override;
 };
 
 } // namespace inet
 
 #endif // ifndef __INET_GPSR_H
-

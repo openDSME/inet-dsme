@@ -18,25 +18,25 @@
 
 package inet_dsme.simulations;
 
-import inet.networklayer.configurator.generic.GenericNetworkConfigurator;
+import inet.networklayer.configurator.nexthop.NextHopNetworkConfigurator;
 import inet.physicallayer.ieee802154.packetlevel.Ieee802154NarrowbandScalarRadioMedium;
 
 network Net802154
 {
     parameters:
         int numHosts;
-        
-    submodules:        
+
+    submodules:
         host[numHosts]: IEEE802154ExampleHost {
             parameters:
                 @display("r=,,#707070;p=250,58;is=vs");
         }
-        
+
         radioMedium: Ieee802154NarrowbandScalarRadioMedium {
             parameters:
                 @display("p=60,50");
         }
 
-	configurator: GenericNetworkConfigurator {
-	}
+	    configurator: NextHopNetworkConfigurator {
+	    }
 }

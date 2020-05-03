@@ -12,7 +12,7 @@
 #include <inet/common/ProtocolGroup.h>
 #include <inet/common/packet/chunk/ByteCountChunk.h>
 #include <inet/physicallayer/base/packetlevel/FlatRadioBase.h>
-#include <inet/physicallayer/common/packetlevel/SignalTag_m.h>
+#include <inet/physicallayer/contract/packetlevel/SignalTag_m.h>
 #include <inet/physicallayer/contract/packetlevel/IRadio.h>
 
 #include "openDSME/dsmeLayer/DSMELayer.h"
@@ -35,49 +35,6 @@ Define_Module(dsme::DSMEPlatform);
 
 namespace dsme {
 
-//GTS ALLOCATIONS
-// NOTIFIY
-/*simsignal_t DSMEPlatform::statNotifyInitialized;
-
-simsignal_t DSMEPlatform::statNotifyBackoffs;
-simsignal_t DSMEPlatform::statNotifySendSuccess;
-simsignal_t DSMEPlatform::statNotifySendFailedNoAck;
-simsignal_t DSMEPlatform::statNotifySendFailedChannelAccess;
-simsignal_t DSMEPlatform::statNotifySendFailedTransactionOverflow;
-simsignal_t DSMEPlatform::statNotifySendFailedQueue;
-*/
-
-//GTS DEALLOCATIONS
-// DEALLOCATION NOTIFY
-/*simsignal_t DSMEPlatform::statDeallocationNotifyInitialized;
-simsignal_t DSMEPlatform::statDeallocationNotifyBackoffs;
-simsignal_t DSMEPlatform::statDeallocationNotifySendSuccess;
-simsignal_t DSMEPlatform::statDeallocationNotifySendFailedNoAck;
-simsignal_t DSMEPlatform::statDeallocationNotifySendFailedChannelAccess;
-simsignal_t DSMEPlatform::statDeallocationNotifySendFailedTransactionOverflow;
-simsignal_t DSMEPlatform::statDeallocationNotifySendFailedQueue;*/
-
-// STATS PER SF
-simsignal_t DSMEPlatform::superframeLimits;
-simsignal_t DSMEPlatform::gtsRequestsTotal;
-simsignal_t DSMEPlatform::gtsNotifySuccess;
-
-/*simsignal_t DSMEPlatform::gtsRequestsFailed;
-simsignal_t DSMEPlatform::gtsRequestsFailedNoAck;
-simsignal_t DSMEPlatform::gtsRequestsFailedChannelAccess;
-simsignal_t DSMEPlatform::gtsRequestsFailedTransactionOverflow;
-simsignal_t DSMEPlatform::gtsRequestsFailedDenied;
-simsignal_t DSMEPlatform::gtsRequestsFailedTimeout;
-simsignal_t DSMEPlatform::gtsRequestsFailedQueue;
-simsignal_t DSMEPlatform::gtsRequestsFailedDeallocated;*/
-
-// QUEUE LEVEL
-simsignal_t DSMEPlatform::gtsQueueLevel;
-simsignal_t DSMEPlatform::queueLength;
-
-// QUEUE LEVEL PER MSF
-simsignal_t DSMEPlatform::gtsQueueLevelMSF;
-
 simsignal_t DSMEPlatform::broadcastDataSentDown;
 simsignal_t DSMEPlatform::unicastDataSentDown;
 simsignal_t DSMEPlatform::commandSentDown;
@@ -86,6 +43,10 @@ simsignal_t DSMEPlatform::ackSentDown;
 simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
+simsignal_t DSMEPlatform::queueLength;
+simsignal_t DSMEPlatform::packetsTXPerSlot;
+simsignal_t DSMEPlatform::packetsRXPerSlot;
+simsignal_t DSMEPlatform::commandFrameDwellTime;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -135,49 +96,6 @@ DSMEPlatform::DSMEPlatform()
       mcps_sap(*dsme),
       mlme_sap(*dsme),
       dsmeAdaptionLayer(*dsme) {
-
-    //ALLOCATIONS
-
-    // NOTIFIY
-/*    statNotifyInitialized = registerSignal("statNotifyInitialized");
-    statNotifyBackoffs = registerSignal("statNotifyBackoffs");
-    statNotifySendSuccess = registerSignal("statNotifySendSuccess");
-    statNotifySendFailedNoAck = registerSignal("statNotifySendFailedNoAck");
-    statNotifySendFailedChannelAccess = registerSignal("statNotifySendFailedChannelAccess");
-    statNotifySendFailedTransactionOverflow = registerSignal("statNotifySendFailedTransactionOverflow");
-    statNotifySendFailedQueue = registerSignal("statNotifySendFailedQueue");*/
-
-    //DEALLOCATIONS
-
-    // DEALLOCATION NOTIFY
- /*   statDeallocationNotifyInitialized = registerSignal("statDeallocationNotifyInitialized");
-    statDeallocationNotifyBackoffs = registerSignal("statDeallocationNotifyBackoffs");
-    statDeallocationNotifySendSuccess = registerSignal("statDeallocationNotifySendSuccess");
-    statDeallocationNotifySendFailedNoAck = registerSignal("statDeallocationNotifySendFailedNoAck");
-    statDeallocationNotifySendFailedChannelAccess = registerSignal("statDeallocationNotifySendFailedChannelAccess");
-    statDeallocationNotifySendFailedTransactionOverflow = registerSignal("statDeallocationNotifySendFailedTransactionOverflow");
-    statDeallocationNotifySendFailedQueue = registerSignal("statDeallocationNotifySendFailedQueue");*/
-
-    // STATS PER SF
-    superframeLimits = registerSignal("SuperframeLimits");
-    gtsRequestsTotal = registerSignal("GTSRequestsTotal");
-    gtsNotifySuccess = registerSignal("GTSNotifySuccess");
-/*  gtsRequestsFailed = registerSignal("GTSRequestsFailed");
-    gtsRequestsFailedNoAck = registerSignal("GTSRequestsFailedNoAck");
-    gtsRequestsFailedChannelAccess = registerSignal("GTSRequestsFailedChannelAccess");
-    gtsRequestsFailedTransactionOverflow = registerSignal("GTSRequestsFailedTransactionOverflow");
-    gtsRequestsFailedDenied = registerSignal("GTSRequestsFailedDenied");
-    gtsRequestsFailedTimeout = registerSignal("GTSRequestsFailedTimeout");
-    gtsRequestsFailedQueue = registerSignal("GTSRequestsFailedQueue");
-    gtsRequestsFailedDeallocated = registerSignal("GTSRequestsFailedDeallocated"); */
-
-    // QUEUE LEVEL
-    gtsQueueLevel = registerSignal("GTSQueueLevel");
-    queueLength = registerSignal("queueLength");
-
-    // QUEUE LEVEL PER MSF
-    gtsQueueLevelMSF = registerSignal("GTSQueueLevelMSF");
-
     broadcastDataSentDown = registerSignal("broadcastDataSentDown");
     unicastDataSentDown = registerSignal("unicastDataSentDown");
     commandSentDown = registerSignal("commandSentDown");
@@ -186,7 +104,10 @@ DSMEPlatform::DSMEPlatform()
     uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
-
+    queueLength = registerSignal("queueLength");
+    packetsTXPerSlot = registerSignal("packetsTXPerSlot");
+    packetsRXPerSlot = registerSignal("packetsRXPerSlot");
+    commandFrameDwellTime = registerSignal("commandFrameDwellTime");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -200,7 +121,7 @@ DSMEPlatform::~DSMEPlatform() {
 
 /****** INET ******/
 
-InterfaceEntry* DSMEPlatform::createInterfaceEntry() {
+void DSMEPlatform::configureInterfaceEntry() {
     InterfaceEntry *e = getContainingNicModule(this);
 
     // data rate
@@ -214,8 +135,6 @@ InterfaceEntry* DSMEPlatform::createInterfaceEntry() {
     e->setMtu(par("mtu").intValue());
     e->setMulticast(true);
     e->setBroadcast(true);
-
-    return e;
 }
 
 /****** OMNeT++ ******/
@@ -247,13 +166,13 @@ void DSMEPlatform::initialize(int stage) {
             tps->setAlpha(par("TPSalpha").doubleValue());
             tps->setMinFreshness(this->mac_pib.macDSMEGTSExpirationTime);
             tps->setUseHysteresis(par("useHysteresis").boolValue());
-            tps->setUseMultiplePacketsPerGTS(par("useMultiplePacketsPerGTS").boolValue());
+            tps->setUseMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
             tps->setUseQueueManagement(par("useQueueManagement").boolValue());
             scheduling = tps;
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
-            scheduling = new StaticScheduling(this->dsmeAdaptionLayer); 
-        } 
+            scheduling = new StaticScheduling(this->dsmeAdaptionLayer);
+        }
         else {
             ASSERT(false);
         }
@@ -277,7 +196,7 @@ void DSMEPlatform::initialize(int stage) {
         }
 
         translateMacAddress(addr, this->mac_pib.macExtendedAddress);
-        registerInterface();
+        //registerInterface();
 
         /* Find Radio Module */
         cModule* radioModule = getModuleFromPar<cModule>(par("radioModule"), this);
@@ -341,16 +260,16 @@ void DSMEPlatform::initialize(int stage) {
         this->dsme->initialize(this);
         
         //The message dispatcher has a declaration for a default instance of the class in the constructor (explicit atribute)
-        this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("multiplePacketsPerGTS").boolValue());
+        this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
 
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
             cXMLElement *xmlFile = par("staticSchedule");
-            std::vector<StaticSlot> slots = StaticSchedule::loadSchedule(xmlFile, this->mac_pib.macShortAddress);  
+            std::vector<StaticSlot> slots = StaticSchedule::loadSchedule(xmlFile, this->mac_pib.macShortAddress);
             for(auto &slot : slots) {
-                static_cast<StaticScheduling*>(scheduling)->allocateGTS(slot.superframeID, slot.slotID, slot.channelID, (Direction)slot.direction, slot.address); 
+                static_cast<StaticScheduling*>(scheduling)->allocateGTS(slot.superframeID, slot.slotID, slot.channelID, (Direction)slot.direction, slot.address);
             }
-        }    
+        }
     } else if(stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         dsme->start();
@@ -371,6 +290,7 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsForGTS", dsme->getMessageDispatcher().getNumUpperPacketsForGTS());
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
     recordScalar("macChannelOffset", dsme->getMAC_PIB().macChannelOffset);
+    recordScalar("numUnusedTxGTS", dsme->getMessageDispatcher().getNumUnusedTxGTS());
 }
 
 void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
@@ -456,9 +376,7 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
         dsme->dispatchCCAResult(isIdle);
     } else if(msg == cfpTimer) {
         dsme->handleStartOfCFP();
-    }
-
-        else if(strcmp(msg->getName(), "acktimer") == 0) {
+    } else if(strcmp(msg->getName(), "acktimer") == 0) {
         // LOG_INFO("send ACK")
         bool result = prepareSendingCopy((DSMEMessage*)msg->getParList().get(0), txEndCallback);
         ASSERT(result);
@@ -475,7 +393,7 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     }
 }
 
-void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, long l, cObject *details) {
+void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, intval_t l, cObject *details) {
     Enter_Method_Silent();
     if(signalID == IRadio::transmissionStateChangedSignal) {
         IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(l);
@@ -512,7 +430,7 @@ bool DSMEPlatform::setChannelNumber(uint8_t k) {
     DSME_ASSERT(k >= 11 && k <= 26);
 
     auto r = check_and_cast<NarrowbandRadioBase*>(radio);
-    r->setCarrierFrequency(MHz(2405 + 5 * (k-11)));
+    r->setCenterFrequency(MHz(2405 + 5 * (k-11)));
     currentChannel = k;
     return true;
 }
@@ -570,9 +488,15 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
         case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
             emit(ackSentDown, packet);
             break;
-        case IEEE802154eMACHeader::COMMAND:
+        case IEEE802154eMACHeader::COMMAND: {
+            CommandFrameIdentifier cmd = (CommandFrameIdentifier)message->packet->peekDataAsBytes()->getByte(0);
+            if(cmd == CommandFrameIdentifier::DSME_GTS_REQUEST || cmd == CommandFrameIdentifier::DSME_GTS_REPLY || cmd == CommandFrameIdentifier::DSME_GTS_NOTIFY) {
+                LOG_INFO("Command frame transmitted with creation time " << (long)msg->getHeader().getCreationTime() << " and dwell time " << (long)(getSymbolCounter() - msg->getHeader().getCreationTime()));
+                emit(commandFrameDwellTime, getSymbolCounter() - msg->getHeader().getCreationTime());
+                DSME_ASSERT(msg->getHeader().getCreationTime() > 0);
+            }
             emit(commandSentDown, packet);
-            break;
+            break; }
         default:
             DSME_ASSERT(false);
     }
@@ -650,8 +574,10 @@ bool DSMEPlatform::startCCA() {
 }
 
 void DSMEPlatform::turnTransceiverOn() {
-    this->transceiverIsOn = true;
-    this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
+    if(!this->transceiverIsOn) {
+	this->transceiverIsOn = true;
+    	this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
+    }
 }
 
 void DSMEPlatform::turnTransceiverOff(){
@@ -960,106 +886,9 @@ void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress count
     else slots++;
     emit(gtsChange, slots);
 }
-//ALLOCATIONS
-
-// NOTIFIY
-/*void DSMEPlatform::signalNotifyInitialized() {
-    emit(statNotifyInitialized,1);
-}
-void DSMEPlatform::signalNotifyBackoffs(uint8_t backoffs) {
-    emit(statNotifyBackoffs,backoffs);
-}
-void DSMEPlatform::signalNotifySendSuccess() {
-    emit(statNotifySendSuccess,1);
-}
-void DSMEPlatform::signalNotifySendFailedChannelAccess() {
-    emit(statNotifySendFailedChannelAccess,1);
-}
-void DSMEPlatform::signalNotifySendFailedTransactionOverflow() {
-    emit(statNotifySendFailedTransactionOverflow,1);
-}*/
-
-//DEALLOCATIONS
-
-// DEALLOCATION NOTIFY
-/*void DSMEPlatform::signalDeallocationNotifyInitialized() {
-    emit(statDeallocationNotifyInitialized,1);
-}
-void DSMEPlatform::signalDeallocationNotifyBackoffs(uint8_t backoffs) {
-    emit(statDeallocationNotifyBackoffs,backoffs);
-}
-void DSMEPlatform::signalDeallocationNotifySendSuccess() {
-    emit(statDeallocationNotifySendSuccess,1);
-}
-void DSMEPlatform::signalDeallocationNotifySendFailedChannelAccess() {
-    emit(statDeallocationNotifySendFailedChannelAccess,1);
-}
-void DSMEPlatform::signalDeallocationNotifySendFailedTransactionOverflow() {
-    emit(statDeallocationNotifySendFailedTransactionOverflow,1);
-}*/
-
-
-// STATS PER SF
-
-//void DSMEPlatform::signalSuperframe(bool limits){
-//    emit(superframeLimits, limits ? 2:-2);
-//}
-
-//void DSMEPlatform::signalGTSRequestsTotal(uint16_t allocations) {
-//    emit(gtsRequestsTotal, allocations);
-//}
-//
-//void DSMEPlatform::signalGTSNotifySuccess(uint16_t allocations) {
-//    emit(gtsNotifySuccess, allocations);
-//}
-/*
-void DSMEPlatform::signalGTSRequestsFailed(uint16_t allocations) {
-    emit(gtsRequestsFailed, allocations);
-}
-
-void DSMEPlatform::signalGTSRequestsFailedNoAck(uint16_t allocations) {
-    emit(gtsRequestsFailedNoAck, allocations);
-}
-
-void DSMEPlatform::signalGTSRequestsFailedChannelAccess(uint16_t allocations) {
-    emit(gtsRequestsFailedChannelAccess, allocations);
-}
-
-void DSMEPlatform::signalGTSRequestsFailedTransactionOverflow(uint16_t allocations) {
-    emit(gtsRequestsFailedTransactionOverflow, allocations);
-}
-
-void DSMEPlatform::signalGTSRequestsFailedDenied(uint16_t allocations) {
-    emit(gtsRequestsFailedDenied, allocations);
-}
-
-void DSMEPlatform::signalGTSRequestsFailedTimeout(uint16_t allocations) {
-    emit(gtsRequestsFailedTimeout, allocations);
-}
-
-void DSMEPlatform::signalGTSRequestsFailedQueue(uint16_t allocations) {
-    emit(gtsRequestsFailedQueue, allocations);
-}
-
-void DSMEPlatform::signalGTSRequestsFailedDeallocated(uint16_t allocations) {
-    emit(gtsRequestsFailedDeallocated, allocations);
-}*/
-
-
-// QUEUE LEVEL
-
-//void DSMEPlatform::signalGTSQueueLevel(bool push){
-//    emit(gtsQueueLevel,push ? -1:1);
-//}
 
 void DSMEPlatform::signalQueueLength(uint32_t length) {
     emit(queueLength, length);
 }
-
-//// QUEUE LEVEL PER MSF
-//void DSMEPlatform::signalGTSQueueLevelMSF(uint8_t queueLevel){
-//    emit(gtsQueueLevelMSF, queueLevel);
-//}
-
 
 }

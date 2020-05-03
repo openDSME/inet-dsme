@@ -81,7 +81,7 @@ public:
 
     /****** INET ******/
 
-    virtual inet::InterfaceEntry* createInterfaceEntry() override;
+    virtual void configureInterfaceEntry() override;
 
     /****** OMNeT++ ******/
 
@@ -101,7 +101,7 @@ public:
     virtual void handleSelfMessage(omnetpp::cMessage*) override;
 
     /** @brief Handle control messages from lower layer */
-    virtual void receiveSignal(cComponent *source, omnetpp::simsignal_t signalID, long l, cObject *details) override;
+    virtual void receiveSignal(cComponent *source, omnetpp::simsignal_t signalID, intval_t l, cObject *details) override;
 
     /****** IDSMERadio ******/
 
@@ -148,45 +148,7 @@ public:
 
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
 
-
-    //ALLOCATIONS
-
-    // NOTIFIY
-    /*virtual void signalNotifyInitialized() override;
-    virtual void signalNotifyBackoffs(uint8_t backoffs) override;
-    virtual void signalNotifySendSuccess() override;
-    virtual void signalNotifySendFailedChannelAccess() override;
-    virtual void signalNotifySendFailedTransactionOverflow() override;*/
-
-    // DEALLOCATION NOTIFY
-/*  virtual void signalDeallocationNotifyInitialized() override;
-    virtual void signalDeallocationNotifyBackoffs(uint8_t backoffs) override;
-    virtual void signalDeallocationNotifySendSuccess() override;
-    virtual void signalDeallocationNotifySendFailedChannelAccess() override;
-    virtual void signalDeallocationNotifySendFailedTransactionOverflow() override;  */
-
-    // PER SF
-    //virtual void signalSuperframe(bool limits) override;
-    //virtual void signalGTSRequestsTotal(uint16_t allocations) override;
-    //virtual void signalGTSNotifySuccess(uint16_t allocations) override;
-/*    virtual void signalGTSRequestsFailed(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailedNoAck(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailedChannelAccess(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailedTransactionOverflow(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailedTimeout(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailedDenied(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailedQueue(uint16_t allocations) override;
-    virtual void signalGTSRequestsFailedDeallocated(uint16_t allocations) override;     */
-
-    // QUEUE LEVEL
-
-    //virtual void signalGTSQueueLevel(bool push) override;
     virtual void signalQueueLength(uint32_t length) override;
-
-    // QUEUE LEVEL PER MSF
-    //virtual void signalGTSQueueLevelMSF(uint8_t queueLevel) override;
-
-
 
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
@@ -203,7 +165,6 @@ private:
 
     PHY_PIB phy_pib;
     MAC_PIB mac_pib;
-
     DSMELayer* dsme;
     mcps_sap::MCPS_SAP mcps_sap;
     mlme_sap::MLME_SAP mlme_sap;
@@ -219,8 +180,6 @@ private:
     omnetpp::cMessage* timer{nullptr};
     omnetpp::cMessage* ccaTimer{nullptr};
     omnetpp::cMessage* cfpTimer{nullptr};
-
-
     Delegate<void(bool)> txEndCallback{};
     inet::Packet* pendingTxPacket{nullptr};
     bool pendingSendRequest{false};
@@ -239,53 +198,10 @@ private:
     uint8_t minBroadcastLQI{0};
     uint8_t minCoordinatorLQI{0};
     uint8_t currentChannel{0};
-
-    int slots{0};
+    uint32_t slots{0};
 
 public:
     omnetpp::SimTime symbolDuration;
-
-    //ALLOCATIONS
-    // NOTIFIY
-/*    static omnetpp::simsignal_t statNotifyInitialized;
-    static omnetpp::simsignal_t statNotifyBackoffs;
-    static omnetpp::simsignal_t statNotifySendSuccess;
-    static omnetpp::simsignal_t statNotifySendFailedNoAck;
-    static omnetpp::simsignal_t statNotifySendFailedChannelAccess;
-    static omnetpp::simsignal_t statNotifySendFailedTransactionOverflow;
-    static omnetpp::simsignal_t statNotifySendFailedQueue;*/
-
-    // DEALLOCATION NOTIFY
-/*    static omnetpp::simsignal_t statDeallocationNotifyInitialized;
-    static omnetpp::simsignal_t statDeallocationNotifyBackoffs;
-    static omnetpp::simsignal_t statDeallocationNotifySendSuccess;
-    static omnetpp::simsignal_t statDeallocationNotifySendFailedNoAck;
-    static omnetpp::simsignal_t statDeallocationNotifySendFailedChannelAccess;
-    static omnetpp::simsignal_t statDeallocationNotifySendFailedTransactionOverflow;
-    static omnetpp::simsignal_t statDeallocationNotifySendFailedQueue;
-    */
-
-    //PER SF
-    static omnetpp::simsignal_t superframeLimits;
-    static omnetpp::simsignal_t gtsRequestsTotal;
-    static omnetpp::simsignal_t gtsNotifySuccess;
-/*    static omnetpp::simsignal_t gtsRequestsFailed;
-    static omnetpp::simsignal_t gtsRequestsFailedNoAck;
-    static omnetpp::simsignal_t gtsRequestsFailedChannelAccess;
-    static omnetpp::simsignal_t gtsRequestsFailedTransactionOverflow;
-    static omnetpp::simsignal_t gtsRequestsFailedDenied;
-    static omnetpp::simsignal_t gtsRequestsFailedTimeout;
-    static omnetpp::simsignal_t gtsRequestsFailedQueue;
-    static omnetpp::simsignal_t gtsRequestsFailedDeallocated;*/
-
-    // QUEUE LEVEL
-
-    static omnetpp::simsignal_t gtsQueueLevel;
-    static omnetpp::simsignal_t queueLength;
-
-    // QUEUE LEVEL MSF
-
-    static omnetpp::simsignal_t gtsQueueLevelMSF;
 
     static omnetpp::simsignal_t broadcastDataSentDown;
     static omnetpp::simsignal_t unicastDataSentDown;
@@ -295,12 +211,15 @@ public:
     static omnetpp::simsignal_t uncorruptedFrameReceived;
     static omnetpp::simsignal_t corruptedFrameReceived;
     static omnetpp::simsignal_t gtsChange;
+    static omnetpp::simsignal_t queueLength;
+    static omnetpp::simsignal_t packetsTXPerSlot;
+    static omnetpp::simsignal_t packetsRXPerSlot;
+    static omnetpp::simsignal_t commandFrameDwellTime;
 
 public:
     IEEE802154MacAddress& getAddress() {
         return this->mac_pib.macExtendedAddress;
     }
-
 
 private:
     GTSScheduling* scheduling = nullptr;

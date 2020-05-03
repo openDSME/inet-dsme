@@ -12,7 +12,9 @@ simple DSME extends MacProtocolBase like IMacProtocol
     parameters:
         string address = default("auto"); // MAC address as hex string (12 hex digits), or
                                           // "auto". "auto" values will be replaced by
-                                          // a generated MAC address in init stage 0. 
+                                          // a generated MAC address in init stage 0.
+        string radioModule = default("^.radio");   // The path to the Radio module  //FIXME remove default value
+
 
         bool macCapReduction = default(false);
 
@@ -37,12 +39,12 @@ simple DSME extends MacProtocolBase like IMacProtocol
         string scheduling = default("TPS"); 
         double TPSalpha = default(0.7); // EWMA factor for TPS, ignored otherwise
         bool useHysteresis = default(true);
-        bool useMultiplePacketsPerGTS = default(false); //use by TPS to configure how many packets are tx per GTS slot
+        bool sendMultiplePacketsPerGTS = default(false); //use by TPS to configure how many packets are tx per GTS slot
         bool useQueueManagement = default(false); //use by TPS to define if slots are kept to manage the queue        
         bool useMultipleGTSDeallocation = default(false); //use by TPS to define if slots are kept to manage the queue
         xml staticSchedule = default(xml("<root/>"));
          
-		bool multiplePacketsPerGTS = default(false); // use in the message dispatcher in order to control # of packets delivered per GTS
+	bool multiplePacketsPerGTS = default(false); // use in the message dispatcher in order to control # of packets delivered per GTS
         int macDSMEGTSExpirationTime = default(7);
         int macResponseWaitTime = default(32);
 
@@ -51,7 +53,6 @@ simple DSME extends MacProtocolBase like IMacProtocol
         int scanDuration = default(6);
         int macPANId = default(10);
 
-        string radioModule = default("^.radio");   // The path to the Radio module  //FIXME remove default value
 
         // bit rate
         double bitrate @unit(bps) = default(250000 bps);
@@ -85,92 +86,20 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
-		
-		//GTS ALLOCATIONS
-		//NOTIFY
-//		@signal[statNotifyInitialized](type=long);
-//        @signal[statNotifyBackoffs](type=long);
-//        @signal[statNotifySendSuccess](type=long);
-//        @signal[statNotifySendFailedChannelAccess](type=long);
-//        @signal[statNotifySendFailedTransactionOverflow](type=long);
-        
-		//DEALLOCATIONS
-		//NOTIFY
-//		@signal[statDeallocationNotifyInitialized](type=long);
-//        @signal[statDeallocationNotifyBackoffs](type=long);
-//        @signal[statDeallocationNotifySendSuccess](type=long);
-//        @signal[statDeallocationNotifySendFailedChannelAccess](type=long);
-//        @signal[statDeallocationNotifySendFailedTransactionOverflow](type=long);        
-        
-		//PER SF
-		
-		@signal[SuperframeLimits](type=long);
-		@signal[GTSRequestsTotal](type=long);
-//        @signal[signalGTSNotifySuccess](type=long);
-//        @signal[GTSRequestsFailed](type=long);
-//        @signal[GTSRequestsFailedNoAck](type=long);
-//        @signal[GTSRequestsFailedChannelAccess](type=long);
-//        @signal[GTSRequestsFailedTransactionOverflow](type=long);
-//        @signal[GTSRequestsFailedDenied](type=long);
-//        @signal[GTSRequestsFailedTimeout](type=long);
-//        @signal[GTSRequestsFailedQueue](type=long);
-//        @signal[GTSRequestsFailedDeallocated](type=long);		
-		
-		// QUEUE LEVEL
-		@signal[GTSQueueLevel](type=long);
-		@signal[queueLength](type=long);
-		
-		// QUEUE LEVEL PER MSF
-		@signal[GTSQueueLevelMSF](type=long);
-
-		
+        @signal[queueLength](type=long);
+        @signal[packetsTXPerSlot](type=long);
+        @signal[packetsRXPerSlot](type=long);
+        @signal[commandFrameDwellTime](type=long);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
         @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
-
-
-
-		//GTS ALLOCATIONS
-		
-//		@statistic[statNotifyInitialized](title="NAN"; source=statNotifyInitialized ; record=count,vector; interpolationmode=none);
-//        @statistic[statNotifyBackoffs](title="NAN"; source=statNotifyBackoffs ; record=count,vector; interpolationmode=none);
-//        @statistic[statNotifySendSuccess](title="NAN"; source=statNotifySendSuccess ; record=max,count,vector; interpolationmode=none);
-//        @statistic[statNotifySendFailedChannelAccess](title="NAN"; source=statNotifySendFailedChannelAccess ; record=count,vector; interpolationmode=none);
-//        @statistic[statNotifySendFailedTransactionOverflow](title="NAN"; source=statNotifySendFailedTransactionOverflow ; record=count,vector; interpolationmode=none);
-
-		//GTS DEALLOCATIONS
-        
-//        @statistic[statDeallocationNotifyInitialized](title="NAN"; source=statDeallocationNotifyInitialized ; record=count,vector; interpolationmode=none);
-//        @statistic[statDeallocationNotifyBackoffs](title="NAN"; source=statDeallocationNotifyBackoffs ; record=count,vector; interpolationmode=none);
-//        @statistic[statDeallocationNotifySendSuccess](title="NAN"; source=statDeallocationNotifySendSuccess ; record=count,vector; interpolationmode=none);
-//        @statistic[statDeallocationNotifySendFailedChannelAccess](title="NAN"; source=statDeallocationNotifySendFailedChannelAccess ; record=count,vector; interpolationmode=none);
-//        @statistic[statDeallocationNotifySendFailedTransactionOverflow](title="NAN"; source=statDeallocationNotifySendFailedTransactionOverflow ; record=count,vector; interpolationmode=none);
-//  		
-		
-		//PER MSF
-
-       @statistic[SuperframeLimits](title="limits of superframe in MAC dataframe structure"; source=SuperframeLimits; record=count,vector; interpolationmode=none);		
-       @statistic[GTSRequestsTotal](title="Requests per MSF"; source=GTSRequestsTotal; record=count,vector; interpolationmode=none);
-//       @statistic[signalGTSNotifySuccess](title="Sucessful requests per MSF"; source=GTSRequestsSuccess; record=count,vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailed](title="Failed requests per MSF"; source=GTSRequestsFailed; record=vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailedNoAck](title="Failed requests per MSF"; source=GTSRequestsFailedNoAck; record=vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailedChannelAccess](title="Failed requests per MSF"; source=GTSRequestsFailedChannelAccess; record=vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailedDenied](title="Failed requests per MSF"; source=GTSRequestsFailedDenied; record=vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailedTimeout](title="Failed requests per MSF"; source=GTSRequestsFailedTimeout; record=vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailedTransactionOverflow](title="Failed requests per MSF"; source=GTSRequestsFailedTransactionOverflow; record=vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailedQueue](title="Failed requests per MSF due to queue"; source=GTSRequestsFailedQueue; record=vector; interpolationmode=none);
-//        @statistic[GTSRequestsFailedDeallocated](title="Failed requests per MSF due to queue"; source=GTSRequestsFailedDeallocated; record=vector; interpolationmode=none);
-//		
-
-		//QUEUE LEVEL
-        @statistic[GTSQueueLevel](title="GTS queue level"; source=GTSQueueLevel; record=vector; interpolationmode=none);
         @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
-        
-		//QUEUE LEVEL MSF
-		@statistic[GTSQueueLevelMSF](title="GTS queue level per MSF"; source=GTSQueueLevelMSF; record=vector; interpolationmode=none);
+        @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
