@@ -85,7 +85,9 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
-		
+
+		@signal[commandFrameDwellTime](time=long);
+				
 		//GTS ALLOCATIONS
 		//NOTIFY
 //		@signal[statNotifyInitialized](type=long);
@@ -131,7 +133,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
 
-
+        @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
 
 		//GTS ALLOCATIONS
 		

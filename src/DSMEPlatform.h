@@ -295,6 +295,8 @@ public:
     static omnetpp::simsignal_t uncorruptedFrameReceived;
     static omnetpp::simsignal_t corruptedFrameReceived;
     static omnetpp::simsignal_t gtsChange;
+    static omnetpp::simsignal_t commandFrameDwellTime;
+
 
 public:
     IEEE802154MacAddress& getAddress() {
