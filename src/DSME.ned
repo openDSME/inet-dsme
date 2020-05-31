@@ -37,7 +37,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
 
         // Scheduling
         string scheduling = default("TPS"); 
-        double TPSalpha = default(0.7); // EWMA factor for TPS, ignored otherwise
+        double TPSalpha = default(0.1); // EWMA factor for TPS, ignored otherwise
         bool useHysteresis = default(true);
         bool sendMultiplePacketsPerGTS = default(false); //use by TPS to configure how many packets are tx per GTS slot
         bool useQueueManagement = default(false); //use by TPS to define if slots are kept to manage the queue        
