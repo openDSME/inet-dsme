@@ -83,10 +83,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
-        @signal[queueLength](type=long);
-        @signal[packetsTXPerSlot](type=long);
-        @signal[packetsRXPerSlot](type=long);
-        @signal[commandFrameDwellTime](type=long);
+        @signal[queueLength](type=unsigned long);
+        @signal[packetsTXPerSlot](type=unsigned long);
+        @signal[packetsRXPerSlot](type=unsigned long);
+        @signal[commandFrameDwellTime](type=unsigned long);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
