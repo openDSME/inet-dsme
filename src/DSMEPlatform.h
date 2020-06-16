@@ -154,6 +154,8 @@ public:
 
     virtual void signalPacketsRXPerSlot(uint32_t packets) override;
 
+    virtual void signalAckedTransmissionResult(bool success, uint8_t transmissionAttempts, IEEE802154MacAddress receiver) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 

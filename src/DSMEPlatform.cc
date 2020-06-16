@@ -894,6 +894,10 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
     return ss.str();
 }
 
+void DSMEPlatform::signalAckedTransmissionResult(bool success, uint8_t transmissionAttempts, IEEE802154MacAddress receiver) {
+    this->dsmeAdaptionLayer.getChannelAdaptor().signalTransmissionStatus(getChannelNumber()-11, transmissionAttempts, success);
+}
+
 void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
     if(deallocation) slots--;
     else slots++;
