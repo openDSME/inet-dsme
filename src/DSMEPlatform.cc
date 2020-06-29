@@ -350,7 +350,8 @@ void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
     header.setSrcAddr(this->mac_pib.macExtendedAddress);
 
     auto destinationAddress = packet->getTag<inet::MacAddressReq>()->getDestAddress();
-    if(destinationAddress.isMulticast()) {
+    //if(destinationAddress.isMulticast()) {
+    if(true) {
         // handle multicast as broadcast (TODO ok?)
         destinationAddress = MacAddress::BROADCAST_ADDRESS;
         LOG_INFO_PURE("Broadcast");
