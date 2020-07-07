@@ -84,19 +84,28 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
         @signal[queueLength](type=long);
+        @signal[queueLevelCAP](type=long);
         @signal[packetsTXPerSlot](type=long);
         @signal[packetsRXPerSlot](type=long);
         @signal[commandFrameDwellTime](type=long);
+        @signal[csmaRetransmissions](type=double);
+        @signal[reward](type=double);
+        @signal[q](type=double);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
         @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
+        @statistic[queueLevelCAP](title="Level of the CAP queue"; source=queueLevelCAP; record=mean,max; interpolationmode=none);
         @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
         @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
+        @statistic[csmaRetransmissions](title="Ratio of succesful CSMA transmission to number of backoffs"; source=csmaRetransmissions; record=vector; interpolationmode=none);
+        @statistic[reward](title="Reward received by the QAgent"; source=reward; record=vector; interpolationmode=none);
+        @statistic[q](title="Q achieved by the QAgent"; source=q; record=vector,mean; interpolationmode=none);
+
 
         @class(::dsme::DSMEPlatform);
 }

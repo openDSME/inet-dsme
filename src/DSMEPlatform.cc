@@ -43,10 +43,14 @@ simsignal_t DSMEPlatform::ackSentDown;
 simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
+simsignal_t DSMEPlatform::queueLevelCAP;
 simsignal_t DSMEPlatform::queueLength;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
 simsignal_t DSMEPlatform::commandFrameDwellTime;
+simsignal_t DSMEPlatform::csmaRetransmissions;
+simsignal_t DSMEPlatform::reward;
+simsignal_t DSMEPlatform::q;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -105,9 +109,13 @@ DSMEPlatform::DSMEPlatform()
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
     queueLength = registerSignal("queueLength");
+    queueLevelCAP = registerSignal("queueLevelCAP");
     packetsTXPerSlot = registerSignal("packetsTXPerSlot");
     packetsRXPerSlot = registerSignal("packetsRXPerSlot");
     commandFrameDwellTime = registerSignal("commandFrameDwellTime");
+    csmaRetransmissions = registerSignal("csmaRetransmissions");
+    reward = registerSignal("reward");
+    q = registerSignal("q");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -350,8 +358,7 @@ void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
     header.setSrcAddr(this->mac_pib.macExtendedAddress);
 
     auto destinationAddress = packet->getTag<inet::MacAddressReq>()->getDestAddress();
-    //if(destinationAddress.isMulticast()) {
-    if(true) {
+    if(destinationAddress.isMulticast()) {
         // handle multicast as broadcast (TODO ok?)
         destinationAddress = MacAddress::BROADCAST_ADDRESS;
         LOG_INFO_PURE("Broadcast");
@@ -905,12 +912,28 @@ void DSMEPlatform::signalQueueLength(uint32_t length) {
     emit(queueLength, length);
 }
 
+void DSMEPlatform::signalQueueLevelCAP(uint32_t level) {
+    emit(queueLevelCAP, level);
+}
+
 void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {
     emit(packetsTXPerSlot, packets);
 }
 
 void DSMEPlatform::signalPacketsRXPerSlot(uint32_t packets) {
     emit(packetsRXPerSlot, packets);
+}
+
+void DSMEPlatform::signalCSMAResult(uint8_t succesful, uint8_t retransmissions, uint8_t backoffs) {
+    emit(csmaRetransmissions, retransmissions);
+}
+
+void DSMEPlatform::signalReward(int32_t reward) {
+    emit(this->reward, reward);
+}
+
+void DSMEPlatform::signalQ(int32_t q) {
+    emit(this->q, q);
 }
 
 }
