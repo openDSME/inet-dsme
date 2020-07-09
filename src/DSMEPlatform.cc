@@ -49,6 +49,7 @@ simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
 simsignal_t DSMEPlatform::commandFrameDwellTime;
 simsignal_t DSMEPlatform::csmaRetransmissions;
+simsignal_t DSMEPlatform::csmaSuccess;
 simsignal_t DSMEPlatform::reward;
 simsignal_t DSMEPlatform::q;
 
@@ -114,6 +115,7 @@ DSMEPlatform::DSMEPlatform()
     packetsRXPerSlot = registerSignal("packetsRXPerSlot");
     commandFrameDwellTime = registerSignal("commandFrameDwellTime");
     csmaRetransmissions = registerSignal("csmaRetransmissions");
+    csmaSuccess = registerSignal("csmaSuccess");
     reward = registerSignal("reward");
     q = registerSignal("q");
 }
@@ -926,6 +928,7 @@ void DSMEPlatform::signalPacketsRXPerSlot(uint32_t packets) {
 
 void DSMEPlatform::signalCSMAResult(uint8_t succesful, uint8_t retransmissions, uint8_t backoffs) {
     emit(csmaRetransmissions, retransmissions);
+    emit(csmaSuccess, succesful);
 }
 
 void DSMEPlatform::signalReward(int32_t reward) {

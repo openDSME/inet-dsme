@@ -230,6 +230,7 @@ public:
     static omnetpp::simsignal_t packetsRXPerSlot;
     static omnetpp::simsignal_t commandFrameDwellTime;
     static omnetpp::simsignal_t csmaRetransmissions;
+    static omnetpp::simsignal_t csmaSuccess;
     static omnetpp::simsignal_t reward;
     static omnetpp::simsignal_t q;
 

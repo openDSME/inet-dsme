@@ -89,6 +89,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[packetsRXPerSlot](type=long);
         @signal[commandFrameDwellTime](type=long);
         @signal[csmaRetransmissions](type=double);
+        @signal[csmaSuccess](type=double);
         @signal[reward](type=double);
         @signal[q](type=double);
 
@@ -103,6 +104,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
         @statistic[csmaRetransmissions](title="Ratio of succesful CSMA transmission to number of backoffs"; source=csmaRetransmissions; record=vector; interpolationmode=none);
+        @statistic[csmaSuccess](title="CSMA transmission result"; source=csmaSuccess; record=vector; interpolationmode=none);
         @statistic[reward](title="Reward received by the QAgent"; source=reward; record=vector; interpolationmode=none);
         @statistic[q](title="Q achieved by the QAgent"; source=q; record=vector,mean; interpolationmode=none);
 
