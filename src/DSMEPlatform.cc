@@ -20,7 +20,6 @@
 #include "openDSME/dsmeAdaptionLayer/scheduling/PIDScheduling.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/TPS.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/StaticScheduling.h"
-#include "openDSME/dsmeAdaptionLayer/scheduling/ExerciseScheduler.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
 // coverity[+kill]
@@ -172,9 +171,6 @@ void DSMEPlatform::initialize(int stage) {
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
             scheduling = new StaticScheduling(this->dsmeAdaptionLayer);
-        }
-        else if(!strcmp(schedulingSelection, "CUSTOM")) {
-            scheduling = new ExerciseScheduler(this->dsmeAdaptionLayer);
         }
         else {
             ASSERT(false);
