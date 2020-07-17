@@ -293,6 +293,7 @@ void DSMEPlatform::finish() {
 
 void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
     if(!this->transceiverIsOn) {
+
         DSMEMessage* message = getLoadedMessage(packet);
         message->getHeader().decapsulateFrom(message);
 
@@ -319,6 +320,20 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
     DSMEMessage* message = getLoadedMessage(packet);
     message->getHeader().decapsulateFrom(message);
 
+//    if(message->getHeader().getFrameType() == IEEE802154eMACHeader::FrameType::DATA){
+//        auto chunk = packet->peekAllAsBytes();
+//        auto bytes = chunk->getBytes();
+//
+//        for(uint8_t i = 0; i < bytes.size(); i++){
+//            bytes[i] -= dsme->getMAC_PIB().preshared_secret;
+//        }
+//
+//        auto newChunk = makeShared<BytesChunk>();
+//        chunk->setBytes(bytes);
+//        packet->eraseAll();
+//        packet->insertAtFront(newChunk);
+//    }
+
     // Get LQI
     auto errorRateInd = packet->getTag<inet::ErrorRateInd>();
     message->setLQI(PERtoLQI(errorRateInd->getPacketErrorRate()));
@@ -342,6 +357,20 @@ void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
 
     LOG_INFO_PREFIX;
     LOG_INFO_PURE("Upper layer requests to send a message to ");
+
+
+//    auto chunk = packet->peekAllAsBytes();
+//    auto bytes = chunk->getBytes();
+//
+//    for(uint8_t i = 0; i < bytes.size(); i++){
+//        //bytes[i] = (bytes[i] + dsme->getMAC_PIB().preshared_secret) %  256;
+//    }
+//
+//    auto newChunk = makeShared<BytesChunk>();
+//    newChunk->setBytes(bytes);
+//    packet->eraseAll();
+//    packet->insertAtFront(newChunk);
+
 
     auto message = getLoadedMessage(packet);
 
@@ -383,13 +412,18 @@ void DSMEPlatform::handleSelfMessage(cMessage* msg) {
         // the ACK Message itself will be deleted inside the AckLayer
         delete msg;
     } else if(strcmp(msg->getName(), "receive") == 0) {
-        // LOG_INFO("switch to receive")
+        LOG_INFO_PURE("switch to receive");
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
         delete msg;
+    } else if(strcmp(msg->getName(), "transceiveroff") == 0) {
+        turnTransceiverOff();
     } else {
         MacProtocolBase::handleSelfMessage(msg);
     }
 }
+
+
+
 
 void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, intval_t l, cObject *details) {
     Enter_Method_Silent();
@@ -397,8 +431,8 @@ void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, intva
         IRadio::TransmissionState newRadioTransmissionState = static_cast<IRadio::TransmissionState>(l);
         if(transmissionState == IRadio::TRANSMISSION_STATE_TRANSMITTING && newRadioTransmissionState == IRadio::TRANSMISSION_STATE_IDLE) {
             // LOG_INFO("Transmission ready")
-            txEndCallback(true); // TODO could it be false?
             scheduleAt(simTime(), new cMessage("receive"));
+            txEndCallback(true); // TODO could it be false?
         }
         transmissionState = newRadioTransmissionState;
     } else if(signalID == IRadio::radioModeChangedSignal) {
@@ -413,7 +447,7 @@ void DSMEPlatform::receiveSignal(cComponent *source, simsignal_t signalID, intva
                 pendingSendRequest = false;
             }
         } else if(newRadioMode == IRadio::RADIO_MODE_RECEIVER) {
-            // LOG_INFO("switched to receive")
+            LOG_INFO("switched to receive 2");
         }
     } else if(signalID == IRadio::receptionStateChangedSignal) {
         // LOG_INFO("receptionStateChanged to " << (uint16_t)value);
@@ -589,6 +623,7 @@ bool DSMEPlatform::startCCA() {
 void DSMEPlatform::turnTransceiverOn() {
     if(!this->transceiverIsOn) {
 	this->transceiverIsOn = true;
+	LOG_INFO("turnedON");
     	this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_RECEIVER);
     }
 }
@@ -596,6 +631,10 @@ void DSMEPlatform::turnTransceiverOn() {
 void DSMEPlatform::turnTransceiverOff(){
     this->transceiverIsOn = false;
     this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_OFF);
+}
+
+void DSMEPlatform::delayedTurnTransceiverOff() {
+    scheduleAt(simTime(), new cMessage("transceiveroff"));
 }
 
 /****** IDSMEPlatform ******/

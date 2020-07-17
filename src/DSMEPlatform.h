@@ -124,6 +124,8 @@ public:
 
     virtual void turnTransceiverOff() override;
 
+    virtual void delayedTurnTransceiverOff();
+
     /****** IDSMEPlatform ******/
 
     virtual bool isReceptionFromAckLayerPossible() override;
