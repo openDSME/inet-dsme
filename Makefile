@@ -10,7 +10,7 @@ cleanall: checkmakefiles
 	rm -f src/Makefile
 
 makefiles:
-	cd src && opp_makemake -f --deep
+	cd src && opp_makemake -f --deep --make-so -I../../inet/src -I../../inet/src/inet/common -I.. -KINET_PROJ=../../inet 
 
 checkmakefiles:
 	@if [ ! -f src/Makefile ]; then \

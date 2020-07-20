@@ -162,6 +162,10 @@ public:
 
     virtual void signalQ(int32_t q) override;
 
+    virtual void signalBE(uint8_t be) override;
+
+    virtual void signalEPS(float eps) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -233,7 +237,8 @@ public:
     static omnetpp::simsignal_t csmaSuccess;
     static omnetpp::simsignal_t reward;
     static omnetpp::simsignal_t q;
-
+    static omnetpp::simsignal_t be;
+    static omnetpp::simsignal_t eps;
 
 public:
     IEEE802154MacAddress& getAddress() {

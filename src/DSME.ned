@@ -15,9 +15,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
                                           // a generated MAC address in init stage 0.
         string radioModule = default("^.radio");   // The path to the Radio module  //FIXME remove default value
 
+        bool useQAgent = default(false);
 
         bool macCapReduction = default(false);
-        bool sendMultiplePacketsPerGTS = default(true);
+        bool sendMultiplePacketsPerGTS = default(false);
 
         bool isPANCoordinator = default(false);
         bool isCoordinator = default(false);
@@ -84,30 +85,35 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
         @signal[queueLength](type=long);
-        @signal[queueLevelCAP](type=long);
+        @signal[queueLevelCAP](type=unsigned long);
         @signal[packetsTXPerSlot](type=long);
         @signal[packetsRXPerSlot](type=long);
         @signal[commandFrameDwellTime](type=long);
-        @signal[csmaRetransmissions](type=double);
-        @signal[csmaSuccess](type=double);
-        @signal[reward](type=double);
-        @signal[q](type=double);
+
+        @signal[csmaRetransmissions](type=unsigned int);
+        @signal[csmaSuccess](type=unsigned int);
+        @signal[reward](type=int);
+        @signal[q](type=int);
+        @signal[be](type=unsigned int);
+        @signal[eps](type=double);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
         @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
-        @statistic[queueLevelCAP](title="Level of the CAP queue"; source=queueLevelCAP; record=mean,max; interpolationmode=none);
+        @statistic[queueLevelCAP](title="Level of the CAP queue"; source=queueLevelCAP; record=mean,max,vector; interpolationmode=none);
         @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
         @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
+
         @statistic[csmaRetransmissions](title="Ratio of succesful CSMA transmission to number of backoffs"; source=csmaRetransmissions; record=vector; interpolationmode=none);
         @statistic[csmaSuccess](title="CSMA transmission result"; source=csmaSuccess; record=vector; interpolationmode=none);
         @statistic[reward](title="Reward received by the QAgent"; source=reward; record=vector; interpolationmode=none);
         @statistic[q](title="Q achieved by the QAgent"; source=q; record=vector,mean; interpolationmode=none);
-
+        @statistic[be](title="BE used by the QAgent"; source=be; record=vector; interpolationmode=none);
+        @statistic[eps](title="EPS used by the QAgent"; source=eps; record=vector; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }

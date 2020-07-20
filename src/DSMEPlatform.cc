@@ -52,6 +52,8 @@ simsignal_t DSMEPlatform::csmaRetransmissions;
 simsignal_t DSMEPlatform::csmaSuccess;
 simsignal_t DSMEPlatform::reward;
 simsignal_t DSMEPlatform::q;
+simsignal_t DSMEPlatform::be;
+simsignal_t DSMEPlatform::eps;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -118,6 +120,8 @@ DSMEPlatform::DSMEPlatform()
     csmaSuccess = registerSignal("csmaSuccess");
     reward = registerSignal("reward");
     q = registerSignal("q");
+    be = registerSignal("be");
+    eps = registerSignal("eps");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -233,6 +237,8 @@ void DSMEPlatform::initialize(int stage) {
             }
         }
 
+        dsme->getCapLayer().setQAgent(par("useQAgent"));
+
         this->mac_pib.macShortAddress = this->mac_pib.macExtendedAddress.getShortAddress();
 
         if(par("isPANCoordinator")) {
@@ -267,6 +273,7 @@ void DSMEPlatform::initialize(int stage) {
         this->minCoordinatorLQI = par("minCoordinatorLQI");
 
         this->dsme->initialize(this);
+        WATCH(dsme->getMAC_PIB().macMinBE);
 
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
 
@@ -679,6 +686,7 @@ void DSMEPlatform::updateVisual() {
     if(this->mac_pib.macAssociatedPANCoord) {
         s << " A";
     }
+    s << " BE" << (int)dsme->getMAC_PIB().macMinBE;
 
     cModule* host = findContainingNode(this);
     while(host->getParentModule() && host->getParentModule()->getId() != 1) {
@@ -937,6 +945,15 @@ void DSMEPlatform::signalReward(int32_t reward) {
 
 void DSMEPlatform::signalQ(int32_t q) {
     emit(this->q, q);
+}
+
+void DSMEPlatform::signalBE(uint8_t be) {
+    emit(this->be, be);
+    updateVisual();
+}
+
+void DSMEPlatform::signalEPS(float eps) {
+    emit(this->eps, eps);
 }
 
 }
