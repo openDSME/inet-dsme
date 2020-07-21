@@ -321,7 +321,7 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
     message->getHeader().decapsulateFrom(message);
 
 //    if(message->getHeader().getFrameType() == IEEE802154eMACHeader::FrameType::DATA){
-//        auto chunk = packet->peekAllAsBytes();
+//        auto chunk = packet->peekDataAsBytes();
 //        auto bytes = chunk->getBytes();
 //
 //        for(uint8_t i = 0; i < bytes.size(); i++){
@@ -329,7 +329,7 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
 //        }
 //
 //        auto newChunk = makeShared<BytesChunk>();
-//        chunk->setBytes(bytes);
+//        newChunk->(bytes);
 //        packet->eraseAll();
 //        packet->insertAtFront(newChunk);
 //    }
@@ -359,20 +359,21 @@ void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
     LOG_INFO_PURE("Upper layer requests to send a message to ");
 
 
-//    auto chunk = packet->peekAllAsBytes();
-//    auto bytes = chunk->getBytes();
-//
-//    for(uint8_t i = 0; i < bytes.size(); i++){
-//        //bytes[i] = (bytes[i] + dsme->getMAC_PIB().preshared_secret) %  256;
-//    }
-//
-//    auto newChunk = makeShared<BytesChunk>();
-//    newChunk->setBytes(bytes);
-//    packet->eraseAll();
-//    packet->insertAtFront(newChunk);
-
-
     auto message = getLoadedMessage(packet);
+
+//    if(message->getHeader().getFrameType() == IEEE802154eMACHeader::FrameType::DATA){
+//        auto chunk = packet->peekAllAsBytes();
+//        auto bytes = chunk->getBytes();
+//
+//        for(uint8_t i = 0; i < bytes.size(); i++){
+//            //bytes[i] = (bytes[i] + dsme->getMAC_PIB().preshared_secret) %  256;
+//        }
+//
+//        auto newChunk = makeShared<BytesChunk>();
+//        newChunk->setBytes(bytes);
+//        packet->eraseAll();
+//        packet->insertAtFront(newChunk);
+//    }
 
     auto& header = message->getHeader();
     header.setFrameType(IEEE802154eMACHeader::DATA);
@@ -633,7 +634,7 @@ void DSMEPlatform::turnTransceiverOff(){
     this->radio->setRadioMode(inet::physicallayer::IRadio::RADIO_MODE_OFF);
 }
 
-void DSMEPlatform::delayedTurnTransceiverOff() {
+void DSMEPlatform::delayedTurnTransceiverOff(){
     scheduleAt(simTime(), new cMessage("transceiveroff"));
 }
 
