@@ -307,6 +307,7 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
         DSMEMessage* message = getLoadedMessage(packet);
         message->getHeader().decapsulateFrom(message);
 
+
         LOG_DEBUG("Received corrupted frame " << packet->str() << "(" << getSequenceChartInfo(message, false) << ")");
         emit(corruptedFrameReceived, packet);
 
