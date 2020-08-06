@@ -540,7 +540,8 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
     pendingTxPacket = packet;
 
     if(radio->getRadioMode() != IRadio::RADIO_MODE_TRANSMITTER) {
-        DSME_ASSERT(msg->getHeader().getFrameType() != IEEE802154eMACHeader::ACKNOWLEDGEMENT); // switching is handled by ACK routine
+        //JND:
+        //DSME_ASSERT(msg->getHeader().getFrameType() != IEEE802154eMACHeader::ACKNOWLEDGEMENT); // switching is handled by ACK routine
         radio->setRadioMode(IRadio::RADIO_MODE_TRANSMITTER);
     }
 
