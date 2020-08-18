@@ -470,6 +470,8 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
         return false;
     }
 
+    updateVisual();
+
     DSMEMessage* message = check_and_cast<DSMEMessage*>(msg);
 
     std::string printable_info = getSequenceChartInfo(msg, true);
@@ -686,7 +688,7 @@ void DSMEPlatform::updateVisual() {
     if(this->mac_pib.macAssociatedPANCoord) {
         s << " A";
     }
-    s << " BE" << (int)dsme->getMAC_PIB().macMinBE;
+    s << " Q:" << (int)dsme->getCapLayer().getQueueLevel();
 
     cModule* host = findContainingNode(this);
     while(host->getParentModule() && host->getParentModule()->getId() != 1) {
