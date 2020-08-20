@@ -76,7 +76,7 @@ constexpr uint16_t UPPER_LAYER_QUEUE_SIZE = 12;
 constexpr uint16_t MSG_POOL_SIZE = CAP_QUEUE_SIZE + 2 * TOTAL_GTS_QUEUE_SIZE + 2 * UPPER_LAYER_QUEUE_SIZE + 10;
 constexpr uint8_t ADDITIONAL_ACK_WAIT_DURATION = 0;
 
-constexpr uint8_t GACK_SIZE = 140;//7*maxPacketsSO
+constexpr uint8_t GACK_MAX_SIZE = 658;//7*94 (maxPacketsSO=9)
 }
 
 #endif
