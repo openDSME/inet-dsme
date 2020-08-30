@@ -306,6 +306,7 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
     recordScalar("macChannelOffset", dsme->getMAC_PIB().macChannelOffset);
     recordScalar("numUnusedTxGTS", dsme->getMessageDispatcher().getNumUnusedTxGTS());
+    dsme->getQAgent().printTxTimes();
 }
 
 void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
