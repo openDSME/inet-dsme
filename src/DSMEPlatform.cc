@@ -237,8 +237,6 @@ void DSMEPlatform::initialize(int stage) {
             }
         }
 
-        dsme->getCapLayer().setQAgent(par("useQAgent"));
-
         this->mac_pib.macShortAddress = this->mac_pib.macExtendedAddress.getShortAddress();
 
         if(par("isPANCoordinator")) {
