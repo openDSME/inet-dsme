@@ -166,6 +166,12 @@ public:
 
     virtual void signalEPS(float eps) override;
 
+    virtual void signalCAPSucc(uint8_t succ) override;
+
+    virtual void signalCAPFailed(uint8_t fail) override;
+
+    virtual void signalOverheardMsg(uint8_t overheard) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -239,6 +245,9 @@ public:
     static omnetpp::simsignal_t q;
     static omnetpp::simsignal_t be;
     static omnetpp::simsignal_t eps;
+    static omnetpp::simsignal_t capSuccess;
+    static omnetpp::simsignal_t capFailed;
+    static omnetpp::simsignal_t overheardMsg;
 
 public:
     IEEE802154MacAddress& getAddress() {

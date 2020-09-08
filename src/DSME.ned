@@ -96,6 +96,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[q](type=int);
         @signal[be](type=unsigned int);
         @signal[eps](type=double);
+        @signal[capSuccess](type=unsigned int);
+        @signal[capFailed](type=unsigned int);
+        @signal[overheardMsg](type=unsigned int);
+
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
@@ -114,6 +118,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[q](title="Q achieved by the QAgent"; source=q; record=vector,mean; interpolationmode=none);
         @statistic[be](title="BE used by the QAgent"; source=be; record=vector; interpolationmode=none);
         @statistic[eps](title="EPS used by the QAgent"; source=eps; record=vector; interpolationmode=none);
+
+        @statistic[capSuccess](title="capSuccess"; source=capSuccess; record=mean,max,min; interpolationmode=none);
+        @statistic[capFailed](title="capFailed"; source=capFailed; record=mean,max,min; interpolationmode=none);
+        @statistic[overheardMsg](title="overheardMsg"; source=overheardMsg; record=mean,max,min; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }

@@ -54,6 +54,9 @@ simsignal_t DSMEPlatform::reward;
 simsignal_t DSMEPlatform::q;
 simsignal_t DSMEPlatform::be;
 simsignal_t DSMEPlatform::eps;
+simsignal_t DSMEPlatform::capSuccess;
+simsignal_t DSMEPlatform::capFailed;
+simsignal_t DSMEPlatform::overheardMsg;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -122,6 +125,9 @@ DSMEPlatform::DSMEPlatform()
     q = registerSignal("q");
     be = registerSignal("be");
     eps = registerSignal("eps");
+    capSuccess = registerSignal("capSuccess");
+    capFailed = registerSignal("capFailed");
+    overheardMsg = registerSignal("overheardMsg");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -955,6 +961,18 @@ void DSMEPlatform::signalBE(uint8_t be) {
 
 void DSMEPlatform::signalEPS(float eps) {
     emit(this->eps, eps);
+}
+
+void DSMEPlatform::signalCAPSucc(uint8_t succ) {
+    emit(capSuccess, succ);
+}
+
+void DSMEPlatform::signalCAPFailed(uint8_t fail) {
+    emit(capFailed, fail);
+}
+
+void DSMEPlatform::signalOverheardMsg(uint8_t overheard) {
+    emit(overheardMsg, overheard);
 }
 
 }
