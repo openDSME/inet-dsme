@@ -310,6 +310,7 @@ void DSMEPlatform::finish() {
     recordScalar("numUpperPacketsDroppedFullQueue", dsme->getMessageDispatcher().getNumUpperPacketsDroppedFullQueue());
     recordScalar("macChannelOffset", dsme->getMAC_PIB().macChannelOffset);
     recordScalar("numUnusedTxGTS", dsme->getMessageDispatcher().getNumUnusedTxGTS());
+    dsme->getQAgent().printQTable();
     dsme->getQAgent().printTxTimes();
 }
 
@@ -694,6 +695,7 @@ void DSMEPlatform::updateVisual() {
         s << " A";
     }
     s << " Q:" << (int)dsme->getCapLayer().getQueueLevel();
+    s << " T:" << dsme->getQAgent().getFeatureManager().getState().getFeature<TimeFeature>().getValue();
 
     cModule* host = findContainingNode(this);
     while(host->getParentModule() && host->getParentModule()->getId() != 1) {
