@@ -105,7 +105,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
         @statistic[corruptedFrameReceived](title="corrupted frame received"; source=corruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
-        @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
+        @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max,vector; interpolationmode=none);
         @statistic[queueLevelCAP](title="Level of the CAP queue"; source=queueLevelCAP; record=mean,max,vector; interpolationmode=none);
         @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
         @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
