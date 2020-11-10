@@ -47,6 +47,11 @@ simsignal_t DSMEPlatform::queueLength;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
 simsignal_t DSMEPlatform::commandFrameDwellTime;
+simsignal_t DSMEPlatform::packetsPerCAP;
+simsignal_t DSMEPlatform::failedPacketsPerCAP;
+simsignal_t DSMEPlatform::failedCCAs;
+simsignal_t DSMEPlatform::prrCAP;
+simsignal_t DSMEPlatform::successPacketsCAP;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -108,6 +113,11 @@ DSMEPlatform::DSMEPlatform()
     packetsTXPerSlot = registerSignal("packetsTXPerSlot");
     packetsRXPerSlot = registerSignal("packetsRXPerSlot");
     commandFrameDwellTime = registerSignal("commandFrameDwellTime");
+    packetsPerCAP = registerSignal("packetsPerCAP");
+    failedPacketsPerCAP = registerSignal("failedPacketsPerCAP");
+    failedCCAs = registerSignal("failedCCAs");
+    prrCAP = registerSignal("prrCAP");
+    successPacketsCAP = registerSignal("successPacketsCAP");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -257,6 +267,10 @@ void DSMEPlatform::initialize(int stage) {
         this->minCoordinatorLQI = par("minCoordinatorLQI");
 
         this->dsme->initialize(this);
+
+        this->dsme->getCapLayer().setSlottedCSMA(par("slottedCSMA"));
+	
+	this->dsme->getCapLayer().setBLE(par("batteryLifeExtension"));
 
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
 
@@ -910,6 +924,26 @@ void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {
 
 void DSMEPlatform::signalPacketsRXPerSlot(uint32_t packets) {
     emit(packetsRXPerSlot, packets);
+}
+
+void DSMEPlatform::signalPacketsPerCAP(uint32_t packets){
+    emit(packetsPerCAP, packets);
+}
+
+void DSMEPlatform::signalFailedPacketsPerCAP(uint32_t packets){
+    emit(failedPacketsPerCAP, packets);
+}
+
+void DSMEPlatform::signalFailedCCAs(uint32_t failedAttempts){
+    emit(failedCCAs, failedAttempts);
+}
+
+void DSMEPlatform::signalPRRCAP(double prr){
+    emit(prrCAP, prr);
+}
+
+void DSMEPlatform::signalSuccessPacketsCAP(uint32_t packets) {
+    emit(successPacketsCAP, packets);
 }
 
 }
