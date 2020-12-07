@@ -43,7 +43,6 @@ simsignal_t DSMEPlatform::ackSentDown;
 simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
-simsignal_t DSMEPlatform::queueLevelCAP;
 simsignal_t DSMEPlatform::queueLength;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
@@ -57,6 +56,11 @@ simsignal_t DSMEPlatform::eps;
 simsignal_t DSMEPlatform::capSuccess;
 simsignal_t DSMEPlatform::capFailed;
 simsignal_t DSMEPlatform::overheardMsg;
+simsignal_t DSMEPlatform::packetsPerCAP;
+simsignal_t DSMEPlatform::failedPacketsPerCAP;
+simsignal_t DSMEPlatform::failedCCAs;
+simsignal_t DSMEPlatform::prrCAP;
+simsignal_t DSMEPlatform::successPacketsCAP;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -128,6 +132,11 @@ DSMEPlatform::DSMEPlatform()
     capSuccess = registerSignal("capSuccess");
     capFailed = registerSignal("capFailed");
     overheardMsg = registerSignal("overheardMsg");
+    packetsPerCAP = registerSignal("packetsPerCAP");
+    failedPacketsPerCAP = registerSignal("failedPacketsPerCAP");
+    failedCCAs = registerSignal("failedCCAs");
+    prrCAP = registerSignal("prrCAP");
+    successPacketsCAP = registerSignal("successPacketsCAP");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -277,7 +286,10 @@ void DSMEPlatform::initialize(int stage) {
         this->minCoordinatorLQI = par("minCoordinatorLQI");
 
         this->dsme->initialize(this);
-        WATCH(dsme->getMAC_PIB().macMinBE);
+
+        this->dsme->setUseQAgent(par("useQAgent"));
+        this->dsme->getCapLayer().setSlottedCSMA(par("slottedCSMA"));
+	this->dsme->getCapLayer().setBLE(par("batteryLifeExtension"));
 
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
 
@@ -976,5 +988,26 @@ void DSMEPlatform::signalCAPFailed(uint8_t fail) {
 void DSMEPlatform::signalOverheardMsg(uint8_t overheard) {
     emit(overheardMsg, overheard);
 }
+
+void DSMEPlatform::signalPacketsPerCAP(uint32_t packets){
+    emit(packetsPerCAP, packets);
+}
+
+void DSMEPlatform::signalFailedPacketsPerCAP(uint32_t packets){
+    emit(failedPacketsPerCAP, packets);
+}
+
+void DSMEPlatform::signalFailedCCAs(uint32_t failedAttempts){
+    emit(failedCCAs, failedAttempts);
+}
+
+void DSMEPlatform::signalPRRCAP(double prr){
+    emit(prrCAP, prr);
+}
+
+void DSMEPlatform::signalSuccessPacketsCAP(uint32_t packets) {
+    emit(successPacketsCAP, packets);
+}
+
 
 }

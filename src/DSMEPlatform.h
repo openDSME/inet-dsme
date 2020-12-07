@@ -156,6 +156,16 @@ public:
 
     virtual void signalPacketsRXPerSlot(uint32_t packets) override;
 
+    virtual void signalPacketsPerCAP(uint32_t packets) override;
+
+    virtual void signalFailedPacketsPerCAP(uint32_t packets) override;
+
+    virtual void signalFailedCCAs(uint32_t failedAttempts) override;
+
+    virtual void signalPRRCAP(double prr) override;
+    
+    virtual void signalSuccessPacketsCAP(uint32_t packets) override;
+
     virtual void signalCSMAResult(uint8_t succesful, uint8_t restransmission, uint8_t backoffs) override;
 
     virtual void signalReward(int32_t reward) override;
@@ -248,6 +258,11 @@ public:
     static omnetpp::simsignal_t capSuccess;
     static omnetpp::simsignal_t capFailed;
     static omnetpp::simsignal_t overheardMsg;
+    static omnetpp::simsignal_t packetsPerCAP;
+    static omnetpp::simsignal_t failedCCAs;
+    static omnetpp::simsignal_t failedPacketsPerCAP;
+    static omnetpp::simsignal_t prrCAP;
+    static omnetpp::simsignal_t successPacketsCAP;
 
 public:
     IEEE802154MacAddress& getAddress() {

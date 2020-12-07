@@ -75,6 +75,9 @@ simple DSME extends MacProtocolBase like IMacProtocol
         // LQI 150 corresponds roughly to 20% PER
         int minBroadcastLQI = default(150);
         int minCoordinatorLQI = default(150);
+        
+        bool slottedCSMA = default(false);
+	bool batteryLifeExtension = default(false);
 
         @signal[unicastDataSentDown](type=cPacket);
         @signal[broadcastDataSentDown](type=cPacket);
@@ -84,11 +87,17 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
-        @signal[queueLength](type=long);
+        @signal[queueLength](type=unsigned long);
         @signal[queueLevelCAP](type=unsigned long);
         @signal[packetsTXPerSlot](type=long);
         @signal[packetsRXPerSlot](type=long);
         @signal[commandFrameDwellTime](type=long);
+
+        @signal[packetsPerCAP](type=unsigned long);
+        @signal[failedPacketsPerCAP](type=unsigned long);
+        @signal[failedCCAs](type=unsigned long);
+        @signal[prrCAP](type=double);
+	@signal[successPacketsCAP](type=unsigned long);
 
         @signal[csmaRetransmissions](type=unsigned int);
         @signal[csmaSuccess](type=unsigned int);
@@ -122,6 +131,13 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[capSuccess](title="capSuccess"; source=capSuccess; record=mean,max,min; interpolationmode=none);
         @statistic[capFailed](title="capFailed"; source=capFailed; record=mean,max,min; interpolationmode=none);
         @statistic[overheardMsg](title="overheardMsg"; source=overheardMsg; record=mean,max,min; interpolationmode=none);
+
+
+	@statistic[packetsPerCAP](title="Packets sent per CAP"; source=packetsPerCAP; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[failedCCAs](title="Failed CCA attempts per CAP"; source=failedCCAs; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[prrCAP](title="Packet reception ration per CAP"; source=prrCAP; record=min,mean,max; interpolationmode=none);
+        @statistic[failedPacketsPerCAP](title="Failed packets per CAP"; source=failedPacketsPerCAP; record=min,mean,max; interpolationmode=none);
+	@statistic[successPacketsCAP](title="Successfully sent packets per CAP"; source=successPacketsCAP; record=min,mean,max; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
