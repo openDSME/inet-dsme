@@ -44,6 +44,7 @@ simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
 simsignal_t DSMEPlatform::queueLength;
+simsignal_t DSMEPlatform::queueLevelCAP;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
 simsignal_t DSMEPlatform::commandFrameDwellTime;
