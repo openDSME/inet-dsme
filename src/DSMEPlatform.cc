@@ -287,9 +287,9 @@ void DSMEPlatform::initialize(int stage) {
 
         this->dsme->initialize(this);
 
-        this->dsme->setUseQAgent(par("useQAgent"));
+        this->dsme->getCapLayer().setUseQAgent(par("useQAgent"));
         this->dsme->getCapLayer().setSlottedCSMA(par("slottedCSMA"));
-	this->dsme->getCapLayer().setBLE(par("batteryLifeExtension"));
+	    this->dsme->getCapLayer().setBLE(par("batteryLifeExtension"));
 
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
 
