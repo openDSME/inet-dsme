@@ -126,6 +126,8 @@ public:
 
     virtual void delayedTurnTransceiverOff();
 
+    virtual bool isGackEnabled();
+
     /****** IDSMEPlatform ******/
 
     virtual bool isReceptionFromAckLayerPossible() override;
@@ -206,6 +208,8 @@ private:
     uint8_t currentChannel{0};
 
     int slots{0};
+
+    bool gackEnabled = false;
 
 public:
     omnetpp::SimTime symbolDuration;

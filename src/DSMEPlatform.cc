@@ -259,6 +259,8 @@ void DSMEPlatform::initialize(int stage) {
         this->dsme->initialize(this);
 
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
+        this->gackEnabled = par("gackEnabled").boolValue(); //maybe move to MessageDispatcher
+        this->mac_pib.macGroupAckOrder = par("groupAckOrder");
 
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
@@ -638,6 +640,10 @@ void DSMEPlatform::turnTransceiverOff(){
 
 void DSMEPlatform::delayedTurnTransceiverOff(){
     scheduleAt(simTime(), new cMessage("transceiveroff"));
+}
+
+bool DSMEPlatform::isGackEnabled(){
+    return gackEnabled;
 }
 
 /****** IDSMEPlatform ******/
