@@ -62,6 +62,10 @@ using omnetpp::getThisPtr;
     do {                                                        \
         EV_INFO << (omnetpp::simTime()) << " \t " << palId_id() << ": "; \
     } while(0)
+#define LOG_INFO_PREFIX_DIRTY                                        \
+    do {                                                        \
+        std::cout << (omnetpp::simTime()) << " \t " << palId_id() << ": "; \
+    } while(0)
 #define HEXOUT std::hex
 #define DECOUT std::dec
 #define LOG_ENDL std::endl

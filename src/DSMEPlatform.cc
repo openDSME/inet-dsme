@@ -304,8 +304,12 @@ void DSMEPlatform::initialize(int stage) {
         }
     } else if(stage == INITSTAGE_LINK_LAYER) {
         radio->setRadioMode(IRadio::RADIO_MODE_RECEIVER);
-        dsme->start();
-        dsmeAdaptionLayer.startAssociation();
+        //dsme->start();
+        //dsmeAdaptionLayer.startAssociation();
+
+
+        cMessage* startupTimer = new cMessage("startupTimer");
+        scheduleAt(par("startupTime"), startupTimer);
 
         updateVisual();
         cModule* mobilityModule = this->getParentModule()->getParentModule()->getSubmodule("mobility");
@@ -324,10 +328,16 @@ void DSMEPlatform::finish() {
     recordScalar("macChannelOffset", dsme->getMAC_PIB().macChannelOffset);
     recordScalar("numUnusedTxGTS", dsme->getMessageDispatcher().getNumUnusedTxGTS());
     dsme->getQAgent().printQTable();
-    dsme->getQAgent().printTxTimes();
+    //dsme->getQAgent().printTxTimes();
 }
 
 void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
+    if(simTime() < par("startupTime")) {
+        DSMEMessage* message = getLoadedMessage(packet);
+        releaseMessage(message);
+        return; 
+    }
+
     if(!this->transceiverIsOn) {
         DSMEMessage* message = getLoadedMessage(packet);
         message->getHeader().decapsulateFrom(message);
@@ -369,6 +379,10 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
 }
 
 void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
+    if(simTime() < par("startupTime")) {
+        return;
+    }
+
     if (auto *tag = packet->findTag<inet::PacketProtocolTag>()) {
         /* 'Smuggle' protocol information across lower layers via par() */
         auto protocol = tag->getProtocol();
@@ -404,11 +418,17 @@ void DSMEPlatform::handleUpperPacket(inet::Packet* packet) {
 void DSMEPlatform::handleSelfMessage(cMessage* msg) {
     if(msg == timer) {
         dsme->getEventDispatcher().timerInterrupt();
+    } else if(strcmp(msg->getName(), "startupTimer") == 0) {
+        dsme->start();
+        dsmeAdaptionLayer.startAssociation();
     } else if(msg == ccaTimer) {
         bool isIdle = (radio->getReceptionState() == IRadio::RECEPTION_STATE_IDLE) && channelInactive;
         LOG_DEBUG("CCA isIdle " << isIdle);
         dsme->dispatchCCAResult(isIdle);
     } else if(msg == cfpTimer) {
+        if(int(simTime().dbl()) % 20 == 10) {   
+            dsme->getQAgent().printTxTimes(); 
+        }
         dsme->handleStartOfCFP();
     } else if(strcmp(msg->getName(), "acktimer") == 0) {
         // LOG_INFO("send ACK")
@@ -961,11 +981,11 @@ void DSMEPlatform::signalCSMAResult(uint8_t succesful, uint8_t retransmissions, 
     emit(csmaSuccess, succesful);
 }
 
-void DSMEPlatform::signalReward(int32_t reward) {
+void DSMEPlatform::signalReward(double reward) {
     emit(this->reward, reward);
 }
 
-void DSMEPlatform::signalQ(int32_t q) {
+void DSMEPlatform::signalQ(double q) {
     emit(this->q, q);
 }
 

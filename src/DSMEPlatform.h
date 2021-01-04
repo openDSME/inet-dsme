@@ -168,9 +168,9 @@ public:
 
     virtual void signalCSMAResult(uint8_t succesful, uint8_t restransmission, uint8_t backoffs) override;
 
-    virtual void signalReward(int32_t reward) override;
+    virtual void signalReward(double reward) override;
 
-    virtual void signalQ(int32_t q) override;
+    virtual void signalQ(double q) override;
 
     virtual void signalBE(uint8_t be) override;
 

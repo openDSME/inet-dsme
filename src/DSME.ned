@@ -10,6 +10,9 @@ import inet.linklayer.contract.IMacProtocol;
 simple DSME extends MacProtocolBase like IMacProtocol
 {
     parameters:
+        double startupTime @unit("s") = default(0s);
+
+
         string address = default("auto"); // MAC address as hex string (12 hex digits), or
                                           // "auto". "auto" values will be replaced by
                                           // a generated MAC address in init stage 0.
@@ -101,8 +104,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
 
         @signal[csmaRetransmissions](type=unsigned int);
         @signal[csmaSuccess](type=unsigned int);
-        @signal[reward](type=int);
-        @signal[q](type=int);
+        @signal[reward](type=double);
+        @signal[q](type=double);
         @signal[be](type=unsigned int);
         @signal[eps](type=double);
         @signal[capSuccess](type=unsigned int);
