@@ -44,6 +44,7 @@ simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
 simsignal_t DSMEPlatform::queueLength;
+simsignal_t DSMEPlatform::retransmissionQueueLength;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
 simsignal_t DSMEPlatform::commandFrameDwellTime;
@@ -105,6 +106,7 @@ DSMEPlatform::DSMEPlatform()
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
     queueLength = registerSignal("queueLength");
+    retransmissionQueueLength = registerSignal("retransmissionQueueLength");
     packetsTXPerSlot = registerSignal("packetsTXPerSlot");
     packetsRXPerSlot = registerSignal("packetsRXPerSlot");
     commandFrameDwellTime = registerSignal("commandFrameDwellTime");
@@ -950,6 +952,10 @@ void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress count
 
 void DSMEPlatform::signalQueueLength(uint32_t length) {
     emit(queueLength, length);
+}
+
+void DSMEPlatform::signalRetransmissionQueueLength(uint32_t length) {
+    emit(retransmissionQueueLength, length);
 }
 
 void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {

@@ -87,6 +87,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
         @signal[queueLength](type=unsigned long);
+        @signal[retransmissionQueueLength](type=unsigned long);
         @signal[packetsTXPerSlot](type=unsigned long);
         @signal[packetsRXPerSlot](type=unsigned long);
         @signal[commandFrameDwellTime](type=unsigned long);
@@ -97,6 +98,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[uncorruptedFrameReceived](title="uncorrupted frame received"; source=uncorruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[GTSChange](title="GTS allocation or deallocation"; source=GTSChange; record=mean,max; interpolationmode=none);
         @statistic[queueLength](title="Length of the neighbor queue"; source=queueLength; record=mean,max,vector; interpolationmode=none);
+        @statistic[retransmissionQueueLength](title="Length of the retransmission queue"; source=retransmissionQueueLength; record=mean,max,vector; interpolationmode=none);
         @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);

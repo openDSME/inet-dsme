@@ -154,6 +154,8 @@ public:
 
     virtual void signalQueueLength(uint32_t length) override;
 
+    virtual void signalRetransmissionQueueLength(uint32_t length) override;
+
     virtual void signalPacketsTXPerSlot(uint32_t packets) override;
 
     virtual void signalPacketsRXPerSlot(uint32_t packets) override;
@@ -223,6 +225,7 @@ public:
     static omnetpp::simsignal_t corruptedFrameReceived;
     static omnetpp::simsignal_t gtsChange;
     static omnetpp::simsignal_t queueLength;
+    static omnetpp::simsignal_t retransmissionQueueLength;
     static omnetpp::simsignal_t packetsTXPerSlot;
     static omnetpp::simsignal_t packetsRXPerSlot;
     static omnetpp::simsignal_t commandFrameDwellTime;
