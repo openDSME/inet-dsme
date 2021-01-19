@@ -91,6 +91,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[packetsTXPerSlot](type=unsigned long);
         @signal[packetsRXPerSlot](type=unsigned long);
         @signal[commandFrameDwellTime](type=unsigned long);
+        @signal[messagesInUse](type=unsigned long);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
@@ -102,6 +103,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
+		@statistic[messagesInUse](title="Messages In Use"; source=messagesInUse; record=mean,max,vector; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }

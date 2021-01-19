@@ -48,6 +48,7 @@ simsignal_t DSMEPlatform::retransmissionQueueLength;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
 simsignal_t DSMEPlatform::commandFrameDwellTime;
+simsignal_t DSMEPlatform::sig_messagesInUse;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -110,6 +111,7 @@ DSMEPlatform::DSMEPlatform()
     packetsTXPerSlot = registerSignal("packetsTXPerSlot");
     packetsRXPerSlot = registerSignal("packetsRXPerSlot");
     commandFrameDwellTime = registerSignal("commandFrameDwellTime");
+    sig_messagesInUse = registerSignal("messagesInUse");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -661,6 +663,7 @@ void DSMEPlatform::handleReceivedMessageFromAckLayer(IDSMEMessage* message) {
 
 DSMEMessage* DSMEPlatform::getEmptyMessage() {
     messagesInUse++;
+    signalMessagesInUse(messagesInUse);
     DSME_ASSERT(messagesInUse <= MSG_POOL_SIZE); // TODO should return nullptr (and check everywhere!!)
     auto msg = new DSMEMessage();
     msg->receivedViaMCPS = false;
@@ -670,6 +673,7 @@ DSMEMessage* DSMEPlatform::getEmptyMessage() {
 
 DSMEMessage* DSMEPlatform::getLoadedMessage(inet::Packet* packet) {
     messagesInUse++;
+    signalMessagesInUse(messagesInUse);
     DSME_ASSERT(messagesInUse <= MSG_POOL_SIZE); // TODO
     auto msg = new DSMEMessage(packet);
     msg->receivedViaMCPS = false;
@@ -681,6 +685,7 @@ void DSMEPlatform::releaseMessage(IDSMEMessage* msg) {
     DSME_ASSERT(messagesInUse > 0);
     DSME_ASSERT(msg != nullptr);
     messagesInUse--;
+    signalMessagesInUse(messagesInUse);
 
 #if 1
     DSMEMessage* dsmeMsg = dynamic_cast<DSMEMessage*>(msg);
@@ -956,6 +961,10 @@ void DSMEPlatform::signalQueueLength(uint32_t length) {
 
 void DSMEPlatform::signalRetransmissionQueueLength(uint32_t length) {
     emit(retransmissionQueueLength, length);
+}
+
+void DSMEPlatform::signalMessagesInUse(uint32_t nr) {
+    emit(sig_messagesInUse, nr);
 }
 
 void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {

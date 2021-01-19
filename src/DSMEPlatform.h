@@ -160,6 +160,8 @@ public:
 
     virtual void signalPacketsRXPerSlot(uint32_t packets) override;
 
+    virtual void signalMessagesInUse(uint32_t nr) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -229,6 +231,7 @@ public:
     static omnetpp::simsignal_t packetsTXPerSlot;
     static omnetpp::simsignal_t packetsRXPerSlot;
     static omnetpp::simsignal_t commandFrameDwellTime;
+    static omnetpp::simsignal_t sig_messagesInUse;
 
 public:
     IEEE802154MacAddress& getAddress() {
