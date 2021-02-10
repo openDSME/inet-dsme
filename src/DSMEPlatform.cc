@@ -43,7 +43,12 @@ simsignal_t DSMEPlatform::ackSentDown;
 simsignal_t DSMEPlatform::uncorruptedFrameReceived;
 simsignal_t DSMEPlatform::corruptedFrameReceived;
 simsignal_t DSMEPlatform::gtsChange;
+simsignal_t DSMEPlatform::gackGTSChange;
 simsignal_t DSMEPlatform::queueLength;
+simsignal_t DSMEPlatform::numDroppedRetransmissionPackets;
+simsignal_t DSMEPlatform::numDroppedPackets;
+simsignal_t DSMEPlatform::acksInGack;
+simsignal_t DSMEPlatform::packetRetransmissionRate;
 simsignal_t DSMEPlatform::retransmissionQueueLength;
 simsignal_t DSMEPlatform::packetsTXPerSlot;
 simsignal_t DSMEPlatform::packetsRXPerSlot;
@@ -106,7 +111,11 @@ DSMEPlatform::DSMEPlatform()
     uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
     corruptedFrameReceived = registerSignal("corruptedFrameReceived");
     gtsChange = registerSignal("GTSChange");
+    gackGTSChange = registerSignal("GackGTSChange");
     queueLength = registerSignal("queueLength");
+    numDroppedRetransmissionPackets = registerSignal("numDroppedRetransmissionPackets");
+    numDroppedPackets = registerSignal("numDroppedPackets");
+    packetRetransmissionRate = registerSignal("packetRetransmissionRate");
     retransmissionQueueLength = registerSignal("retransmissionQueueLength");
     packetsTXPerSlot = registerSignal("packetsTXPerSlot");
     packetsRXPerSlot = registerSignal("packetsRXPerSlot");
@@ -949,14 +958,36 @@ std::string DSMEPlatform::getSequenceChartInfo(IDSMEMessage* msg, bool outgoing)
     return ss.str();
 }
 
-void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) {
-    if(deallocation) slots--;
-    else slots++;
-    emit(gtsChange, slots);
+void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart, bool gackGTS) {
+    if(gackGTS){
+        if(deallocation) gackGTSSlots--;
+        else gackGTSSlots++;
+        emit(gackGTSChange, gackGTSSlots);
+    }else{
+        if(deallocation) slots--;
+        else slots++;
+        emit(gtsChange, slots);
+    }
 }
 
 void DSMEPlatform::signalQueueLength(uint32_t length) {
     emit(queueLength, length);
+}
+
+void DSMEPlatform::signalNumDroppedRetransmissionPackets(uint32_t packets){
+    emit(numDroppedRetransmissionPackets, packets);
+}
+
+void DSMEPlatform::signalNumDroppedPackets(uint32_t packets){
+    emit(numDroppedPackets, packets);
+}
+
+void DSMEPlatform::signalAcksInGack(uint32_t packets){
+    emit(acksInGack, packets);
+}
+
+void DSMEPlatform::signalPacketRetransmissionRate(double rate){
+    emit(packetRetransmissionRate, rate);
 }
 
 void DSMEPlatform::signalRetransmissionQueueLength(uint32_t length) {

@@ -150,9 +150,17 @@ public:
 
     virtual uint8_t getMinCoordinatorLQI() override;
 
-    virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart) override;
+    virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart, bool gackGTS) override;
 
     virtual void signalQueueLength(uint32_t length) override;
+
+    virtual void signalNumDroppedRetransmissionPackets(uint32_t packets) override;
+
+    virtual void signalAcksInGack(uint32_t packets) override;
+
+    virtual void signalNumDroppedPackets(uint32_t packets) override;
+
+    virtual void signalPacketRetransmissionRate(double rate) override;
 
     virtual void signalRetransmissionQueueLength(uint32_t length) override;
 
@@ -211,7 +219,7 @@ private:
     uint8_t minCoordinatorLQI{0};
     uint8_t currentChannel{0};
 
-    int slots{0};
+    int slots{0}, gackGTSSlots{0};
 
     bool gackEnabled = false;
 
@@ -226,7 +234,12 @@ public:
     static omnetpp::simsignal_t uncorruptedFrameReceived;
     static omnetpp::simsignal_t corruptedFrameReceived;
     static omnetpp::simsignal_t gtsChange;
+    static omnetpp::simsignal_t gackGTSChange;
     static omnetpp::simsignal_t queueLength;
+    static omnetpp::simsignal_t numDroppedRetransmissionPackets;
+    static omnetpp::simsignal_t numDroppedPackets;
+    static omnetpp::simsignal_t acksInGack;
+    static omnetpp::simsignal_t packetRetransmissionRate;
     static omnetpp::simsignal_t retransmissionQueueLength;
     static omnetpp::simsignal_t packetsTXPerSlot;
     static omnetpp::simsignal_t packetsRXPerSlot;

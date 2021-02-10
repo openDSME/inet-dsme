@@ -86,12 +86,17 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
+        @signal[GackGTSChange](type=long);
         @signal[queueLength](type=unsigned long);
+        @signal[numDroppedRetransmissionPackets](type=unsigned long);
+        @signal[numDroppedPackets](type=unsigned long);
+        @signal[acksInGack](type=unsigned long);
         @signal[retransmissionQueueLength](type=unsigned long);
         @signal[packetsTXPerSlot](type=unsigned long);
         @signal[packetsRXPerSlot](type=unsigned long);
         @signal[commandFrameDwellTime](type=unsigned long);
         @signal[messagesInUse](type=unsigned long);
+        @signal[packetRetransmissionRate](type=double);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
@@ -104,6 +109,11 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
 		@statistic[messagesInUse](title="Messages In Use"; source=messagesInUse; record=mean,max,vector; interpolationmode=none);
-
+		@statistic[GTSChange](title="Number of allocated GTS"; source=GTSChange; record=vector; interpolationmode=none);
+		@statistic[GackGTSChange](title="Number of allocated Gack GTS"; source=GackGTSChange; record=vector; interpolationmode=none);
+		@statistic[DroppedRetransmissionPackets](title="Number of dropped packets because of full retransmission queue"; source=numDroppedRetransmissionPackets; record=max,vector; interpolationmode=none);
+		@statistic[DroppedPackets](title="Number of dropped packets because of full neighbor queue"; source=numDroppedPackets; record=max,vector; interpolationmode=none);
+		@statistic[PacketRetransmissionRate](title="Packet Retransmission Rate by group acknowledgments"; source=packetRetransmissionRate; record=min,mean,max,vector; interpolationmode=none);
+		@statistic[vec_acksInGack](title="Number of acknowledged packet in Gack Message"; source=acksInGack; record=min,mean,max,vector; interpolationmode=none);
         @class(::dsme::DSMEPlatform);
 }
