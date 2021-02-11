@@ -226,24 +226,24 @@ private:
 public:
     omnetpp::SimTime symbolDuration;
 
-    static omnetpp::simsignal_t broadcastDataSentDown;
-    static omnetpp::simsignal_t unicastDataSentDown;
-    static omnetpp::simsignal_t ackSentDown;
-    static omnetpp::simsignal_t beaconSentDown;
-    static omnetpp::simsignal_t commandSentDown;
-    static omnetpp::simsignal_t uncorruptedFrameReceived;
-    static omnetpp::simsignal_t corruptedFrameReceived;
-    static omnetpp::simsignal_t gtsChange;
-    static omnetpp::simsignal_t gackGTSChange;
-    static omnetpp::simsignal_t queueLength;
-    static omnetpp::simsignal_t numDroppedRetransmissionPackets;
-    static omnetpp::simsignal_t numDroppedPackets;
-    static omnetpp::simsignal_t acksInGack;
-    static omnetpp::simsignal_t packetRetransmissionRate;
-    static omnetpp::simsignal_t retransmissionQueueLength;
-    static omnetpp::simsignal_t packetsTXPerSlot;
-    static omnetpp::simsignal_t packetsRXPerSlot;
-    static omnetpp::simsignal_t commandFrameDwellTime;
+    static omnetpp::simsignal_t sig_broadcastDataSentDown;
+    static omnetpp::simsignal_t sig_unicastDataSentDown;
+    static omnetpp::simsignal_t sig_ackSentDown;
+    static omnetpp::simsignal_t sig_beaconSentDown;
+    static omnetpp::simsignal_t sig_commandSentDown;
+    static omnetpp::simsignal_t sig_uncorruptedFrameReceived;
+    static omnetpp::simsignal_t sig_corruptedFrameReceived;
+    static omnetpp::simsignal_t sig_gtsChange;
+    static omnetpp::simsignal_t sig_gackGTSChange;
+    static omnetpp::simsignal_t sig_queueLength;
+    static omnetpp::simsignal_t sig_numDroppedRetransmissionPackets;
+    static omnetpp::simsignal_t sig_numDroppedPackets;
+    static omnetpp::simsignal_t sig_acksInGack;
+    static omnetpp::simsignal_t sig_packetRetransmissionRate;
+    static omnetpp::simsignal_t sig_retransmissionQueueLength;
+    static omnetpp::simsignal_t sig_packetsTXPerSlot;
+    static omnetpp::simsignal_t sig_packetsRXPerSlot;
+    static omnetpp::simsignal_t sig_commandFrameDwellTime;
     static omnetpp::simsignal_t sig_messagesInUse;
 
 public:

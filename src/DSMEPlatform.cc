@@ -35,24 +35,24 @@ Define_Module(dsme::DSMEPlatform);
 
 namespace dsme {
 
-simsignal_t DSMEPlatform::broadcastDataSentDown;
-simsignal_t DSMEPlatform::unicastDataSentDown;
-simsignal_t DSMEPlatform::commandSentDown;
-simsignal_t DSMEPlatform::beaconSentDown;
-simsignal_t DSMEPlatform::ackSentDown;
-simsignal_t DSMEPlatform::uncorruptedFrameReceived;
-simsignal_t DSMEPlatform::corruptedFrameReceived;
-simsignal_t DSMEPlatform::gtsChange;
-simsignal_t DSMEPlatform::gackGTSChange;
-simsignal_t DSMEPlatform::queueLength;
-simsignal_t DSMEPlatform::numDroppedRetransmissionPackets;
-simsignal_t DSMEPlatform::numDroppedPackets;
-simsignal_t DSMEPlatform::acksInGack;
-simsignal_t DSMEPlatform::packetRetransmissionRate;
-simsignal_t DSMEPlatform::retransmissionQueueLength;
-simsignal_t DSMEPlatform::packetsTXPerSlot;
-simsignal_t DSMEPlatform::packetsRXPerSlot;
-simsignal_t DSMEPlatform::commandFrameDwellTime;
+simsignal_t DSMEPlatform::sig_broadcastDataSentDown;
+simsignal_t DSMEPlatform::sig_unicastDataSentDown;
+simsignal_t DSMEPlatform::sig_commandSentDown;
+simsignal_t DSMEPlatform::sig_beaconSentDown;
+simsignal_t DSMEPlatform::sig_ackSentDown;
+simsignal_t DSMEPlatform::sig_uncorruptedFrameReceived;
+simsignal_t DSMEPlatform::sig_corruptedFrameReceived;
+simsignal_t DSMEPlatform::sig_gtsChange;
+simsignal_t DSMEPlatform::sig_gackGTSChange;
+simsignal_t DSMEPlatform::sig_queueLength;
+simsignal_t DSMEPlatform::sig_numDroppedRetransmissionPackets;
+simsignal_t DSMEPlatform::sig_numDroppedPackets;
+simsignal_t DSMEPlatform::sig_acksInGack;
+simsignal_t DSMEPlatform::sig_packetRetransmissionRate;
+simsignal_t DSMEPlatform::sig_retransmissionQueueLength;
+simsignal_t DSMEPlatform::sig_packetsTXPerSlot;
+simsignal_t DSMEPlatform::sig_packetsRXPerSlot;
+simsignal_t DSMEPlatform::sig_commandFrameDwellTime;
 simsignal_t DSMEPlatform::sig_messagesInUse;
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
@@ -103,24 +103,25 @@ DSMEPlatform::DSMEPlatform()
       mcps_sap(*dsme),
       mlme_sap(*dsme),
       dsmeAdaptionLayer(*dsme) {
-    broadcastDataSentDown = registerSignal("broadcastDataSentDown");
-    unicastDataSentDown = registerSignal("unicastDataSentDown");
-    commandSentDown = registerSignal("commandSentDown");
-    beaconSentDown = registerSignal("beaconSentDown");
-    ackSentDown = registerSignal("ackSentDown");
-    uncorruptedFrameReceived = registerSignal("uncorruptedFrameReceived");
-    corruptedFrameReceived = registerSignal("corruptedFrameReceived");
-    gtsChange = registerSignal("GTSChange");
-    gackGTSChange = registerSignal("GackGTSChange");
-    queueLength = registerSignal("queueLength");
-    numDroppedRetransmissionPackets = registerSignal("numDroppedRetransmissionPackets");
-    numDroppedPackets = registerSignal("numDroppedPackets");
-    packetRetransmissionRate = registerSignal("packetRetransmissionRate");
-    retransmissionQueueLength = registerSignal("retransmissionQueueLength");
-    packetsTXPerSlot = registerSignal("packetsTXPerSlot");
-    packetsRXPerSlot = registerSignal("packetsRXPerSlot");
-    commandFrameDwellTime = registerSignal("commandFrameDwellTime");
-    sig_messagesInUse = registerSignal("messagesInUse");
+    sig_broadcastDataSentDown = registerSignal("sig_broadcastDataSentDown");
+    sig_unicastDataSentDown = registerSignal("sig_unicastDataSentDown");
+    sig_commandSentDown = registerSignal("sig_commandSentDown");
+    sig_beaconSentDown = registerSignal("sig_beaconSentDown");
+    sig_ackSentDown = registerSignal("sig_ackSentDown");
+    sig_uncorruptedFrameReceived = registerSignal("sig_uncorruptedFrameReceived");
+    sig_corruptedFrameReceived = registerSignal("sig_corruptedFrameReceived");
+    sig_gtsChange = registerSignal("sig_GTSChange");
+    sig_gackGTSChange = registerSignal("sig_gackGTSChange");
+    sig_queueLength = registerSignal("sig_queueLength");
+    sig_numDroppedRetransmissionPackets = registerSignal("sig_numDroppedRetransmissionPackets");
+    sig_numDroppedPackets = registerSignal("sig_numDroppedPackets");
+    sig_packetRetransmissionRate = registerSignal("sig_packetRetransmissionRate");
+    sig_retransmissionQueueLength = registerSignal("sig_retransmissionQueueLength");
+    sig_packetsTXPerSlot = registerSignal("sig_packetsTXPerSlot");
+    sig_packetsRXPerSlot = registerSignal("sig_packetsRXPerSlot");
+    sig_commandFrameDwellTime = registerSignal("sig_commandFrameDwellTime");
+    sig_messagesInUse = registerSignal("sig_messagesInUse");
+    sig_acksInGack = registerSignal("sig_acksInGack");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -324,13 +325,13 @@ void DSMEPlatform::handleLowerPacket(inet::Packet* packet) {
 
 
         LOG_DEBUG("Received corrupted frame " << packet->str() << "(" << getSequenceChartInfo(message, false) << ")");
-        emit(corruptedFrameReceived, packet);
+        emit(sig_corruptedFrameReceived, packet);
 
         releaseMessage(message);
         return;
     }
 
-    emit(uncorruptedFrameReceived, packet);
+    emit(sig_uncorruptedFrameReceived, packet);
 
     auto fcs = packet->removeAtBack(B(2)); // FCS is not explicitly handled -> hasBitError is used instead
     DSMEMessage* message = getLoadedMessage(packet);
@@ -525,26 +526,26 @@ bool DSMEPlatform::prepareSendingCopy(IDSMEMessage* msg, Delegate<void(bool)> tx
 
     switch(msg->getHeader().getFrameType()) {
         case IEEE802154eMACHeader::BEACON:
-            emit(beaconSentDown, packet);
+            emit(sig_beaconSentDown, packet);
             break;
         case IEEE802154eMACHeader::DATA:
             if(msg->getHeader().getDestAddr().isBroadcast()) {
-                emit(broadcastDataSentDown, packet);
+                emit(sig_broadcastDataSentDown, packet);
             } else {
-                emit(unicastDataSentDown, packet);
+                emit(sig_unicastDataSentDown, packet);
             }
             break;
         case IEEE802154eMACHeader::ACKNOWLEDGEMENT:
-            emit(ackSentDown, packet);
+            emit(sig_ackSentDown, packet);
             break;
         case IEEE802154eMACHeader::COMMAND: {
             CommandFrameIdentifier cmd = (CommandFrameIdentifier)message->packet->peekDataAsBytes()->getByte(0);
             if(cmd == CommandFrameIdentifier::DSME_GTS_REQUEST || cmd == CommandFrameIdentifier::DSME_GTS_REPLY || cmd == CommandFrameIdentifier::DSME_GTS_NOTIFY) {
                 LOG_INFO("Command frame transmitted with creation time " << (long)msg->getHeader().getCreationTime() << " and dwell time " << (long)(getSymbolCounter() - msg->getHeader().getCreationTime()));
-                emit(commandFrameDwellTime, getSymbolCounter() - msg->getHeader().getCreationTime());
+                emit(sig_commandFrameDwellTime, getSymbolCounter() - msg->getHeader().getCreationTime());
                 DSME_ASSERT(msg->getHeader().getCreationTime() > 0);
             }
-            emit(commandSentDown, packet);
+            emit(sig_commandSentDown, packet);
             break; }
         default:
             DSME_ASSERT(false);
@@ -962,36 +963,36 @@ void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress count
     if(gackGTS){
         if(deallocation) gackGTSSlots--;
         else gackGTSSlots++;
-        emit(gackGTSChange, gackGTSSlots);
+        emit(sig_gackGTSChange, gackGTSSlots);
     }else{
         if(deallocation) slots--;
         else slots++;
-        emit(gtsChange, slots);
+        emit(sig_gtsChange, slots);
     }
 }
 
 void DSMEPlatform::signalQueueLength(uint32_t length) {
-    emit(queueLength, length);
+    emit(sig_queueLength, length);
 }
 
 void DSMEPlatform::signalNumDroppedRetransmissionPackets(uint32_t packets){
-    emit(numDroppedRetransmissionPackets, packets);
+    emit(sig_numDroppedRetransmissionPackets, packets);
 }
 
 void DSMEPlatform::signalNumDroppedPackets(uint32_t packets){
-    emit(numDroppedPackets, packets);
+    emit(sig_numDroppedPackets, packets);
 }
 
 void DSMEPlatform::signalAcksInGack(uint32_t packets){
-    emit(acksInGack, packets);
+    emit(sig_acksInGack, packets);
 }
 
 void DSMEPlatform::signalPacketRetransmissionRate(double rate){
-    emit(packetRetransmissionRate, rate);
+    emit(sig_packetRetransmissionRate, rate);
 }
 
 void DSMEPlatform::signalRetransmissionQueueLength(uint32_t length) {
-    emit(retransmissionQueueLength, length);
+    emit(sig_retransmissionQueueLength, length);
 }
 
 void DSMEPlatform::signalMessagesInUse(uint32_t nr) {
@@ -999,11 +1000,11 @@ void DSMEPlatform::signalMessagesInUse(uint32_t nr) {
 }
 
 void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {
-    emit(packetsTXPerSlot, packets);
+    emit(sig_packetsTXPerSlot, packets);
 }
 
 void DSMEPlatform::signalPacketsRXPerSlot(uint32_t packets) {
-    emit(packetsRXPerSlot, packets);
+    emit(sig_packetsRXPerSlot, packets);
 }
 
 }
