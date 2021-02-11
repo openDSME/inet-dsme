@@ -88,6 +88,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[sig_GTSChange](type=long);
         @signal[sig_gackGTSChange](type=long);
         @signal[sig_queueLength](type=unsigned long);
+        @signal[sig_GTSCount](type=unsigned long);
+        @signal[sig_gackGTSCount](type=unsigned long);
         @signal[sig_numDroppedRetransmissionPackets](type=unsigned long);
         @signal[sig_numDroppedPackets](type=unsigned long);
         @signal[sig_acksInGack](type=unsigned long);
@@ -115,5 +117,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
 		@statistic[vec_numDroppedPackets](title="Number of dropped packets because of full neighbor queue"; source=sig_numDroppedPackets; record=min,mean,max,vector; interpolationmode=none);
 		@statistic[vec_packetRetransmissionRate](title="Packet Retransmission Rate by group acknowledgments"; source=sig_packetRetransmissionRate; record=min,mean,max,vector; interpolationmode=none);
 		@statistic[vec_acksInGack](title="Number of acknowledged packets in Gack Message"; source=sig_acksInGack; record=min,mean,max,vector; interpolationmode=none);
+		@statistic[vec_GTSCount](title="Number of allocated GTS"; source=sig_GTSCount; record=min,mean,max,vector; interpolationmode=none);
+		@statistic[vec_gackGTSCount](title="Number of allocated Gack GTS"; source=sig_gackGTSCount; record=min,mean,max,vector; interpolationmode=none);
+
         @class(::dsme::DSMEPlatform);
 }

@@ -152,6 +152,10 @@ public:
 
     virtual void signalGTSChange(bool deallocation, IEEE802154MacAddress counterpart, bool gackGTS) override;
 
+    virtual void signalGTSCount(uint32_t value) override;
+
+    virtual void signalGackGTSCount(uint32_t value) override;
+
     virtual void signalQueueLength(uint32_t length) override;
 
     virtual void signalNumDroppedRetransmissionPackets(uint32_t packets) override;
@@ -236,6 +240,8 @@ public:
     static omnetpp::simsignal_t sig_gtsChange;
     static omnetpp::simsignal_t sig_gackGTSChange;
     static omnetpp::simsignal_t sig_queueLength;
+    static omnetpp::simsignal_t sig_GTSCount;
+    static omnetpp::simsignal_t sig_gackGTSCount;
     static omnetpp::simsignal_t sig_numDroppedRetransmissionPackets;
     static omnetpp::simsignal_t sig_numDroppedPackets;
     static omnetpp::simsignal_t sig_acksInGack;

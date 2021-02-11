@@ -45,6 +45,8 @@ simsignal_t DSMEPlatform::sig_corruptedFrameReceived;
 simsignal_t DSMEPlatform::sig_gtsChange;
 simsignal_t DSMEPlatform::sig_gackGTSChange;
 simsignal_t DSMEPlatform::sig_queueLength;
+simsignal_t DSMEPlatform::sig_GTSCount;
+simsignal_t DSMEPlatform::sig_gackGTSCount;
 simsignal_t DSMEPlatform::sig_numDroppedRetransmissionPackets;
 simsignal_t DSMEPlatform::sig_numDroppedPackets;
 simsignal_t DSMEPlatform::sig_acksInGack;
@@ -113,6 +115,8 @@ DSMEPlatform::DSMEPlatform()
     sig_gtsChange = registerSignal("sig_GTSChange");
     sig_gackGTSChange = registerSignal("sig_gackGTSChange");
     sig_queueLength = registerSignal("sig_queueLength");
+    sig_GTSCount = registerSignal("sig_GTSCount");
+    sig_gackGTSCount = registerSignal("sig_gackGTSCount");
     sig_numDroppedRetransmissionPackets = registerSignal("sig_numDroppedRetransmissionPackets");
     sig_numDroppedPackets = registerSignal("sig_numDroppedPackets");
     sig_packetRetransmissionRate = registerSignal("sig_packetRetransmissionRate");
@@ -969,6 +973,14 @@ void DSMEPlatform::signalGTSChange(bool deallocation, IEEE802154MacAddress count
         else slots++;
         emit(sig_gtsChange, slots);
     }
+}
+
+void DSMEPlatform::signalGTSCount(uint32_t value) {
+    emit(sig_GTSCount, value);
+}
+
+void DSMEPlatform::signalGackGTSCount(uint32_t value) {
+    emit(sig_gackGTSCount, value);
 }
 
 void DSMEPlatform::signalQueueLength(uint32_t length) {
