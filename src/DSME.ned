@@ -18,8 +18,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
 
         bool macCapReduction = default(false);
         bool sendMultiplePacketsPerGTS = default(true);
-        
+
         bool gackEnabled = default(false);
+        bool gackGTSEnabled = default(false);
+        bool gackCAPEnabled = default(false);
         int  groupAckOrder = default(5);		// 3 bits, same as MSFOrder
 
         bool isPANCoordinator = default(false);
@@ -104,7 +106,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[val_broadDataSentDown](title="broadcast packet sent down of type DATA"; source=sig_broadcastDataSentDown; record=count; interpolationmode=none);
         @statistic[val_corruptedFrameReceived](title="corrupted frame received"; source=sig_corruptedFrameReceived; record=count; interpolationmode=none);
         @statistic[val_uncorruptedFrameReceived](title="uncorrupted frame received"; source=sig_uncorruptedFrameReceived; record=count; interpolationmode=none);
-        
+
         @statistic[vec_queueLength](title="Length of the neighbor queue"; source=sig_queueLength; record=min,mean,max,vector; interpolationmode=none);
         @statistic[vec_retransmissionQueueLength](title="Length of the retransmission queue"; source=sig_retransmissionQueueLength; record=min,mean,max,vector; interpolationmode=none);
         @statistic[vec_packetsTXPerSlot](title="Length of the neighbor queue"; source=sig_packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);

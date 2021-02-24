@@ -128,6 +128,10 @@ public:
 
     virtual bool isGackEnabled();
 
+    virtual bool isGackCAPEnabled();
+
+    virtual bool isGackGTSEnabled();
+
     /****** IDSMEPlatform ******/
 
     virtual bool isReceptionFromAckLayerPossible() override;
@@ -226,6 +230,8 @@ private:
     int slots{0}, gackGTSSlots{0};
 
     bool gackEnabled = false;
+    bool gackCAPEnabled = false;
+    bool gackGTSEnabled = false;
 
 public:
     omnetpp::SimTime symbolDuration;
