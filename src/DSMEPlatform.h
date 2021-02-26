@@ -128,6 +128,8 @@ public:
 
     virtual bool isGackEnabled();
 
+    virtual bool isGackBeaconEnabled();
+
     virtual bool isGackCAPEnabled();
 
     virtual bool isGackGTSEnabled();
@@ -232,6 +234,7 @@ private:
     bool gackEnabled = false;
     bool gackCAPEnabled = false;
     bool gackGTSEnabled = false;
+    bool gackBeaconEnabled = false;
 
 public:
     omnetpp::SimTime symbolDuration;

@@ -20,6 +20,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         bool sendMultiplePacketsPerGTS = default(true);
 
         bool gackEnabled = default(false);
+        bool gackBeaconEnabled = default(false);
         bool gackGTSEnabled = default(false);
         bool gackCAPEnabled = default(false);
         int  groupAckOrder = default(5);		// 3 bits, same as MSFOrder

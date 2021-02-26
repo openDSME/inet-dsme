@@ -278,6 +278,7 @@ void DSMEPlatform::initialize(int stage) {
 
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
         this->gackEnabled = par("gackEnabled").boolValue(); //maybe move to MessageDispatcher
+        this->gackBeaconEnabled = par("gackBeaconEnabled").boolValue();
         this->gackCAPEnabled = par("gackCAPEnabled").boolValue();
         this->gackGTSEnabled = par("gackGTSEnabled").boolValue();
         this->mac_pib.macGroupAckOrder = par("groupAckOrder");
@@ -664,6 +665,10 @@ void DSMEPlatform::delayedTurnTransceiverOff(){
 
 bool DSMEPlatform::isGackEnabled(){
     return gackEnabled;
+}
+
+bool DSMEPlatform::isGackBeaconEnabled() {
+    return gackBeaconEnabled;
 }
 
 bool DSMEPlatform::isGackCAPEnabled(){
