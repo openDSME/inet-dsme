@@ -56,6 +56,9 @@ simsignal_t DSMEPlatform::sig_packetsTXPerSlot;
 simsignal_t DSMEPlatform::sig_packetsRXPerSlot;
 simsignal_t DSMEPlatform::sig_commandFrameDwellTime;
 simsignal_t DSMEPlatform::sig_messagesInUse;
+simsignal_t DSMEPlatform::sig_cfpAckDelay;
+simsignal_t DSMEPlatform::sig_capAckDelay;
+
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
     // TODO only handles short address
@@ -126,6 +129,8 @@ DSMEPlatform::DSMEPlatform()
     sig_commandFrameDwellTime = registerSignal("sig_commandFrameDwellTime");
     sig_messagesInUse = registerSignal("sig_messagesInUse");
     sig_acksInGack = registerSignal("sig_acksInGack");
+    sig_cfpAckDelay = registerSignal("sig_cfpAckDelay");
+    sig_capAckDelay = registerSignal("sig_capAckDelay");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -1009,6 +1014,14 @@ void DSMEPlatform::signalRetransmissionQueueLength(uint32_t length) {
 
 void DSMEPlatform::signalMessagesInUse(uint32_t nr) {
     emit(sig_messagesInUse, nr);
+}
+
+void DSMEPlatform::signalCFPAckDelay(uint32_t symbols) {
+    emit(sig_cfpAckDelay, symbols);
+}
+
+void DSMEPlatform::signalCAPAckDelay(uint32_t symbols) {
+    emit(sig_capAckDelay, symbols);
 }
 
 void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {

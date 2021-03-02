@@ -99,6 +99,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[sig_commandFrameDwellTime](type=unsigned long);
         @signal[sig_messagesInUse](type=unsigned long);
         @signal[sig_packetRetransmissionRate](type=double);
+        @signal[sig_capAckDelay](type=unsigned long);
+        @signal[sig_cfpAckDelay](type=unsigned long);
 
         @statistic[val_unicastDataSentDown](title="unicast packet sent down of type DATA"; source=sig_unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[val_broadDataSentDown](title="broadcast packet sent down of type DATA"; source=sig_broadcastDataSentDown; record=count; interpolationmode=none);
@@ -119,6 +121,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
 		@statistic[vec_acksInGack](title="Number of acknowledged packets in Gack Message"; source=sig_acksInGack; record=min,mean,max,vector; interpolationmode=none);
 		@statistic[vec_GTSCount](title="Number of allocated GTS"; source=sig_GTSCount; record=min,mean,max,vector; interpolationmode=none);
 		@statistic[vec_gackGTSCount](title="Number of allocated Gack GTS"; source=sig_gackGTSCount; record=min,mean,max,vector; interpolationmode=none);
+		@statistic[vec_cfpAckDelay](title="Ack Delay of CFP messages, in Symbols"; source=sig_cfpAckDelay; record=min,mean,max,vector; interpolationmode=none);
+		@statistic[vec_capAckDelay](title="Ack Delay of CAP messages, in Symbols"; source=sig_capAckDelay; record=min,mean,max,vector; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
