@@ -50,6 +50,7 @@ simsignal_t DSMEPlatform::sig_gackGTSCount;
 simsignal_t DSMEPlatform::sig_numDroppedRetransmissionPackets;
 simsignal_t DSMEPlatform::sig_numDroppedPackets;
 simsignal_t DSMEPlatform::sig_acksInGack;
+simsignal_t DSMEPlatform::sig_gackSize;
 simsignal_t DSMEPlatform::sig_packetRetransmissionRate;
 simsignal_t DSMEPlatform::sig_retransmissionQueueLength;
 simsignal_t DSMEPlatform::sig_packetsTXPerSlot;
@@ -58,6 +59,7 @@ simsignal_t DSMEPlatform::sig_commandFrameDwellTime;
 simsignal_t DSMEPlatform::sig_messagesInUse;
 simsignal_t DSMEPlatform::sig_cfpAckDelay;
 simsignal_t DSMEPlatform::sig_capAckDelay;
+simsignal_t DSMEPlatform::sig_ackSent;
 
 
 static void translateMacAddress(MacAddress& from, IEEE802154MacAddress& to) {
@@ -129,8 +131,10 @@ DSMEPlatform::DSMEPlatform()
     sig_commandFrameDwellTime = registerSignal("sig_commandFrameDwellTime");
     sig_messagesInUse = registerSignal("sig_messagesInUse");
     sig_acksInGack = registerSignal("sig_acksInGack");
+    sig_gackSize = registerSignal("sig_gackSize");
     sig_cfpAckDelay = registerSignal("sig_cfpAckDelay");
     sig_capAckDelay = registerSignal("sig_capAckDelay");
+    sig_ackSent = registerSignal("sig_ackSent");
 }
 
 DSMEPlatform::~DSMEPlatform() {
@@ -1004,6 +1008,10 @@ void DSMEPlatform::signalAcksInGack(uint32_t packets){
     emit(sig_acksInGack, packets);
 }
 
+void DSMEPlatform::signalGackSize(uint16_t bytes){
+    emit(sig_gackSize, bytes);
+}
+
 void DSMEPlatform::signalPacketRetransmissionRate(double rate){
     emit(sig_packetRetransmissionRate, rate);
 }
@@ -1030,6 +1038,10 @@ void DSMEPlatform::signalPacketsTXPerSlot(uint32_t packets) {
 
 void DSMEPlatform::signalPacketsRXPerSlot(uint32_t packets) {
     emit(sig_packetsRXPerSlot, packets);
+}
+
+void DSMEPlatform::signalAckSent() {
+    emit(sig_ackSent, (unsigned int)1);
 }
 
 }

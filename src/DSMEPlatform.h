@@ -162,6 +162,8 @@ public:
 
     virtual void signalAcksInGack(uint32_t packets) override;
 
+    virtual void signalGackSize(uint16_t bytes) override;
+
     virtual void signalNumDroppedPackets(uint32_t packets) override;
 
     virtual void signalPacketRetransmissionRate(double rate) override;
@@ -177,6 +179,8 @@ public:
     virtual void signalCFPAckDelay(uint32_t symbols) override;
 
     virtual void signalCAPAckDelay(uint32_t symbols) override;
+
+    virtual void signalAckSent() override;
 
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
@@ -249,6 +253,7 @@ public:
     static omnetpp::simsignal_t sig_numDroppedRetransmissionPackets;
     static omnetpp::simsignal_t sig_numDroppedPackets;
     static omnetpp::simsignal_t sig_acksInGack;
+    static omnetpp::simsignal_t sig_gackSize;
     static omnetpp::simsignal_t sig_packetRetransmissionRate;
     static omnetpp::simsignal_t sig_retransmissionQueueLength;
     static omnetpp::simsignal_t sig_packetsTXPerSlot;
@@ -257,6 +262,7 @@ public:
     static omnetpp::simsignal_t sig_messagesInUse;
     static omnetpp::simsignal_t sig_cfpAckDelay;
     static omnetpp::simsignal_t sig_capAckDelay;
+    static omnetpp::simsignal_t sig_ackSent;
 
 public:
     IEEE802154MacAddress& getAddress() {

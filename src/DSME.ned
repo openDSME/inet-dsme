@@ -93,6 +93,7 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[sig_numDroppedRetransmissionPackets](type=unsigned long);
         @signal[sig_numDroppedPackets](type=unsigned long);
         @signal[sig_acksInGack](type=unsigned long);
+        @signal[sig_gackSize](type=unsigned long);
         @signal[sig_retransmissionQueueLength](type=unsigned long);
         @signal[sig_packetsTXPerSlot](type=unsigned long);
         @signal[sig_packetsRXPerSlot](type=unsigned long);
@@ -101,6 +102,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[sig_packetRetransmissionRate](type=double);
         @signal[sig_capAckDelay](type=unsigned long);
         @signal[sig_cfpAckDelay](type=unsigned long);
+        @signal[sig_ackSent](type=unsigned long);
+        
 
         @statistic[val_unicastDataSentDown](title="unicast packet sent down of type DATA"; source=sig_unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[val_broadDataSentDown](title="broadcast packet sent down of type DATA"; source=sig_broadcastDataSentDown; record=count; interpolationmode=none);
@@ -119,10 +122,12 @@ simple DSME extends MacProtocolBase like IMacProtocol
 		@statistic[vec_numDroppedPackets](title="Number of dropped packets because of full neighbor queue"; source=sig_numDroppedPackets; record=min,mean,max,vector; interpolationmode=none);
 		@statistic[vec_packetRetransmissionRate](title="Packet Retransmission Rate by group acknowledgments"; source=sig_packetRetransmissionRate; record=min,mean,max; interpolationmode=none);
 		@statistic[vec_acksInGack](title="Number of acknowledged packets in Gack Message"; source=sig_acksInGack; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_gackSize](title="Size of Gack Message in Bytes"; source=sig_gackSize; record=min,mean,max,vector; interpolationmode=none);
 		@statistic[vec_GTSCount](title="Number of allocated GTS"; source=sig_GTSCount; record=min,mean,max, vector; interpolationmode=none);
 		@statistic[vec_gackGTSCount](title="Number of allocated Gack GTS"; source=sig_gackGTSCount; record=min,mean,max; interpolationmode=none);
 		@statistic[vec_cfpAckDelay](title="Ack Delay of CFP messages, in Symbols"; source=sig_cfpAckDelay; record=min,mean,max; interpolationmode=none);
 		@statistic[vec_capAckDelay](title="Ack Delay of CAP messages, in Symbols"; source=sig_capAckDelay; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_sentAcks](title="Number of Acks sent"; source=sig_ackSent; record=count; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
