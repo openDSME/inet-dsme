@@ -180,6 +180,10 @@ public:
 
     virtual void signalMessagesInUse(uint32_t nr) override;
 
+    virtual void signalCFPAckDelay(uint32_t symbols) override;
+
+    virtual void signalCAPAckDelay(uint32_t symbols) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -260,6 +264,8 @@ public:
     static omnetpp::simsignal_t sig_packetsRXPerSlot;
     static omnetpp::simsignal_t sig_commandFrameDwellTime;
     static omnetpp::simsignal_t sig_messagesInUse;
+    static omnetpp::simsignal_t sig_cfpAckDelay;
+    static omnetpp::simsignal_t sig_capAckDelay;
 
 public:
     IEEE802154MacAddress& getAddress() {

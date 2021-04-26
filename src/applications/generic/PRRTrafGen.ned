@@ -49,8 +49,8 @@ simple PRRTrafGen extends IpvxTrafGen
         @statistic[sinkRcvdPk](title="own packets received by sink"; source=sinkRcvdPk; record=count,vector(packetBytes); interpolationmode=none);
         @statistic[sourceSentPk](title="packets sent to me"; source=sourceSentPk; record=count,vector(packetBytes); interpolationmode=none);
         @statistic[sentDummyPk](title="dummy packets sent"; source=sentDummyPk; record=count,vector(packetBytes); interpolationmode=none);
-        @statistic[sinkRcvdPkDelay](title="delay of own packets received by sink"; source=messageAge(sinkRcvdPk); record=mean,max,vector; interpolationmode=none);
-        @statistic[PRR](title="PRR"; source=count(sinkRcvdPk)/count(packetSent); record=last,vector; interpolationmode=none);
+        @statistic[sinkRcvdPkDelay](title="delay of own packets received by sink"; source=messageAge(sinkRcvdPk); record=mean,max; interpolationmode=none);
+        @statistic[PRR](title="PRR"; source=count(sinkRcvdPk)/count(packetSent); record=last; interpolationmode=none);
 	@statistic[pktRcvdAfterWarmup](title="Packets received after warmup"; source=pktRcvdAfterWarmup; record=count,vector(packetBytes));
 
         @class(PRRTrafGen);

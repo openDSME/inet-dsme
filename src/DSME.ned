@@ -102,6 +102,8 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[sig_commandFrameDwellTime](type=unsigned long);
         @signal[sig_messagesInUse](type=unsigned long);
         @signal[sig_packetRetransmissionRate](type=double);
+        @signal[sig_capAckDelay](type=unsigned long);
+        @signal[sig_cfpAckDelay](type=unsigned long);
 
         @statistic[val_unicastDataSentDown](title="unicast packet sent down of type DATA"; source=sig_unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[val_broadDataSentDown](title="broadcast packet sent down of type DATA"; source=sig_broadcastDataSentDown; record=count; interpolationmode=none);
@@ -112,16 +114,18 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[vec_retransmissionQueueLength](title="Length of the retransmission queue"; source=sig_retransmissionQueueLength; record=min,mean,max,vector; interpolationmode=none);
         @statistic[vec_packetsTXPerSlot](title="Length of the neighbor queue"; source=sig_packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[vec_packetsRXPerSlot](title="Length of the neighbor queue"; source=sig_packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
-        @statistic[vec_commandFrameDwellTime](title="Dwell time for command frames"; source=sig_commandFrameDwellTime; record=min,mean,max,vector; interpolationmode=none);
-		@statistic[vec_messagesInUse](title="Messages In Use"; source=sig_messagesInUse; record=min,mean,max,vector; interpolationmode=none);
-		@statistic[vec_GTSChange](title="Number of allocated GTS"; source=sig_GTSChange; record=min,mean,max,vector; interpolationmode=none);
-		@statistic[vec_gackGTSChange](title="Number of allocated Gack GTS"; source=sig_gackGTSChange; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[vec_commandFrameDwellTime](title="Dwell time for command frames"; source=sig_commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_messagesInUse](title="Messages In Use"; source=sig_messagesInUse; record=min,mean,max, vector; interpolationmode=none);
+		@statistic[vec_GTSChange](title="Number of allocated GTS"; source=sig_GTSChange; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_gackGTSChange](title="Number of allocated Gack GTS"; source=sig_gackGTSChange; record=min,mean,max; interpolationmode=none);
 		@statistic[vec_numDroppedRetransmissionPackets](title="Number of dropped packets because of full retransmission queue"; source=sig_numDroppedRetransmissionPackets; record=min,mean,max,vector; interpolationmode=none);
 		@statistic[vec_numDroppedPackets](title="Number of dropped packets because of full neighbor queue"; source=sig_numDroppedPackets; record=min,mean,max,vector; interpolationmode=none);
-		@statistic[vec_packetRetransmissionRate](title="Packet Retransmission Rate by group acknowledgments"; source=sig_packetRetransmissionRate; record=min,mean,max,vector; interpolationmode=none);
-		@statistic[vec_acksInGack](title="Number of acknowledged packets in Gack Message"; source=sig_acksInGack; record=min,mean,max,vector; interpolationmode=none);
-		@statistic[vec_GTSCount](title="Number of allocated GTS"; source=sig_GTSCount; record=min,mean,max,vector; interpolationmode=none);
-		@statistic[vec_gackGTSCount](title="Number of allocated Gack GTS"; source=sig_gackGTSCount; record=min,mean,max,vector; interpolationmode=none);
+		@statistic[vec_packetRetransmissionRate](title="Packet Retransmission Rate by group acknowledgments"; source=sig_packetRetransmissionRate; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_acksInGack](title="Number of acknowledged packets in Gack Message"; source=sig_acksInGack; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_GTSCount](title="Number of allocated GTS"; source=sig_GTSCount; record=min,mean,max, vector; interpolationmode=none);
+		@statistic[vec_gackGTSCount](title="Number of allocated Gack GTS"; source=sig_gackGTSCount; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_cfpAckDelay](title="Ack Delay of CFP messages, in Symbols"; source=sig_cfpAckDelay; record=min,mean,max; interpolationmode=none);
+		@statistic[vec_capAckDelay](title="Ack Delay of CAP messages, in Symbols"; source=sig_capAckDelay; record=min,mean,max; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
