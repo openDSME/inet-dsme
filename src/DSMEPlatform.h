@@ -63,6 +63,9 @@
 #include "openDSME/mac_services/pib/MAC_PIB.h"
 #include "openDSME/mac_services/pib/PHY_PIB.h"
 
+#include "MovingAverage.h"
+#include "ReinforcementLearning.h"
+
 namespace dsme {
 
 class DSMELayer;
@@ -214,6 +217,12 @@ private:
     uint8_t currentChannel{0};
 
     int slots{0};
+
+    /** moving average of packets received **/
+        MovingAverage *PRR_Last_moving_average;
+        MovingAverage *Link_Quality_moving_average;
+        ReinforcementLearning *ReinforcementLearningTest;
+
 
 public:
     omnetpp::SimTime symbolDuration;
