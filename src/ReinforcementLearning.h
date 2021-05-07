@@ -32,15 +32,15 @@ private:
     enum Algos {Qlearning, MCts};
     int algo = Algos::Qlearning;
     int states = 8;
-    int actions = 9;
-    float transmissionPowers[10] = {0.0, 0.01, 0.1, 1.0, 2.24, 5.0, 10.0, 15.0, 20.0, 25.0};
+    int actions = 11;
+    float transmissionPowers[11] = {0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0, 1.5, 2.24};
     int state_current = 0;
     int state_next = 0;
     int state_last = 0;
     int action_current = 0;
     int action_last = 0;
     int action_next = 5;
-    int slots = 4;
+    int slots = 16;
     QLearning *QLearningClass;
     Mcts *MctsClass;
 

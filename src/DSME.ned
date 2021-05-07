@@ -112,4 +112,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
 	@statistic[successPacketsCAP](title="Successfully sent packets per CAP"; source=successPacketsCAP; record=min,mean,max; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
+        
+        // Reinforcement learning
+        // Q, Mcts, Normal
+        string RL_method = default("Q");
+        // StateTransition Prr, Packets, Superframe
+        string RL_stateTransition = default("Superframe");
 }

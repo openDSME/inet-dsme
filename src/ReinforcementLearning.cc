@@ -42,7 +42,7 @@ ReinforcementLearning::~ReinforcementLearning() {
 
 float ReinforcementLearning::reward(int action, float prr_last) {
     // as little as possible Transmissionpower as much reward as possible
-    return ((this->actions - action) * 10) * prr_last;
+    return ((this->actions - action) * 1.0) * prr_last;
     // return prr_last;
 }
 
@@ -66,6 +66,7 @@ int ReinforcementLearning::prr_to_state(float prr_last) {
 void ReinforcementLearning::setSuperFrameState(int superframe, int slot){
    //  int num = superframe * this->slots + slot;
     this->state_next = superframe * this->slots + slot;
+    // std::cout << "slot" << slot << " frame " << superframe <<std::endl;
 }
 
 int ReinforcementLearning::getStateTranstion(){
@@ -113,6 +114,10 @@ int ReinforcementLearning::rewardAction(float prr_last, int datastatus) {
 
     // if Qlearning
     if (this->algo == Algos::Qlearning) {
+        // if prr is zero then try to reset the learning rate
+        if(prr_last == 0.0){
+            this->QLearningClass->setLearningRate(0.8, true);
+        }
         // get reward
         float reward = this->reward(this->action_current, prr_last);
         // recalc QTable

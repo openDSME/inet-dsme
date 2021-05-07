@@ -18,6 +18,7 @@ public:
         std::cout << "test";
     }
     int getAction(int state);
+    void setLearningRate(float value, bool greedy = false);
 
 private:
     int random(int min, int max);
@@ -28,7 +29,7 @@ private:
     int actions;
     bool is_greedy = true; // use normal or a greedy random
     float min_epsilon = 0.01;
-    float epsilon_percentage = 0.99;
+    float epsilon_percentage = 0.9999;
     float epsilon = 0.3; // Exploration Param
     float alpha = 0.1; // Weight old q-value
     float gamma = 0.6; // Weight new q-value

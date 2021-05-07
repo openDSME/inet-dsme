@@ -70,6 +70,11 @@ int QLearning::getMaxQValue(int state) {
     return currentBestIndex;
 }
 
+void QLearning::setLearningRate(float value, bool greedy){
+    this->epsilon = value;
+    this->is_greedy = greedy;
+}
+
 void QLearning::updateQTable(int action, int state, int next_state,
         float reward) {
     float q_value = q_table[state][action];

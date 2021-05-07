@@ -27,7 +27,7 @@ float Mcts::ucb1(int total_num_runs){
         this->ucb1_score = (this->value / this->times_node_executed) +
         (exploration_param * std::sqrt((std::log(total_num_runs) / this->times_node_executed)));
     }else{
-        this->ucb1_score = 9999999;
+        this->ucb1_score = 9999999.0;
     }
     return this->ucb1_score;
 }
