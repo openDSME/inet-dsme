@@ -317,12 +317,28 @@ void DSMEPlatform::initialize(int stage) {
 
     // load setup vars from dsme.ned
     std::string RL_method = par("RL_method");
+    std::string RL_stateTransition = par("RL_stateTransition");
 
     /** init Moving average for packets **/
     PRR_Last_moving_average = new MovingAverage(10, "PRR");
     Link_Quality_moving_average = new MovingAverage(10, "LQI");
     ReinforcementLearningTest = new ReinforcementLearning();
-    ReinforcementLearningTest->initQLearning(64);
+    ReinforcementLearningTest->setStateTransition(RL_stateTransition);
+    if(RL_method == "Q"){
+        ReinforcementLearningTest->initQLearning(64);
+        // load values
+        bool Q_option_greedy = par("Q_option_greedy");
+        bool Q_option_hotbooting = par("Q_option_hotbooting");
+        double Q_option_epsilon = par("Q_option_epsilon");
+        double Q_option_epsilon_decay = par("Q_option_epsilon_decay");
+        double Q_option_old_weight = par("Q_option_old_weight");
+        double Q_option_new_weight = par("Q_option_new_weight");
+        ReinforcementLearningTest->setupQLearning(Q_option_old_weight, Q_option_new_weight, Q_option_epsilon, Q_option_epsilon_decay, Q_option_greedy, Q_option_hotbooting);
+    }
+    if(RL_method == "Mcts"){
+        ReinforcementLearningTest->initMcts(64);
+    }
+
 }
 
 void DSMEPlatform::finish() {
@@ -588,14 +604,18 @@ DSME_ASSERT(transceiverIsOn);
 DSME_ASSERT(pendingTxPacket);
 DSME_ASSERT(!pendingSendRequest);
 
+std::cout << "sendNow" << std::endl;
+
 if (this->radio->getRadioMode() == IRadio::RADIO_MODE_TRANSMITTER) {
 if (ReinforcementLearningTest->getReinforcementLearningOption()
         == ReinforcementLearningTest->ReinforementLearningOptions::Learning) {
     ReinforcementLearningTest->setSuperFrameState(
             this->dsme->getCurrentSuperframe(), this->dsme->getCurrentSlot());
+    std::cout << "calc action" << std::endl;
     int power = ReinforcementLearningTest->getBestAction();
     FlatRadioBase *r = check_and_cast<FlatRadioBase*>(this->radio);
     r->setPower(inet::units::values::mW(ReinforcementLearningTest->getPower()));
+    std::cout << "send" << std::endl;
 }
 if (this->dsme->getCurrentSlot() == 0) {
     // Beacon slot
@@ -621,9 +641,11 @@ if (this->dsme->getCurrentSlot() == 0) {
 // can be sent direct
 sendDown(pendingTxPacket);
 pendingTxPacket = nullptr;
+
 } else {
 pendingSendRequest = true;
 }
+std::cout << "sendNow done" << std::endl;
 // otherwise receiveSignal will be called eventually
 return true;
 }
@@ -808,6 +830,7 @@ sendUp(packet);
 void DSMEPlatform::handleConfirmFromMCPS(IDSMEMessage *msg,
 DataStatus::Data_Status status) {
 
+std::cout << "handleconfirm" << std::endl;
 if (status == DataStatus::SUCCESS) {
 PRR_Last_moving_average->newValue(1.0);
 } else {
@@ -832,16 +855,19 @@ int power = ReinforcementLearningTest->rewardAction(
 // FlatRadioBase *r = check_and_cast<FlatRadioBase*>(this->radio);
 // trans->getPower();
 // r->setPower(inet::units::values::mW(ReinforcementLearningTest->getPower()));
-// const FlatTransmitterBase* trans = check_and_cast<const FlatTransmitterBase*>(this->radio->getTransmitter());
+const FlatTransmitterBase *trans = check_and_cast<const FlatTransmitterBase*>(
+        this->radio->getTransmitter());
 
 // ReinforcementLearningTest->print();
-/* std::cout << " PLMA " << std::to_string(PRR_Last_movingF_average->getAverage()) <<
- " LQIMA " << std::to_string(Link_Quality_moving_average->getAverage()) <<
- " CS " << std::to_string(ReinforcementLearningTest->getCurrentState()) <<
- " CA " << std::to_string(ReinforcementLearningTest->getCurrentAction()) <<
- " pow " << std::to_string(ReinforcementLearningTest->getPower()) <<
- " " << trans->getPower() << " " << status << std::endl;
- */
+std::cout << " PLMA " << std::to_string(PRR_Last_moving_average->getAverage())
+        << " LQIMA "
+        << std::to_string(Link_Quality_moving_average->getAverage()) << " CS "
+        << std::to_string(ReinforcementLearningTest->getCurrentState())
+        << " CA "
+        << std::to_string(ReinforcementLearningTest->getCurrentAction())
+        << " pow " << std::to_string(ReinforcementLearningTest->getPower())
+        << " " << trans->getPower() << " " << status << std::endl;
+
 }
 
 // log TransmissionPower

@@ -29,8 +29,8 @@ using omnetpp::cOutVector;
 
 class ReinforcementLearning {
 private:
-    enum Algos {Qlearning, MCts};
-    int algo = Algos::Qlearning;
+    enum Algos {Qlearning, MCts, NormalAlgo};
+    int algo = Algos::NormalAlgo;
     int states = 8;
     int actions = 11;
     float transmissionPowers[11] = {0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0, 1.5, 2.24};
@@ -40,15 +40,18 @@ private:
     int action_current = 0;
     int action_last = 0;
     int action_next = 5;
+    int total_num_runs = 0;
     int slots = 16;
     QLearning *QLearningClass;
-    Mcts *MctsClass;
+    Mcts *MctsClass; // max states deep
+    Mcts *MctsState;
 
     cOutVector *logging_transmissionpower;
     cOutVector *logging_states;
     cOutVector *logging_dataStatus;
 
     float reward(int action, float prr_last);
+    float neg_reward(int action, float prr_last);
     int prr_to_state(float prr_last);
 public:
     ReinforcementLearning();
@@ -68,6 +71,7 @@ public:
     enum StateTransitions {Prr, Packets, SuperFrame};
     void setSuperFrameState(int superframe, int slot);
     int getStateTranstion();
+    void setStateTransition(std::string transition);
 
     enum ReinforementLearningOptions {Normal, Learning};
     int getReinforcementLearningOption();
@@ -76,14 +80,16 @@ public:
     // QLearning Implementation
     void initQLearning();
     void initQLearning(int states);
+    void setupQLearning(double alpha, double gamma, double epsilon, double epsilon_percentage, bool is_greedy, bool is_hotbooting);
 
     // Mcts
     void initMcts();
+    void initMcts(int states);
 
 private:
     // Options
-    int ReinforementLearningOption = ReinforementLearningOptions::Learning;
-    int state_transition = StateTransitions::SuperFrame;
+    int ReinforementLearningOption = ReinforementLearningOptions::Normal;
+    int state_transition = StateTransitions::Packets;
 };
 
 //} /* namespace inet_dsme */

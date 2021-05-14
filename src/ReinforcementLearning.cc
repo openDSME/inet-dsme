@@ -46,6 +46,13 @@ float ReinforcementLearning::reward(int action, float prr_last) {
     // return prr_last;
 }
 
+float ReinforcementLearning::neg_reward(int action, float prr_last) {
+    // as little as possible Transmissionpower as much reward as possible
+    // can be negative
+    return (((this->actions - action) * 1.0) * (prr_last-0.3));
+    // return prr_last;
+}
+
 void ReinforcementLearning::logPower(double power = 0.0) {
     if (this->ReinforementLearningOption
             == ReinforementLearningOptions::Normal) {
@@ -63,14 +70,27 @@ int ReinforcementLearning::prr_to_state(float prr_last) {
     return state;
 }
 
-void ReinforcementLearning::setSuperFrameState(int superframe, int slot){
-   //  int num = superframe * this->slots + slot;
+void ReinforcementLearning::setSuperFrameState(int superframe, int slot) {
+    //  int num = superframe * this->slots + slot;
     this->state_next = superframe * this->slots + slot;
     // std::cout << "slot" << slot << " frame " << superframe <<std::endl;
 }
 
-int ReinforcementLearning::getStateTranstion(){
+int ReinforcementLearning::getStateTranstion() {
     return state_transition;
+}
+
+void ReinforcementLearning::setStateTransition(std::string transition){
+    // set the statetransition
+    if(transition == "SuperFrame"){
+        this->state_transition = this->StateTransitions::SuperFrame;
+    }
+    if(transition == "Packets"){
+            this->state_transition = this->StateTransitions::Packets;
+        }
+    if(transition == "Prr"){
+            this->state_transition = this->StateTransitions::Prr;
+       }
 }
 
 double ReinforcementLearning::getPower() {
@@ -90,7 +110,15 @@ int ReinforcementLearning::getBestAction() {
     }
     // if Mcts
     if (this->algo == Algos::MCts) {
-        // best Action
+        // best Action in current Layer
+        // this->action_next = this->MctsState->getBestAction();
+        // std::cout << "get next action" << std::endl;
+        Mcts *mctsnode = this->MctsState->getNodeforState(this->state_next);
+        std::cout << "get monte carlo child" << std::endl;
+        Mcts *mctschildnode = mctsnode->getMonteCarloChild();
+        std::cout << "bestAction is action " << mctschildnode << " child node layer " << mctschildnode->getLayer() << std::endl;
+        this->action_next  = mctschildnode->getAction();
+        std::cout << "bestAction mcts finished "<<std::endl;
     }
     // old state = new state
     this->action_last = this->action_current;
@@ -115,7 +143,7 @@ int ReinforcementLearning::rewardAction(float prr_last, int datastatus) {
     // if Qlearning
     if (this->algo == Algos::Qlearning) {
         // if prr is zero then try to reset the learning rate
-        if(prr_last == 0.0){
+        if (prr_last == 0.0) {
             this->QLearningClass->setLearningRate(0.8, true);
         }
         // get reward
@@ -128,11 +156,47 @@ int ReinforcementLearning::rewardAction(float prr_last, int datastatus) {
     }
     // if Mcts
     if (this->algo == Algos::MCts) {
-        // current best Node
-        // create all possible childs
-        // backpropagate Score
-        // update score *0.3 new + *0.7 old score
-        // best Action
+        int maxTreeDepth = this->states;
+        this->total_num_runs++;
+        std::cout << "reward" << std::endl;
+        // get current best node n layers deep
+        Mcts *currentNode = this->MctsClass->getNodeforState(this->state_current);
+        // update values
+        // negative reward
+        std::cout << "reward backprop" << std::endl;
+        currentNode->backpropagateScore(this->neg_reward(this->action_current, prr_last));
+
+//        // current best Node at a Leaf
+//        Mcts *bestChild = this->MctsClass->currentBestNode(
+//                this->total_num_runs);
+//        // create all possible childs
+//        std::vector<int> actionsPerformed = bestChild->getActionsPerformed();
+//        if (actionsPerformed.size() < maxTreeDepth) {
+//            // es können noch nodes eingehängt werden
+//            for (int i = 0; i < this->actions; i++) {
+//                bestChild->createChild(0.0, i);
+//            }
+//        }
+//        // backpropagate Score
+//        bestChild->backpropagateScore_RL(prr_last);
+//        // update score *0.3 new + *0.7 old score
+//        // best Action
+//        this->MctsClass->printTree();
+//        //this->MctsState = bestChild;
+//        if(this->state_next != this->MctsState->getLayer()){
+//            // if current layer is not the State
+//            if(this->MctsState->getLayer() < this->state_next){
+//                // go layers down till reached
+//                for(int i = 0; i < this->states; i++){
+//                    this
+//                }
+//            }else{
+//                // start at the top again
+//                this->MctsState = this->MctsClass;
+//            }
+//        }
+        // this->action_next = this->MctsClass->getBestAction();
+        // this->MctsClass->printTree();
     }
     // old state = new state
     this->action_last = this->action_current;
@@ -152,6 +216,9 @@ void ReinforcementLearning::print() {
     if (this->algo == Algos::Qlearning) {
         this->QLearningClass->print_q_table();
     }
+    if (this->algo == Algos::MCts) {
+        this->MctsClass->printTree();
+    }
 }
 
 int ReinforcementLearning::getCurrentAction() {
@@ -164,6 +231,7 @@ int ReinforcementLearning::getCurrentState() {
 
 // use QLearning
 void ReinforcementLearning::initQLearning() {
+    this->ReinforementLearningOption = ReinforementLearningOptions::Learning;
     this->algo = Algos::Qlearning;
     this->QLearningClass = new QLearning(this->states, this->actions);
 }
@@ -171,11 +239,25 @@ void ReinforcementLearning::initQLearning(int states) {
     this->states = states;
     this->initQLearning();
 }
+void ReinforcementLearning::setupQLearning(double alpha, double gamma, double epsilon, double epsilon_percentage, bool is_greedy, bool is_hotbooting){
+    this->QLearningClass->updateAllParameters(alpha, gamma, epsilon, epsilon_percentage, is_greedy, is_hotbooting);
+}
 
 // use Mcts
 void ReinforcementLearning::initMcts() {
+    this->ReinforementLearningOption = ReinforementLearningOptions::Learning;
     this->algo = Algos::MCts;
     this->MctsClass = new Mcts(0.0, this->actions);
+    this->MctsState = this->MctsClass;
+    // input all possible childs
+    for (int i = 0; i < this->actions; i++) {
+        this->MctsClass->createChild(0.0, i);
+    }
+}
+
+void ReinforcementLearning::initMcts(int states) {
+    this->states = states;
+    this->initMcts();
 }
 
 int ReinforcementLearning::getReinforcementLearningOption() {
