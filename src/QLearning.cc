@@ -90,6 +90,13 @@ void QLearning::setLearningRate(float value, bool greedy) {
 this->epsilon = value;
 this->is_greedy = greedy;
 }
+void QLearning::setEpsilonDynamicIncrease(){
+    this->epsilon *= this->epsilon_dynamic_increase;
+    if(this->epsilon >= 1.0){
+        this->epsilon = 1.0;
+    }
+    this->is_greedy = true;
+}
 
 void QLearning::updateQTable(int action, int state, int next_state,
     float reward) {
@@ -119,9 +126,10 @@ for (std::vector<std::vector<float>>::iterator row = q_table.begin();
 std::cout << "---   END   ---" << std::endl;
 }
 
-void QLearning::updateAllParameters(double alpha, double gamma, double epsilon, double epsilon_percentage, bool is_greedy, bool is_hotbooting){
+void QLearning::updateAllParameters(double alpha, double gamma, double epsilon, double epsilon_percentage, double min_epsilon, bool is_greedy, bool is_hotbooting){
     this->alpha = alpha;
     this->gamma = gamma;
+    this->min_epsilon = min_epsilon;
     this->epsilon = epsilon;
     this->epsilon_percentage = epsilon_percentage;
     this->is_greedy = is_greedy;

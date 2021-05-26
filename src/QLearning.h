@@ -19,7 +19,8 @@ public:
     }
     int getAction(int state);
     void setLearningRate(float value, bool greedy = false);
-    void updateAllParameters(double alpha, double gamma, double epsilon, double epsilon_percentage, bool is_greedy, bool is_hotbooting);
+    void setEpsilonDynamicIncrease();
+    void updateAllParameters(double alpha, double gamma, double epsilon, double epsilon_percentage, double min_epsilon, bool is_greedy, bool is_hotbooting);
 
 private:
     int random(int min, int max);
@@ -35,7 +36,8 @@ private:
     float epsilon_percentage = 0.9999;
     float epsilon = 0.3; // Exploration Param
     float alpha = 0.1; // Weight old q-value
-    float gamma = 0.6; // Weight new q-value
+    float gamma = 0.1; // Weight new q-value
+    float epsilon_dynamic_increase = 1.1;
     std::vector<std::vector<float>> q_table;
     omnetpp::cRNG* randomNumGen;
     omnetpp::cOutVector *logging_rewards;

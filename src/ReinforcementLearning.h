@@ -42,6 +42,8 @@ private:
     int action_next = 5;
     int total_num_runs = 0;
     int slots = 16;
+    float reward_last = 0.0;
+    float epsilon_set_back = 0.8;
     QLearning *QLearningClass;
     Mcts *MctsClass; // max states deep
     Mcts *MctsState;
@@ -80,7 +82,7 @@ public:
     // QLearning Implementation
     void initQLearning();
     void initQLearning(int states);
-    void setupQLearning(double alpha, double gamma, double epsilon, double epsilon_percentage, bool is_greedy, bool is_hotbooting);
+    void setupQLearning(double alpha, double gamma, double epsilon, double epsilon_percentage, double epsilon_set_back, double min_epsilon, bool is_greedy, bool is_hotbooting);
 
     // Mcts
     void initMcts();

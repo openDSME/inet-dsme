@@ -221,7 +221,7 @@ private:
     /** moving average of packets received **/
         MovingAverage *PRR_Last_moving_average;
         MovingAverage *Link_Quality_moving_average;
-        ReinforcementLearning *ReinforcementLearningTest;
+        ReinforcementLearning *ReinforcementLearningClass;
 
 
 public:

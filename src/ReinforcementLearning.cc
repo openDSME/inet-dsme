@@ -114,11 +114,11 @@ int ReinforcementLearning::getBestAction() {
         // this->action_next = this->MctsState->getBestAction();
         // std::cout << "get next action" << std::endl;
         Mcts *mctsnode = this->MctsState->getNodeforState(this->state_next);
-        std::cout << "get monte carlo child" << std::endl;
+        // std::cout << "get monte carlo child" << std::endl;
         Mcts *mctschildnode = mctsnode->getMonteCarloChild();
-        std::cout << "bestAction is action " << mctschildnode << " child node layer " << mctschildnode->getLayer() << std::endl;
+        // std::cout << "bestAction is action " << mctschildnode << " child node layer " << mctschildnode->getLayer() << std::endl;
         this->action_next  = mctschildnode->getAction();
-        std::cout << "bestAction mcts finished "<<std::endl;
+        // std::cout << "bestAction mcts finished "<<std::endl;
     }
     // old state = new state
     this->action_last = this->action_current;
@@ -144,26 +144,29 @@ int ReinforcementLearning::rewardAction(float prr_last, int datastatus) {
     if (this->algo == Algos::Qlearning) {
         // if prr is zero then try to reset the learning rate
         if (prr_last == 0.0) {
-            this->QLearningClass->setLearningRate(0.8, true);
+            this->QLearningClass->setLearningRate(this->epsilon_set_back, true);
+            // this->QLearningClass->setEpsilonDynamicIncrease(); -> is worse
         }
         // get reward
         float reward = this->reward(this->action_current, prr_last);
+
         // recalc QTable
         this->QLearningClass->updateQTable(this->action_current,
-                this->state_current, this->state_next, reward);
+                this->state_current, this->state_next, this->reward_last);
         // guess next step
         this->action_next = this->QLearningClass->getAction(this->state_next);
+        this->reward_last = reward;
     }
     // if Mcts
     if (this->algo == Algos::MCts) {
         int maxTreeDepth = this->states;
         this->total_num_runs++;
-        std::cout << "reward" << std::endl;
+        // std::cout << "reward" << std::endl;
         // get current best node n layers deep
         Mcts *currentNode = this->MctsClass->getNodeforState(this->state_current);
         // update values
         // negative reward
-        std::cout << "reward backprop" << std::endl;
+        // std::cout << "reward backprop" << std::endl;
         currentNode->backpropagateScore(this->neg_reward(this->action_current, prr_last));
 
 //        // current best Node at a Leaf
@@ -239,8 +242,9 @@ void ReinforcementLearning::initQLearning(int states) {
     this->states = states;
     this->initQLearning();
 }
-void ReinforcementLearning::setupQLearning(double alpha, double gamma, double epsilon, double epsilon_percentage, bool is_greedy, bool is_hotbooting){
-    this->QLearningClass->updateAllParameters(alpha, gamma, epsilon, epsilon_percentage, is_greedy, is_hotbooting);
+void ReinforcementLearning::setupQLearning(double alpha, double gamma, double epsilon, double epsilon_percentage, double epsilon_set_back, double min_epsilon, bool is_greedy, bool is_hotbooting){
+    this->QLearningClass->updateAllParameters(alpha, gamma, epsilon, epsilon_percentage, min_epsilon, is_greedy, is_hotbooting);
+    this->epsilon_set_back = epsilon_set_back;
 }
 
 // use Mcts
