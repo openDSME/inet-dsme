@@ -22,8 +22,6 @@
 #include "QLearning.h"
 #include "Mcts.h"
 
-//namespace inet_dsme {
-// class Mcts;
 
 using omnetpp::cOutVector;
 
@@ -57,7 +55,6 @@ private:
     int prr_to_state(float prr_last);
 public:
     ReinforcementLearning();
-    // ReinforcementLearning(int states = 8);
     virtual ~ReinforcementLearning();
 
     double getPower();
@@ -67,12 +64,9 @@ public:
     void print();
     int getCurrentState();
     int getCurrentAction();
-//    int currentState
-//    int predictState
-//    int pickbestAction
     enum StateTransitions {Prr, Packets, SuperFrame};
     void setSuperFrameState(int superframe, int slot);
-    int getStateTranstion();
+    int getStateTransition();
     void setStateTransition(std::string transition);
 
     enum ReinforementLearningOptions {Normal, Learning};
@@ -93,7 +87,5 @@ private:
     int ReinforementLearningOption = ReinforementLearningOptions::Normal;
     int state_transition = StateTransitions::Packets;
 };
-
-//} /* namespace inet_dsme */
 
 #endif /* SRC_REINFORCEMENTLEARNING_H_ */

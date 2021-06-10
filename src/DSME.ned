@@ -116,17 +116,17 @@ simple DSME extends MacProtocolBase like IMacProtocol
         // Reinforcement learning
         // Q, Mcts, Normal
         string RL_method = default("Q");
-        // StateTransition Prr, Packets, Superframe
-        string RL_stateTransition = default("Superframe");
+        // StateTransition Prr, Packets, SuperFrame
+        string RL_stateTransition = default("SuperFrame");
+        int RL_quantity_of_states = default(64);
         // Q-learning options
         bool Q_option_greedy = default(true);
         bool Q_option_hotbooting = default(true);
         double Q_option_epsilon = default(0.3);
         double Q_option_epsilon_decay = default(0.9999);
         double Q_option_epsilon_set_back = default(0.8);
-        double Q_option_old_weight = default(0.3); // alpha
-        double Q_option_new_weight = default(0.0); // gamma
+        double Q_option_alpha = default(0.3);
+        double Q_option_gamma = default(0.1);
         double Q_option_min_epsilon = default(0.01);
-        // Mcts options
         
 }

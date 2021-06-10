@@ -12,13 +12,13 @@ class Mcts
 private:
     std::vector<Mcts> childs;
     Mcts *parent;
-    float ucb1_score = 0.0;
+    float uct_score = 0.0;
     float value = 0.0;
     int action = 0;
     int times_node_executed = 0;
     float exporation_param = 2.0;
     float oldValuestrength = 0.7;
-    float ucb1(int total_num_runs);
+    float uct(int total_num_runs);
     omnetpp::cRNG* randomNumGen;
     enum Init_Mode {RL, Normal};
     int initMode = Init_Mode::RL;
@@ -46,4 +46,4 @@ public:
 
 
 
-#endif
+#endif /* MCTS_H */

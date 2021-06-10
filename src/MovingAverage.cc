@@ -21,8 +21,10 @@
 #include "MovingAverage.h"
 
 MovingAverage::MovingAverage(int windowSize, std::string name){
+    // log data
     this->loggingAverage = new cOutVector((name + ":average").data());
     this->loggingweightedAverage = new cOutVector((name + ":weightedAverage").data());
+    // configure MovingAverage
     this->windowSize = windowSize;
     this->values.clear();
 }
@@ -32,10 +34,12 @@ MovingAverage::~MovingAverage(){
 }
 
 float MovingAverage::getAverage(){
+    // return the average that was calculated previously
     return this->average;
 }
 
 void MovingAverage::print(){
+    // print out the values, that are saved in the vector
     for (int i = 0; i < this->values.size(); i++)
     {
         std::cout << std::to_string((int)this->values.at(i));
@@ -44,6 +48,7 @@ void MovingAverage::print(){
 }
 
 float MovingAverage::weightedAverage(){
+    // return the weighted moving average
     float sum = 0;
     for (int i = 0; i < this->values.size(); i++)
     {
@@ -72,6 +77,7 @@ void MovingAverage::newValue(float value){
 }
 
 void MovingAverage::reset(int windowSize){
+    // reset the moving average and start over
     this->average = 0.0;
     this->values.clear();
     this->windowSize = windowSize;

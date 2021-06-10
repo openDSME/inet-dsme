@@ -21,7 +21,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <omnetpp.h>
-// #include <coutvector.h>
 
 using omnetpp::cOutVector;
 
@@ -35,7 +34,7 @@ private:
     cOutVector *loggingweightedAverage;
 
 public:
-    MovingAverage(int windowSize = 5, std::string name = "test");
+    MovingAverage(int windowSize = 5, std::string name = "MovingAverageWithoutName");
     ~MovingAverage();
     void print();
     void newValue(float value);

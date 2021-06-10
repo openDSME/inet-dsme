@@ -6,15 +6,16 @@
 #include <omnetpp.h>
 
 Mcts::Mcts(float value, int action, Mcts *parent) {
+    // set the parameters
     this->parent = parent;
     this->childs.clear();
     this->value = 0.0;
     this->times_node_executed = 0;
     this->action = action;
     if (Init_Mode::Normal == this->initMode) {
-        this->ucb1_score = 99999.0;
+        this->uct_score = 99999.0;
     } else {
-        this->ucb1_score = 0.0;
+        this->uct_score = 0.0;
     }
     // init random number generator
     this->randomNumGen = omnetpp::cModule().getRNG(1);
@@ -23,11 +24,11 @@ Mcts::Mcts(float value, int action, Mcts *parent) {
 Mcts::~Mcts() {
 }
 
-float Mcts::ucb1(int total_num_runs) {
-    // Upper Confidence Bound
+float Mcts::uct(int total_num_runs) {
+    // Upper Confidence Bound applied to trees
     float exploration_param = 2.0;
     if (this->times_node_executed != 0) {
-        this->ucb1_score =
+        this->uct_score =
                 (this->value / ((float) this->times_node_executed))
                         + (exploration_param
                                 * std::sqrt(
@@ -35,27 +36,28 @@ float Mcts::ucb1(int total_num_runs) {
                                                 / ((float) this->times_node_executed))));
     } else {
         if (Init_Mode::Normal == this->initMode) {
-            this->ucb1_score = 99999.0;
+            this->uct_score = 99999.0;
         } else {
-            this->ucb1_score = 0.0;
+            this->uct_score = 0.0;
         }
     }
-    return this->ucb1_score;
+    return this->uct_score;
 }
 
 void Mcts::createChild(float value, int action) {
+    // create a new child node
     Mcts *a = new Mcts(value, action, this);
     this->childs.push_back(*a);
 }
 
 Mcts* Mcts::currentBestNode(int total_num_runs) {
-    // return best Child node
+    // returns a pointer to best leaf node
     if (this->childs.size() > 0) {
         Mcts *bestNode = this->getChild(0);
         float bestScore = 0.0;
         for (std::vector<Mcts>::iterator child = this->childs.begin();
                 child != this->childs.end(); ++child) {
-            float child_score = child->ucb1(total_num_runs);
+            float child_score = child->uct(total_num_runs);
             if (child_score > bestScore) {
                 bestScore = child_score;
                 bestNode = child->getPointer();
@@ -68,21 +70,20 @@ Mcts* Mcts::currentBestNode(int total_num_runs) {
 }
 
 Mcts* Mcts::getChild(int index) {
-    // std::cout << "get child " << std::endl;
+    // returns a pointer to the child node that has the action index
     Mcts *child = &(this->childs[(index)]);
-    // std::cout << " got child " << std::endl;
     return child;
 }
 
 Mcts* Mcts::getBestChild() {
-    // return best Child node
+    // returns best child node
     int total_num_runs = 1;
     if (this->childs.size() > 0) {
         Mcts *bestNode = this->getChild(0);
         float bestScore = 0.0;
         for (std::vector<Mcts>::iterator child = this->childs.begin();
                 child != this->childs.end(); ++child) {
-            float child_score = child->ucb1(total_num_runs);
+            float child_score = child->uct(total_num_runs);
             if (child_score > bestScore) {
                 bestScore = child_score;
                 bestNode = child->getPointer();
@@ -96,22 +97,23 @@ Mcts* Mcts::getBestChild() {
 }
 
 int Mcts::getNumChilds() {
+    // count of child nodes
     return this->childs.size();
 }
 
 Mcts* Mcts::getMonteCarloChild() {
-    // return best Child node or create childs
-    int total_num_runs = 1; // TODO : just for testing
+    // return a child node or create child nodes if no exist
+    int total_num_runs = 1;
     if (this->childs.size() > 0) {
-        // std::cout << " montecarlo get child " << std::endl;
+        // there exist child nodes
         Mcts *bestNode = this->getChild(0);
         float bestScore = 0.0;
-        // select current best or select random
-        // sum up all values
+        // select next randomly node, with a bias to the current best node
         float sum_values = 0.0;
+        // sum up all scores
         for (std::vector<Mcts>::iterator child = this->childs.begin();
                 child != this->childs.end(); ++child) {
-            float child_score = child->ucb1(total_num_runs);
+            float child_score = child->uct(total_num_runs);
             if (child_score > 0.0) {
                 sum_values += child_score;
             }
@@ -120,7 +122,7 @@ Mcts* Mcts::getMonteCarloChild() {
             }
         }
 
-        // calc probability for each
+        // calculate the probability for each
         float number = omnetpp::uniform(this->randomNumGen, 0.0, 1.0);
         float counter_score = 0.0;
         Mcts *drawnNode = this->childs[0].getPointer();
@@ -138,49 +140,29 @@ Mcts* Mcts::getMonteCarloChild() {
                 break;
             }
         }
-
-//        for (std::vector<Mcts>::iterator child = this->childs.begin();
-//                child != this->childs.end(); ++child) {
-//            // select current best child or select random child
-//            float child_score = child->ucb1(total_num_runs);
-//
-//            // TODO: hier noch einfügen
-//
-//            // if better change choise
-//            if (child_score > bestScore) {
-//                bestScore = child_score;
-//                bestNode = child->getPointer();
-//            }
-//
-//        }
-//        return bestNode;
         return drawnNode;
     } else {
-        // std::cout << " montecarlo new layer " << std::endl;
-        // create childs and choose one randomly
+        // when no child nodes exist, create child nodes and choose one randomly
         int numchilds = this->parent->childs.size();
         for (int i = 0; i < numchilds; i++) {
             this->createChild(0.0, i);
         }
-        // std::cout << " all childs " << std::endl;
-        // select one randomly
-        // std::cout << " numchilds " << numchilds << std::endl;
+        // select one randomly using the omnetpp random number generator
         int number = omnetpp::intuniform(this->randomNumGen, 0, numchilds - 1);
-        // std::cout << " child selected " << number << std::endl;
         Mcts *childnode = this->getChild(number);
-        // std::cout << "child node action " << childnode->getAction()
-         //       << std::endl;
+
         return childnode;
     }
-    // will never happen
     return nullptr;
 }
 
 Mcts* Mcts::getPointer() {
+    // returns the pointer of the current node
     return this;
 }
 
 void Mcts::printTree(int level) {
+    // print whole tree that is below this node
     if (level == 0) {
         std::cout << "current best " << this->getBestAction() << std::endl;
         std::cout << "action | ubc1_score | times_executed | value"
@@ -189,16 +171,17 @@ void Mcts::printTree(int level) {
     for (int i = 0; i < level; i++) {
         std::cout << " ";
     }
-    std::cout << this->action << " " << this->ucb1_score << " "
+    std::cout << this->action << " " << this->uct_score << " "
             << this->times_node_executed << " " << this->value << std::endl;
     level++;
     for (auto &child : this->childs) {
-        // std::cout << "ac" << child.getAction() << std::endl;
+        // run the printTree method with all child nodes
         child.printTree(level);
     }
 }
 
 void Mcts::backpropagateScore(float value) {
+    // backpropagate score through the tree
     if (this->times_node_executed == 0) {
         this->value = value;
         this->times_node_executed = 1;
@@ -215,6 +198,7 @@ void Mcts::backpropagateScore(float value) {
 }
 
 void Mcts::backpropagateScore_RL(float value) {
+    // backpropagate score but use a weighted summation
     if (this->times_node_executed == 0) {
         this->value = (1.0 - this->oldValuestrength) * value
                 + this->oldValuestrength * this->value;
@@ -230,6 +214,7 @@ void Mcts::backpropagateScore_RL(float value) {
 }
 
 int Mcts::getBestAction() {
+    // get the best action in the current state
     float bestValue = -99999.0;
     int bestAction = 0;
     for (auto &child : this->childs) {
@@ -242,35 +227,31 @@ int Mcts::getBestAction() {
 }
 
 std::vector<int> Mcts::getActionsPerformed() {
+    // returns a vector of the actions that were performed to end up in this node
     std::vector<int> actionsPerformed;
     actionsPerformed.clear();
     if (this->parent != nullptr) {
         actionsPerformed = this->parent->getActionsPerformed();
-    }
-    if (this->parent != nullptr) {
         actionsPerformed.push_back(this->action);
     }
     return actionsPerformed;
 }
 
 int Mcts::getAction() {
-    // std::cout << "testing Action" << std::endl;
-    // std::cout << "get Action" << this->action << std::endl;
+    // return the action that is represented by this node
     return this->action;
 }
 
 int Mcts::getLayer() {
-    // std::cout << "getlayer" << std::endl;
+    // calculate the layer of the tree that this node is on
     if (this->parent != nullptr) {
-        // std::cout << "1" << std::endl;
         return this->parent->getLayer() + 1;
     }
-    // std::cout << "getlayer top" << std::endl;
     return 0;
 }
 
 Mcts* Mcts::getRootNode() {
-    // get the root of the tree
+    // get the root node of the tree
     if (this->parent != nullptr) {
         return this->parent->getRootNode();
     }
@@ -278,21 +259,19 @@ Mcts* Mcts::getRootNode() {
 }
 
 Mcts* Mcts::getNodeforState(int layer) {
-    // std::cout << "layer " << layer << std::endl;
-    // myLayer
+    // find the node to a given layer
+    // retrieve the current layer
     int current_layer = this->getLayer();
-    // std::cout << " currentlayer " << current_layer << std::endl;
+    // test if it is this layer
     if (current_layer == layer) {
         return this;
     }
 
-    // is deeper
+    // maybe it is deeper
     if (current_layer < layer) {
-        // std::cout << "deeper " << std::endl;
-        // while currentlayer < layer
+        // use the monte carlo child method to find good nodes on the way down
         Mcts *layer_node = this;
         while (layer_node->getLayer() < layer) {
-            // std::cout << "> deeper " << std::endl;
             layer_node = layer_node->getMonteCarloChild();
         }
         return layer_node;

@@ -18,9 +18,9 @@ public:
         std::cout << "test";
     }
     int getAction(int state);
-    void setLearningRate(float value, bool greedy = false);
+    void setExplorationRate(float value, bool greedy = false);
     void setEpsilonDynamicIncrease();
-    void updateAllParameters(double alpha, double gamma, double epsilon, double epsilon_percentage, double min_epsilon, bool is_greedy, bool is_hotbooting);
+    void updateAllParameters(double alpha, double gamma, double epsilon, double epsilon_falloff, double min_epsilon, bool is_greedy, bool is_hotbooting);
 
 private:
     int random(int min, int max);
@@ -33,7 +33,7 @@ private:
     bool is_greedy = true; // use normal or a greedy random
     bool is_hotbooting = true;
     float min_epsilon = 0.01;
-    float epsilon_percentage = 0.9999;
+    float epsilon_falloff = 0.9999;
     float epsilon = 0.3; // Exploration Param
     float alpha = 0.1; // Weight old q-value
     float gamma = 0.1; // Weight new q-value
@@ -46,4 +46,4 @@ private:
 };
 
 
-#endif
+#endif /* QLearning_H */
