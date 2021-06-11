@@ -74,6 +74,9 @@ simple DSME extends MacProtocolBase like IMacProtocol
         // LQI 150 corresponds roughly to 20% PER
         int minBroadcastLQI = default(150);
         int minCoordinatorLQI = default(150);
+        
+        bool slottedCSMA = default(false);
+	bool batteryLifeExtension = default(false);
 
         @signal[unicastDataSentDown](type=cPacket);
         @signal[broadcastDataSentDown](type=cPacket);
@@ -83,10 +86,15 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @signal[corruptedFrameReceived](type=cPacket);
         @signal[uncorruptedFrameReceived](type=cPacket);
         @signal[GTSChange](type=long);
-        @signal[queueLength](type=long);
-        @signal[packetsTXPerSlot](type=long);
-        @signal[packetsRXPerSlot](type=long);
-        @signal[commandFrameDwellTime](type=long);
+        @signal[queueLength](type=unsigned long);
+        @signal[packetsTXPerSlot](type=unsigned long);
+        @signal[packetsRXPerSlot](type=unsigned long);
+        @signal[commandFrameDwellTime](type=unsigned long);
+        @signal[packetsPerCAP](type=unsigned long);
+        @signal[failedPacketsPerCAP](type=unsigned long);
+        @signal[failedCCAs](type=unsigned long);
+        @signal[prrCAP](type=double);
+	@signal[successPacketsCAP](type=unsigned long);
 
         @statistic[unicastDataSentDown](title="unicast packet sent down of type DATA"; source=unicastDataSentDown; record=count; interpolationmode=none);
         @statistic[broadDataSentDown](title="broadcast packet sent down of type DATA"; source=broadcastDataSentDown; record=count; interpolationmode=none);
@@ -97,6 +105,11 @@ simple DSME extends MacProtocolBase like IMacProtocol
         @statistic[packetsTXPerSlot](title="Length of the neighbor queue"; source=packetsTXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[packetsRXPerSlot](title="Length of the neighbor queue"; source=packetsRXPerSlot; record=min,mean,max,vector; interpolationmode=none);
         @statistic[commandFrameDwellTime](title="Dwell time for command frames"; source=commandFrameDwellTime; record=min,mean,max; interpolationmode=none);
+        @statistic[packetsPerCAP](title="Packets sent per CAP"; source=packetsPerCAP; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[failedCCAs](title="Failed CCA attempts per CAP"; source=failedCCAs; record=min,mean,max,vector; interpolationmode=none);
+        @statistic[prrCAP](title="Packet reception ration per CAP"; source=prrCAP; record=min,mean,max; interpolationmode=none);
+        @statistic[failedPacketsPerCAP](title="Failed packets per CAP"; source=failedPacketsPerCAP; record=min,mean,max; interpolationmode=none);
+	@statistic[successPacketsCAP](title="Successfully sent packets per CAP"; source=successPacketsCAP; record=min,mean,max; interpolationmode=none);
 
         @class(::dsme::DSMEPlatform);
 }
