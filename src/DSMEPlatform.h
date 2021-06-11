@@ -154,6 +154,16 @@ public:
 
     virtual void signalPacketsRXPerSlot(uint32_t packets) override;
 
+    virtual void signalPacketsPerCAP(uint32_t packets) override;
+
+    virtual void signalFailedPacketsPerCAP(uint32_t packets) override;
+
+    virtual void signalFailedCCAs(uint32_t failedAttempts) override;
+
+    virtual void signalPRRCAP(double prr) override;
+    
+    virtual void signalSuccessPacketsCAP(uint32_t packets) override;
+
 private:
     DSMEMessage* getLoadedMessage(inet::Packet*);
 
@@ -220,6 +230,11 @@ public:
     static omnetpp::simsignal_t packetsTXPerSlot;
     static omnetpp::simsignal_t packetsRXPerSlot;
     static omnetpp::simsignal_t commandFrameDwellTime;
+    static omnetpp::simsignal_t packetsPerCAP;
+    static omnetpp::simsignal_t failedCCAs;
+    static omnetpp::simsignal_t failedPacketsPerCAP;
+    static omnetpp::simsignal_t prrCAP;
+    static omnetpp::simsignal_t successPacketsCAP;
 
 public:
     IEEE802154MacAddress& getAddress() {
