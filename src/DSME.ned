@@ -50,6 +50,10 @@ simple DSME extends MacProtocolBase like IMacProtocol
         int scanDuration = default(6);
         int macPANId = default(10);
 
+		bool useSarsa = default(false);
+		double sarsaAlpha = default(0.5); 
+		double sarsaGamma = default(0.99);
+	
 
         // bit rate
         double bitrate @unit(bps) = default(250000 bps);

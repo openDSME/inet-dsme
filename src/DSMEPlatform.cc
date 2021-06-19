@@ -252,6 +252,7 @@ void DSMEPlatform::initialize(int stage) {
 
         this->dsmeAdaptionLayer.setIndicationCallback(DELEGATE(&DSMEPlatform::handleIndicationFromMCPS, *this));
         this->dsmeAdaptionLayer.setConfirmCallback(DELEGATE(&DSMEPlatform::handleConfirmFromMCPS, *this));
+        this->dsmeAdaptionLayer.getChannelAdaptor().setUseSarsa(par("useSarsa").boolValue());
 
         this->minBroadcastLQI = par("minBroadcastLQI");
         this->minCoordinatorLQI = par("minCoordinatorLQI");
