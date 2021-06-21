@@ -22,7 +22,7 @@
 #include "openDSME/dsmeAdaptionLayer/scheduling/StaticScheduling.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
 
-// coverity[+kill]
+// coverity[+kill]par"
 void _simulation_will_terminate(void) {
     /* This is only used during static code analysis to signal that the simulation will terminate. */
     return;
@@ -252,7 +252,6 @@ void DSMEPlatform::initialize(int stage) {
 
         this->dsmeAdaptionLayer.setIndicationCallback(DELEGATE(&DSMEPlatform::handleIndicationFromMCPS, *this));
         this->dsmeAdaptionLayer.setConfirmCallback(DELEGATE(&DSMEPlatform::handleConfirmFromMCPS, *this));
-        this->dsmeAdaptionLayer.getChannelAdaptor().setUseSarsa(par("useSarsa").boolValue());
 
         this->minBroadcastLQI = par("minBroadcastLQI");
         this->minCoordinatorLQI = par("minCoordinatorLQI");
@@ -260,6 +259,10 @@ void DSMEPlatform::initialize(int stage) {
         this->dsme->initialize(this);
 
         this->dsme->getMessageDispatcher().setSendMultiplePacketsPerGTS(par("sendMultiplePacketsPerGTS").boolValue());
+
+        this->dsmeAdaptionLayer.getChannelAdaptor().setUseSarsa(par("useSarsa").boolValue());
+        this->dsmeAdaptionLayer.getChannelAdaptor().setAlpha(par("sarsaAlpha").doubleValue());
+        this->dsmeAdaptionLayer.getChannelAdaptor().setGamma(par("sarsaGamma").doubleValue());
 
         // static schedules need to be initialized after dsmeLayer
         if(!strcmp(schedulingSelection, "STATIC")) {
