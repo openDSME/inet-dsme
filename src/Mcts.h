@@ -10,7 +10,7 @@
 class Mcts
 {
 private:
-    std::vector<Mcts> childs;
+    std::vector<Mcts*> childs;
     Mcts *parent;
     float uct_score = 0.0;
     float value = 0.0;
@@ -30,7 +30,7 @@ public:
     Mcts* currentBestNode(int total_num_runs);
     Mcts* getChild(int index);
     int getNumChilds();
-    Mcts* getMonteCarloChild();
+    Mcts* getMonteCarloChild(int total_num_runs);
     Mcts* getBestChild();
     void printTree(int level=0);
     void backpropagateScore(float value);
@@ -41,7 +41,11 @@ public:
     Mcts* getPointer();
     int getLayer();
     Mcts* getRootNode();
-    Mcts* getNodeforState(int layer);
+    Mcts* getNodeforState(int layer, int total_num_runs);
+    void deleteNotUsedNodes();
+    int checkChildsNonZero();
+    int addNewNode(int value, int action);
+    void pruneTree();
 };
 
 

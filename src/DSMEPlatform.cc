@@ -616,6 +616,8 @@ DSME_ASSERT(!pendingSendRequest);
             ReinforcementLearningClass->setSuperFrameState(
                     this->dsme->getCurrentSuperframe(), this->dsme->getCurrentSlot());
 
+            int power = ReinforcementLearningClass->getBestAction();
+
             // set the transmission power
             FlatRadioBase *r = check_and_cast<FlatRadioBase*>(this->radio);
             r->setPower(inet::units::values::mW(ReinforcementLearningClass->getPower()));

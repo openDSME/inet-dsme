@@ -22,23 +22,94 @@ Mcts::Mcts(float value, int action, Mcts *parent) {
 }
 
 Mcts::~Mcts() {
+    this->parent = nullptr;
+    this->value = 0.0;
+    this->times_node_executed = 0;
+    this->action = 0;
+    this->childs.clear();
+}
+
+// delete childs that only are 0
+void Mcts::deleteNotUsedNodes() {
+
+    if (this->childs.size() > 0) {
+
+        bool is_all_null = true;
+        for (int i = 0; i < this->childs.size(); i++) {
+
+            if (this->childs[i] != nullptr) {
+
+                // if child is null
+                if (this->childs[i]->childs.size() == 0) {
+
+                    // has no childs
+                    if (this->childs[i]->value <= 0.0) {
+                        // value of node is 0 than delete it
+
+                        delete this->childs[i];
+                        this->childs[i] = nullptr;
+                    }
+                } else {
+
+                    // has child nodes, check if all pointers are null (not a leaf node)
+                    bool allNull = true;
+                    for (int j = 0; j < this->childs[i]->childs.size(); j++) {
+                        if (this->childs[i]->childs[j] != nullptr) {
+                            allNull = false;
+                            is_all_null = false;
+                            break;
+                        }
+                    }
+                    if (allNull == true && this->childs[i]->value <= 0.0) {
+
+                        // child can be deleted, is leaf node
+                        delete this->childs[i];
+                        this->childs[i] = nullptr;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Mcts::pruneTree() {
+    // go to a leaf node
+    if (this->childs.size() > 0) {
+        // probably not a leaf node
+        for (int i = 0; i < this->childs.size(); i++) {
+            if (this->childs[i] != nullptr) {
+                // call child
+                this->childs[i]->pruneTree();
+            }
+        }
+    }
+    // check if it can be deleted do that with every node above
+
+    this->deleteNotUsedNodes();
+
 }
 
 float Mcts::uct(int total_num_runs) {
     // Upper Confidence Bound applied to trees
     float exploration_param = 2.0;
+
     if (this->times_node_executed != 0) {
+
         this->uct_score =
                 (this->value / ((float) this->times_node_executed))
                         + (exploration_param
                                 * std::sqrt(
                                         (std::log((float) total_num_runs)
                                                 / ((float) this->times_node_executed))));
+
     } else {
+
         if (Init_Mode::Normal == this->initMode) {
             this->uct_score = 99999.0;
         } else {
+
             this->uct_score = 0.0;
+
         }
     }
     return this->uct_score;
@@ -47,7 +118,7 @@ float Mcts::uct(int total_num_runs) {
 void Mcts::createChild(float value, int action) {
     // create a new child node
     Mcts *a = new Mcts(value, action, this);
-    this->childs.push_back(*a);
+    this->childs.push_back(a);
 }
 
 Mcts* Mcts::currentBestNode(int total_num_runs) {
@@ -55,12 +126,11 @@ Mcts* Mcts::currentBestNode(int total_num_runs) {
     if (this->childs.size() > 0) {
         Mcts *bestNode = this->getChild(0);
         float bestScore = 0.0;
-        for (std::vector<Mcts>::iterator child = this->childs.begin();
-                child != this->childs.end(); ++child) {
-            float child_score = child->uct(total_num_runs);
+        for (int i = 0; i < this->childs.size(); i++) {
+            float child_score = this->childs[i]->uct(total_num_runs);
             if (child_score > bestScore) {
                 bestScore = child_score;
-                bestNode = child->getPointer();
+                bestNode = this->childs[i];
             }
         }
         return bestNode->currentBestNode(total_num_runs);
@@ -71,7 +141,7 @@ Mcts* Mcts::currentBestNode(int total_num_runs) {
 
 Mcts* Mcts::getChild(int index) {
     // returns a pointer to the child node that has the action index
-    Mcts *child = &(this->childs[(index)]);
+    Mcts *child = (this->childs[(index)]);
     return child;
 }
 
@@ -81,12 +151,11 @@ Mcts* Mcts::getBestChild() {
     if (this->childs.size() > 0) {
         Mcts *bestNode = this->getChild(0);
         float bestScore = 0.0;
-        for (std::vector<Mcts>::iterator child = this->childs.begin();
-                child != this->childs.end(); ++child) {
-            float child_score = child->uct(total_num_runs);
+        for (int i = 0; i < this->childs.size(); i++) {
+            float child_score = this->childs[i]->uct(total_num_runs);
             if (child_score > bestScore) {
                 bestScore = child_score;
-                bestNode = child->getPointer();
+                bestNode = this->childs[i];
             }
         }
         return bestNode;
@@ -101,45 +170,106 @@ int Mcts::getNumChilds() {
     return this->childs.size();
 }
 
-Mcts* Mcts::getMonteCarloChild() {
+int Mcts::checkChildsNonZero() {
+    // give back the first child node that is nonzero
+    if (this->childs.size() != 0) {
+        for (int i = 0; i < this->childs.size(); i++) {
+            if (this->childs[i] != nullptr) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+int Mcts::addNewNode(int value, int action) {
+    if (action < this->childs.size()) {
+        Mcts *newNode = new Mcts(value, action, this);
+        this->childs[action] = newNode;
+    }
+    return 0;
+}
+
+Mcts* Mcts::getMonteCarloChild(int total_num_runs) {
     // return a child node or create child nodes if no exist
-    int total_num_runs = 1;
     if (this->childs.size() > 0) {
+        Mcts *drawnNode = nullptr;
         // there exist child nodes
-        Mcts *bestNode = this->getChild(0);
-        float bestScore = 0.0;
-        // select next randomly node, with a bias to the current best node
-        float sum_values = 0.0;
-        // sum up all scores
-        for (std::vector<Mcts>::iterator child = this->childs.begin();
-                child != this->childs.end(); ++child) {
-            float child_score = child->uct(total_num_runs);
-            if (child_score > 0.0) {
-                sum_values += child_score;
+        int child_Id = checkChildsNonZero();
+        if (child_Id > -1) {
+            // Mcts *bestNode = this->childs[child_Id];
+            float bestScore = 0.0;
+            // select next randomly node, with a bias to the current best node
+            float sum_values = 0.0;
+
+            // sum up all scores
+            for (int i = 0; i < this->childs.size(); i++) {
+                // check if child exists
+                if (this->childs[i] != nullptr) {
+                    // ToDo: iterator kann nicht verwendet werden
+
+                    float child_score = this->childs[i]->uct(total_num_runs);
+
+                    if (child_score > this->percent_take_lower_option) {
+                        sum_values += child_score;
+                    }
+                    if (child_score < this->percent_take_lower_option
+                            && child_score >= 0.0) {
+                        sum_values += this->percent_take_lower_option;
+                    }
+                } else {
+                    sum_values += this->percent_take_lower_option;
+                }
             }
-            if(child_score < this->percent_take_lower_option && child_score >= 0.0){
-                sum_values += this->percent_take_lower_option;
+
+            // calculate the probability for each
+            float number = omnetpp::uniform(this->randomNumGen, 0.0, 1.0);
+            float counter_score = 0.0;
+            drawnNode = this->childs[0];
+            // make a decision
+            for (int i = 0; i < this->childs.size(); i++) {
+                if (this->childs[i] != nullptr) {
+                    // if child exists test if value is below threshold
+                    if (this->childs[i]->uct_score
+                            <= this->percent_take_lower_option
+                            && this->childs[i]->uct_score >= 0.0) {
+                        counter_score += this->percent_take_lower_option
+                                / sum_values;
+                    } else {
+                        counter_score += this->childs[i]->uct_score
+                                / sum_values;
+                    }
+                    if (counter_score >= number) {
+                        // drawn node with weight
+                        drawnNode = this->childs[i];
+                        break;
+                    }
+                } else {
+                    // if node does not exist add the minimum amount
+                    counter_score += this->percent_take_lower_option
+                            / sum_values;
+                    if (counter_score >= number) {
+                        // drawn node with weight and create that node new
+
+                        this->addNewNode(0.0, i);
+                        drawnNode = this->childs[i];
+                        break;
+                    }
+                }
             }
+
+        } else {
+            // all childs are null
+            // create a child node for a random action
+
+            int number = omnetpp::intuniform(this->randomNumGen, 0,
+                    this->childs.size() - 1);
+
+            this->addNewNode(0.0, number);
+            drawnNode = this->childs[number];
+
         }
 
-        // calculate the probability for each
-        float number = omnetpp::uniform(this->randomNumGen, 0.0, 1.0);
-        float counter_score = 0.0;
-        Mcts *drawnNode = this->childs[0].getPointer();
-        // make a decision
-        for (std::vector<Mcts>::iterator child = this->childs.begin();
-                child != this->childs.end(); ++child) {
-            counter_score += child->value / sum_values;
-            if(child->value < this->percent_take_lower_option && child->value >= 0.0){
-                counter_score += this->percent_take_lower_option;
-            }
-            if (counter_score >= number) {
-                // drawn node with weight
-                drawnNode = child->getPointer();
-                child = this->childs.end();
-                break;
-            }
-        }
         return drawnNode;
     } else {
         // when no child nodes exist, create child nodes and choose one randomly
@@ -147,12 +277,17 @@ Mcts* Mcts::getMonteCarloChild() {
         for (int i = 0; i < numchilds; i++) {
             this->createChild(0.0, i);
         }
+
+        // delete not used
+        this->deleteNotUsedNodes();
         // select one randomly using the omnetpp random number generator
         int number = omnetpp::intuniform(this->randomNumGen, 0, numchilds - 1);
+        this->addNewNode(0.0, number);
         Mcts *childnode = this->getChild(number);
 
         return childnode;
     }
+
     return nullptr;
 }
 
@@ -174,9 +309,11 @@ void Mcts::printTree(int level) {
     std::cout << this->action << " " << this->uct_score << " "
             << this->times_node_executed << " " << this->value << std::endl;
     level++;
-    for (auto &child : this->childs) {
+    for (auto child : this->childs) {
         // run the printTree method with all child nodes
-        child.printTree(level);
+        if (child != nullptr) {
+            child->printTree(level);
+        }
     }
 }
 
@@ -187,7 +324,7 @@ void Mcts::backpropagateScore(float value) {
         this->times_node_executed = 1;
     } else {
         this->value += value;
-        if(this->value < 0.0){
+        if (this->value < 0.0) {
             this->value = 0.0;
         }
         this->times_node_executed++;
@@ -217,10 +354,12 @@ int Mcts::getBestAction() {
     // get the best action in the current state
     float bestValue = -99999.0;
     int bestAction = 0;
-    for (auto &child : this->childs) {
-        if (child.value > bestValue) {
-            bestValue = child.value;
-            bestAction = child.action;
+    for (auto child : this->childs) {
+        if (child != nullptr) {
+            if (child->value > bestValue) {
+                bestValue = child->value;
+                bestAction = child->action;
+            }
         }
     }
     return bestAction;
@@ -258,12 +397,15 @@ Mcts* Mcts::getRootNode() {
     return this;
 }
 
-Mcts* Mcts::getNodeforState(int layer) {
+Mcts* Mcts::getNodeforState(int layer, int total_num_runs) {
+
     // find the node to a given layer
     // retrieve the current layer
     int current_layer = this->getLayer();
+
     // test if it is this layer
     if (current_layer == layer) {
+
         return this;
     }
 
@@ -271,18 +413,24 @@ Mcts* Mcts::getNodeforState(int layer) {
     if (current_layer < layer) {
         // use the monte carlo child method to find good nodes on the way down
         Mcts *layer_node = this;
+
         while (layer_node->getLayer() < layer) {
-            layer_node = layer_node->getMonteCarloChild();
+
+            layer_node = layer_node->getMonteCarloChild(total_num_runs);
+
         }
+
         return layer_node;
     }
     // not so deep
     // start at the top again
     Mcts *root = this->getRootNode();
+
     for (int i = 0; i < layer; i++) {
         // work the way down the tree
-        root = root->getMonteCarloChild();
+        root = root->getMonteCarloChild(total_num_runs);
     }
+
     return root;
 }
 

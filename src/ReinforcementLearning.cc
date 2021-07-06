@@ -20,7 +20,6 @@
 #include "QLearning.h"
 #include "Mcts.h"
 
-
 ReinforcementLearning::ReinforcementLearning() {
     // logging of important characteristics
     this->logging_transmissionpower = new cOutVector("TransmissionPower");
@@ -40,7 +39,7 @@ float ReinforcementLearning::reward(int action, float prr_last) {
 float ReinforcementLearning::neg_reward(int action, float prr_last) {
     // Reward function for MCTS
     // can be negative
-    return (((this->actions - action) * 1.0) * (prr_last-0.3));
+    return (((this->actions - action) * 1.0) * (prr_last - 0.3));
 }
 
 void ReinforcementLearning::logPower(double power = 0.0) {
@@ -65,7 +64,7 @@ int ReinforcementLearning::prr_to_state(float prr_last) {
 
 void ReinforcementLearning::setSuperFrameState(int superframe, int slot) {
     // set the state depending on the slot of the Multi Superframe structure
-    if (this->state_transition == this->StateTransitions::SuperFrame){
+    if (this->state_transition == this->StateTransitions::SuperFrame) {
         this->state_next = superframe * this->slots + slot;
     }
 }
@@ -75,21 +74,21 @@ int ReinforcementLearning::getStateTransition() {
     return state_transition;
 }
 
-void ReinforcementLearning::setStateTransition(std::string transition){
+void ReinforcementLearning::setStateTransition(std::string transition) {
     // set the state transition, that should be used
-    if(transition == "SuperFrame"){
+    if (transition == "SuperFrame") {
         // depend on the Multi Superframe structure
         // needs an extra call in the DSMEPlatform
         this->state_transition = this->StateTransitions::SuperFrame;
     }
-    if(transition == "Packets"){
+    if (transition == "Packets") {
         // advance 1 state after each transmission
         this->state_transition = this->StateTransitions::Packets;
     }
-    if(transition == "Prr"){
+    if (transition == "Prr") {
         // switch depending on the PRR
         this->state_transition = this->StateTransitions::Prr;
-   }
+    }
 }
 
 double ReinforcementLearning::getPower() {
@@ -111,10 +110,16 @@ int ReinforcementLearning::getBestAction() {
 
     if (this->algo == Algos::MCts) {
         // best Action in current Layer
-        // this->action_next = this->MctsState->getBestAction();
-        Mcts *mctsnode = this->MctsState->getNodeforState(this->state_next);
-        Mcts *mctschildnode = mctsnode->getMonteCarloChild();
-        this->action_next  = mctschildnode->getAction();
+
+        this->MctsState = this->MctsClass->getNodeforState(this->state_next,
+                this->total_num_runs);
+
+        Mcts *mctschildnode = this->MctsState->getMonteCarloChild(
+                this->total_num_runs);
+
+        this->action_next = mctschildnode->getAction();
+        this->MctsState = mctschildnode;
+
     }
 
     this->logging_states->record(this->state_next);
@@ -131,7 +136,8 @@ int ReinforcementLearning::rewardAction(float prr_last, int datastatus) {
     if (this->algo == Algos::Qlearning) {
         // if prr is zero then try to reset the learning rate
         if (prr_last == 0.0) {
-            this->QLearningClass->setExplorationRate(this->epsilon_set_back, true);
+            this->QLearningClass->setExplorationRate(this->epsilon_set_back,
+                    true);
             // this->QLearningClass->setEpsilonDynamicIncrease(); -> is worse
         }
         // get reward for next round
@@ -145,13 +151,23 @@ int ReinforcementLearning::rewardAction(float prr_last, int datastatus) {
     }
     // if MCTS is used
     if (this->algo == Algos::MCts) {
+
         int maxTreeDepth = this->states;
+
         this->total_num_runs++;
+
         // get current best node n layers deep
-        Mcts *currentNode = this->MctsClass->getNodeforState(this->state_current);
+        Mcts *currentNode = this->MctsClass->getNodeforState(
+                this->state_current, this->total_num_runs);
+
         // update values
         // negative reward
-        currentNode->backpropagateScore(this->neg_reward(this->action_current, prr_last));
+        currentNode->backpropagateScore(
+                this->neg_reward(this->action_current, prr_last));
+
+        // clear not used nodes with pruning
+        MctsClass->pruneTree();
+
     }
     // old state = new state
     this->action_last = this->action_current;
@@ -199,9 +215,12 @@ void ReinforcementLearning::initQLearning(int states) {
     this->states = states;
     this->initQLearning();
 }
-void ReinforcementLearning::setupQLearning(double alpha, double gamma, double epsilon, double epsilon_falloff, double epsilon_set_back, double min_epsilon, bool is_greedy, bool is_hotbooting){
+void ReinforcementLearning::setupQLearning(double alpha, double gamma,
+        double epsilon, double epsilon_falloff, double epsilon_set_back,
+        double min_epsilon, bool is_greedy, bool is_hotbooting) {
     // set the initial values for the Q-Learning algorithm from the DSME.ned file
-    this->QLearningClass->updateAllParameters(alpha, gamma, epsilon, epsilon_falloff, min_epsilon, is_greedy, is_hotbooting);
+    this->QLearningClass->updateAllParameters(alpha, gamma, epsilon,
+            epsilon_falloff, min_epsilon, is_greedy, is_hotbooting);
     this->epsilon_set_back = epsilon_set_back;
 }
 
@@ -232,5 +251,4 @@ void ReinforcementLearning::setReinforcementLearningOption(int option) {
     // set the algorithm that should be used, is also done in the init methods for the algorithms
     this->ReinforementLearningOption = option;
 }
-
 
