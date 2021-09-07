@@ -21,6 +21,7 @@
 #include "openDSME/dsmeAdaptionLayer/scheduling/TPS.h"
 #include "openDSME/dsmeAdaptionLayer/scheduling/StaticScheduling.h"
 #include "openDSME/mac_services/pib/dsme_phy_constants.h"
+#include "openDSME/dsmeAdaptionLayer/scheduling/DAS.h"
 
 // coverity[+kill]
 void _simulation_will_terminate(void) {
@@ -181,6 +182,10 @@ void DSMEPlatform::initialize(int stage) {
         }
         else if(!strcmp(schedulingSelection, "STATIC")) {
             scheduling = new StaticScheduling(this->dsmeAdaptionLayer);
+        } else if(!strcmp(schedulingSelection, "DAS")) {
+            DAS *das = new DAS(this->dsmeAdaptionLayer);
+            das->setAlpha(par("DASalpha").doubleValue());
+            scheduling = das;
         }
         else {
             ASSERT(false);
