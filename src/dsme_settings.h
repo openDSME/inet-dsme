@@ -73,7 +73,7 @@ constexpr uint8_t MAX_SAB_UNITS = 1;
 constexpr uint16_t CAP_QUEUE_SIZE = 8;
 constexpr uint8_t TOTAL_GTS_QUEUE_SIZE = 30 - CAP_QUEUE_SIZE;
 constexpr uint16_t UPPER_LAYER_QUEUE_SIZE = 12;
-constexpr uint32_t MSG_POOL_SIZE = 100*(CAP_QUEUE_SIZE + 2 * TOTAL_GTS_QUEUE_SIZE + 2 * UPPER_LAYER_QUEUE_SIZE + 10);
+constexpr uint32_t MSG_POOL_SIZE = 300*(CAP_QUEUE_SIZE + 2 * TOTAL_GTS_QUEUE_SIZE + 2 * UPPER_LAYER_QUEUE_SIZE + 10);
 constexpr uint8_t ADDITIONAL_ACK_WAIT_DURATION = 0;
 
 constexpr uint8_t GACK_MAX_SIZE = 140;//658;//7*94 (maxPacketsSO=9)
