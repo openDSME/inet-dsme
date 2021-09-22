@@ -184,7 +184,6 @@ void DSMEPlatform::initialize(int stage) {
             scheduling = new StaticScheduling(this->dsmeAdaptionLayer);
         } else if(!strcmp(schedulingSelection, "DAS")) {
             DAS *das = new DAS(this->dsmeAdaptionLayer);
-            das->setAlpha(par("DASalpha").doubleValue());
             scheduling = das;
         }
         else {
